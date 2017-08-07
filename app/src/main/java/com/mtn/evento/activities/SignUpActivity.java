@@ -90,6 +90,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             onAuthSuccess(task.getResult().getUser());
                             Intent intent = new Intent();
                             intent.putExtra( LoginActivity.SIGNED_UP ,true);
+                            intent.putExtra( LoginActivity.USERNAME,mUsername.getText().toString());
+                            intent.putExtra( LoginActivity.EMAIL,mEmailField.getText().toString());
                             setResult(Activity.RESULT_OK,intent);
                             SignUpActivity.super.onBackPressed();
                         }

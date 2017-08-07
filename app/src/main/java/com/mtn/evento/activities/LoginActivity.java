@@ -33,6 +33,8 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String SIGNED_UP = "SIGNED_UP";
+    public static final String USERNAME ="USERNAME" ;
+    public static final String EMAIL ="EMAIL" ;
     Toolbar toolbar;
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;

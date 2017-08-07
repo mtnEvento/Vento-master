@@ -115,12 +115,18 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
             boolean loginedIn  = data.getBooleanExtra(LOGINED_IN,false);
             if(loginedIn){
+
+                nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
+                nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
                 Loginlogout.setIcon(R.drawable.ic_settings_power_black_24dp);
                 Loginlogout.setTitle("Logout");
             }
             else{
+                nav_username.setText("Username");
+                nav_email.setText("Email");
                 Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
                 Loginlogout.setTitle("Login");
+
             }
         }
     }
@@ -219,8 +225,13 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                       FirebaseAuth.getInstance().signOut();
                       Loginlogout.setTitle("Login");
                       Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
+                      nav_username.setText("Username");
+                      nav_email.setText("Email");
                 }
-                else{
+                else
+                {
+                    nav_username.setText("Username");
+                    nav_email.setText("Email");
                     Loginlogout.setTitle("Login");
                     Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
                 }
