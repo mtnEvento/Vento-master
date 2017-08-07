@@ -29,9 +29,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mtn.evento.R;
 import com.mtn.evento.adapters.CMPagerAdapter;
 import com.mtn.evento.data.Event;
@@ -42,13 +40,12 @@ import java.util.List;
 
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
-public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener, MaterialSearchBar.OnSearchActionListener {
+public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int LOGIN_REQUEST = 47;
     public static final String LOGINED_IN = "LOGINED_IN";
     SearchRequestListener searchRequestListener;
     SearchRegionRequestListener regionRequestListener;
-    private MaterialSearchBar searchBar;
     MenuItem Loginlogout;
     TextView nav_username, nav_email;
     DrawerLayout mDrawerLayout;
@@ -204,36 +201,8 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         return false;
     }
 
-    @Override
-    public boolean onMenuItemClick(MenuItem menuItem) {
-        return false;
-    }
 
 
-    @Override
-    public void onSearchStateChanged(boolean enabled) {
-        String s = enabled ? "enabled" : "disabled";
-        Toast.makeText(HomeScreenActivity.this, "Search " + s, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onSearchConfirmed(CharSequence text) {
-        startSearch(text.toString(), true, null, true);
-    }
-
-    @Override
-    public void onButtonClicked(int buttonCode) {
-        switch (buttonCode){
-            case MaterialSearchBar.BUTTON_NAVIGATION:
-                mDrawerLayout.openDrawer(Gravity.LEFT);
-                break;
-            case MaterialSearchBar.BUTTON_SPEECH:
-               break;
-        }
-    }
-
-//    --Region--
-//
 
 
 
