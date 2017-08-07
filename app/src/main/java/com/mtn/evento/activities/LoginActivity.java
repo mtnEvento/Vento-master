@@ -32,6 +32,7 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String SIGNED_UP = "SIGNED_UP";
     Toolbar toolbar;
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -40,6 +41,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText mUsername;
     private ImageView signUpIcon;
     private TextView signUpText;
+    private final int REQUEST_SIGNUP = 77;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,7 +168,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             signIn();
         }
         else if(i == R.id.signUpText){
-            startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            startActivityForResult(new Intent(LoginActivity.this, SignUpActivity.class),REQUEST_SIGNUP);
         }
         else if(i == R.id.signUpIcon){
             startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
@@ -196,5 +198,26 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_SIGNUP && resultCode== RESULT_OK){
+            boolean loginedIn  = data.getBooleanExtra(SIGNED_UP,false);
+            if(loginedIn){
+                Intent intent = new Intent();
+                intent.putExtra( HomeScreenActivity.LOGINED_IN ,true);
+                setResult(Activity.RESULT_OK,intent);
+                LoginActivity.this.onBackPressed();
+            }
+            else{
+
+                Intent intent = new Intent();
+                intent.putExtra( HomeScreenActivity.LOGINED_IN ,false);
+                setResult(Activity.RESULT_OK,intent);
+                LoginActivity.this.onBackPressed();
+            }
+        }
     }
 }

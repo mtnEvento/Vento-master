@@ -1,5 +1,6 @@
 package com.mtn.evento.activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -34,6 +35,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private EditText mEmailField ,mPasswordField;
     private Button mSignUpButton;
     private EditText mUsername;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,18 +86,27 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         processSignUp.hide();
 
                         if (task.isSuccessful()) {
+
                             onAuthSuccess(task.getResult().getUser());
+                            Intent intent = new Intent();
+                            intent.putExtra( LoginActivity.SIGNED_UP ,true);
+                            setResult(Activity.RESULT_OK,intent);
+                            SignUpActivity.super.onBackPressed();
                         }
                     }
                 })
                 .addOnFailureListener(SignUpActivity.this, new OnFailureListener() {
                      @Override
                      public void onFailure(@NonNull Exception e) {
-                         Toast.makeText(SignUpActivity.this, "Sign Up Failed :"+e.getLocalizedMessage(),
-                                 Toast.LENGTH_SHORT).show();
-                        if(e.getLocalizedMessage().contains("")){
-
-                        }
+//                         Toast.makeText(SignUpActivity.this, "Sign Up Failed :"+e.getLocalizedMessage(),
+//                                 Toast.LENGTH_SHORT).show();
+//                        if(e.getLocalizedMessage().contains("")){
+//
+//                        }
+                         Intent intent = new Intent();
+                         intent.putExtra( LoginActivity.SIGNED_UP ,false);
+                         setResult(Activity.RESULT_OK,intent);
+                         SignUpActivity.super.onBackPressed();
                      }
                 });
     }
@@ -105,10 +116,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         String username =  mUsername.getText().toString();
         // Write new user
         writeNewUser(user.getUid(), username, user.getEmail());
-
-        // Go to MainActivity
-        //startActivity(new Intent(SignUpActivity.this, ReservationActivity.class));
-        super.onBackPressed();
     }
 
     private String usernameFromEmail(String email) {

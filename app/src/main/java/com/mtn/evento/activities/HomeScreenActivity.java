@@ -204,8 +204,12 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                 if ( FirebaseAuth.getInstance().getCurrentUser() != null) {
                       FirebaseAuth.getInstance().signOut();
                       Loginlogout.setTitle("Login");
+                      Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
                 }
-
+                else{
+                    Loginlogout.setTitle("Login");
+                    Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
+                }
             }
             return true;
 
