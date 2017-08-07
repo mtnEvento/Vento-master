@@ -15,7 +15,7 @@
         <com.arlib.floatingsearchview.FloatingSearchView
             android:id="@+id/searchEdit"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             app:floatingSearch_searchHint="Search..."
             app:floatingSearch_suggestionsListAnimDuration="0"
             app:floatingSearch_showSearchKey="false"

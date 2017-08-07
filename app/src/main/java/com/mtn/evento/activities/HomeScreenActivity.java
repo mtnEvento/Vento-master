@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.MenuCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -13,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +39,8 @@ import com.mtn.evento.fragments.EventsFragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mtn.evento.data.Constants.LOGMESSAGE;
+
 public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private static final int LOGIN_REQUEST = 47;
@@ -55,7 +59,31 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         initUI();
 
+        searchEdit.inflateOverflowMenu(R.menu.main_menu);
+        List<MenuItemImpl> items =  searchEdit.getCurrentMenuItems();
 
+        MenuItemImpl item = items.get(0);
+
+        Spinner spinner = (Spinner) item.getActionView();
+
+        if(spinner.getId() == R.id.action_spinner){
+            Log.d(LOGMESSAGE, "spinner found: ");
+        }
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.regions, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        Log.d(LOGMESSAGE, "count: " + spinner.getCount());
+        spinner.setOnItemSelectedListener(spinnerItemSelected());
+
+        searchEdit.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @Override
+            public void onSearchTextChanged(String oldQuery, final String newQuery) {
+
+                searchRequestListener.onSearch(newQuery);
+            }
+        });
 
     }
 
@@ -134,30 +162,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
 
-        List<MenuItemImpl> items =  searchEdit.getCurrentMenuItems();
-
-        MenuItem menuItem = items.get(R.id.spinner);
-        Spinner spinner = (Spinner) MenuItemCompat.getActionView(menuItem);
-
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.regions, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(spinnerItemSelected());
-
-        searchEdit.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @Override
-            public void onSearchTextChanged(String oldQuery, final String newQuery) {
-
-                //get suggestions based on newQuery
-
-                //pass them on to the search view
-               // mSearchView.swapSuggestions(newSuggestions);
-                searchRequestListener.onSearch(newQuery);
-            }
-        });
         return true;
 
     }
