@@ -191,6 +191,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         int id = item.getItemId();
         switch (id){
             case R.id.action_login_logout:
+                Loginlogout = item;
             CharSequence action_text = item.getTitle();
             if(action_text.toString().contains("Login")){
 
