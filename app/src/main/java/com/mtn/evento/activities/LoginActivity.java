@@ -88,9 +88,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         processLogin.hide();
                         if (task.isSuccessful()) {
                             onAuthSuccess(task.getResult().getUser());
-                        } else {
-                           // Toast.makeText(LoginActivity.this, "Sign In Failed",
-                               //     Toast.LENGTH_SHORT).show();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -99,40 +96,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(LoginActivity.this, "Sign In Failed \n\n" +e.getLocalizedMessage(),
                         Toast.LENGTH_SHORT).show();
                 if (e.getLocalizedMessage().contains("There is no user record")){
-                    signUp();
+
                 }
             }
         });
     }
 
-    private void signUp() {
-        Log.d(LOGMESSAGE, "signUp");
-        if (!validateForm()) {
-            return;
-        }
-
-        //showProgressDialog();
-        final  ProgressDialog processSignUp =  ProgressDialog.show(this,"","Signing up and logging in....",true,false);
-        String email = mEmailField.getText().toString();
-        String password = mPasswordField.getText().toString();
-
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(LOGMESSAGE, "createUser:onComplete:" + task.isSuccessful());
-                     //   hideProgressDialog();
-                        processSignUp.hide();
-
-                        if (task.isSuccessful()) {
-                            onAuthSuccess(task.getResult().getUser());
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Sign Up Failed :"+task.getException(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
 
     private void onAuthSuccess(FirebaseUser user) {
         String username = usernameFromEmail(user.getEmail());
