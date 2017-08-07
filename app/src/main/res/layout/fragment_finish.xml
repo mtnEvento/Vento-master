@@ -1,0 +1,97 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/avatar"
+        android:layout_width="150sp"
+        android:layout_height="150sp"
+        android:src="@drawable/avatar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        />
+
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_below="@+id/avatar"
+        android:layout_margin="@dimen/margin_standard"
+        android:text="@string/success"
+        android:gravity="center_horizontal"
+        android:textColor="@color/darkBlue"
+        />
+    <TextView
+        android:id="@+id/submessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_below="@+id/welcome"
+        android:text="@string/sub_message"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/margin_standard"
+        />
+    <LinearLayout
+        android:id="@+id/details"
+        android:layout_width="220dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/submessage"
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/margin_standard"
+        android:layout_marginRight="@dimen/margin_standard"
+        android:background="@drawable/rectangle_with_border"
+        android:paddingBottom="15dp"
+        android:gravity="bottom"
+        android:layout_centerHorizontal="true"
+        >
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DANNY KAY"
+            android:textColor="@color/darkBlue"
+            android:gravity="center_horizontal"
+            android:typeface="sans"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            />
+        <TextView
+            android:id="@+id/phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tel : 0243667899"
+            android:gravity="center_horizontal"
+            />
+        <Button
+            android:id="@+id/plate"
+            android:layout_width="150dp"
+            android:layout_height="30dp"
+            android:background="@drawable/rectangle_yellow"
+            android:layout_gravity="center_horizontal"
+            android:text="Ref #"
+            android:textColor="@color/white"
+            />
+    </LinearLayout>
+    <Button
+        android:id="@+id/next"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/details"
+        android:layout_margin="@dimen/margin_standard"
+        android:background="@drawable/yellow_btn"
+        android:text="@string/finish"
+        android:textColor="@color/white"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/copy_right"
+        android:gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        />
+
+
+</RelativeLayout>

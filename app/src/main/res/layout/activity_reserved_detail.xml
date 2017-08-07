@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mtn.evento.activities.EventDetailActivity">
+
+    <include layout="@layout/toolbar"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/image_card"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                >
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/banner"
+                    android:scaleType="fitXY"
+                    />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/name_card"
+                android:layout_below="@+id/image_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
+
+                <ImageView
+                    android:id="@+id/event_name_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_event_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
+
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Event Name"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/event_date_card"
+                android:layout_below="@+id/name_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
+
+                <ImageView
+                    android:id="@+id/event_date_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_date_range_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Event Date"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/available_seat_card"
+                android:layout_below="@+id/event_date_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
+
+                <ImageView
+                    android:id="@+id/available_seat_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_business_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Venue"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/venue_card"
+                android:layout_below="@+id/available_seat_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
+
+                <ImageView
+                    android:id="@+id/venue_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_description_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Description"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </android.support.v7.widget.CardView>
+
+        </RelativeLayout>
+
+
+    </ScrollView>
+
+
+
+</RelativeLayout>

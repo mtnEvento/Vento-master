@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="regions">
+        <item>--Region--</item>
+        <item>Greater Accra</item>
+        <item>Ashanti</item>
+        <item>Brong Ahafo</item>
+        <item>Volta</item>
+        <item>Eastern</item>
+        <item>Central</item>
+        <item>Western</item>
+        <item>Northern</item>
+        <item>Upper West</item>
+        <item>Upper East</item>
+    </string-array>
+</resources>

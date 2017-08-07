@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/layout"
+   >
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/avatar"
+        android:layout_width="150sp"
+        android:layout_height="150sp"
+        android:src="@drawable/user"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/toolbar"
+        />
+
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/usernameCardView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/card_size"
+        android:padding="20dp"
+        android:layout_below="@+id/avatar"
+        android:layout_marginTop="@dimen/margin_standard"
+        >
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/username"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="@dimen/margin_standard"
+            />
+        <ImageView
+            android:id="@+id/editUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            app:srcCompat="@drawable/ic_edit_black_24dp"
+            android:layout_marginRight="@dimen/margin_standard"
+            android:tint="@color/lightBlue"
+            />
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/phoneCardView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/card_size"
+        android:padding="20dp"
+        android:layout_below="@+id/usernameCardView"
+        >
+
+        <TextView
+            android:id="@+id/phone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/phone"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="@dimen/margin_standard"
+            />
+        <ImageView
+            android:id="@+id/editPhone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            app:srcCompat="@drawable/ic_edit_black_24dp"
+            android:layout_marginRight="@dimen/margin_standard"
+            android:clickable="true"
+            android:tint="@color/lightBlue"
+            />
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/card_size"
+        android:layout_below="@+id/phoneCardView"
+        android:padding="20dp"
+        >
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/email"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="@dimen/margin_standard"
+            />
+
+
+    </android.support.v7.widget.CardView>
+
+
+
+</RelativeLayout>
+

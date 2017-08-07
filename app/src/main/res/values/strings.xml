@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Evento</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search">search ...</string>
+    <string name="event_title">Title</string>
+    <string name="event_venue">Venue</string>
+    <string name="reserve">Reserve Seat</string>
+    <string name="share">Share</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="login">Login Now</string>
+    <string name="total_seats">Number of Seats</string>
+    <string name="make_payment">Make Payment</string>
+    <string name="success">Success</string>
+    <string name="sub_message">You have successfully reserved a seat</string>
+    <string name="finish">Finish</string>
+    <string name="copy_right">Evento 2017</string>
+    <string name="phone">Phone Number</string>
+    <string name="sign_up">Register With Us</string>
+    <string name="signUpText">SignUp</string>
+</resources>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/layout">
+
+    <include layout="@layout/toolbar"/>
+
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/curved_white"
+        android:padding="@dimen/margin_standard"
+        android:layout_below="@+id/toolbar"
+        android:layout_margin="@dimen/margin_standard"
+        android:hint="Enter Value Here"
+        android:maxLines="1"
+        android:inputType="text"
+        android:nextFocusDown="@+id/updateBtn"
+        />
+
+    <Button
+        android:id="@+id/updateBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/yellow_btn"
+
+        android:text="Update"
+        android:textColor="@color/white"
+        android:layout_below="@+id/editText"
+
+        />
+
+</RelativeLayout>
