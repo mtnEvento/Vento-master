@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,6 +38,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText mEmailField ,mPasswordField;
     private Button mSignInButton;
     private EditText mUsername;
+    private ImageView signUpIcon;
+    private TextView signUpText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +57,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mEmailField = (EditText) findViewById(R.id.email);
         mPasswordField = (EditText) findViewById(R.id.password);
         mSignInButton = (Button) findViewById(R.id.loginBtn);
+        signUpIcon = (ImageView) findViewById(R.id.signUpIcon);
+        signUpText = (TextView) findViewById(R.id.signUpText);
 
         mSignInButton.setOnClickListener(this);
+        signUpText.setOnClickListener(this);
+        signUpIcon.setOnClickListener(this);
 
     }
 
@@ -156,6 +164,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         int i = v.getId();
         if (i == R.id.loginBtn) {
             signIn();
+        }
+        else if(i == R.id.signUpText){
+            startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+        }
+        else if(i == R.id.signUpIcon){
+            startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
         }
     }
 
