@@ -4,4 +4,5 @@
     <dimen name="button_radius">50dp</dimen>
     <dimen name="card_size">60dp</dimen>
     <dimen name="elevation_standard">5dp</dimen>
+    <dimen name="standard_height">35dp</dimen>
 </resources>
