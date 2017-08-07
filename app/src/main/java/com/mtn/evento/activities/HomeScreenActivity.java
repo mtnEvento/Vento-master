@@ -50,6 +50,8 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         searchEdit = (com.arlib.floatingsearchview.FloatingSearchView) findViewById(R.id.searchEdit);
         final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.mNavigationView);
+        navigationView.setNavigationItemSelectedListener(this);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Events"));
