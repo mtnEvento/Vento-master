@@ -21,7 +21,8 @@
             app:floatingSearch_showSearchKey="false"
             app:floatingSearch_leftActionMode="showHamburger"
             app:floatingSearch_menu="@menu/main_menu"
-            style="@style/searchStyle"
+            android:layout_margin="5dp"
+            style="@style/SearchView"
             app:floatingSearch_close_search_on_keyboard_dismiss="true"/>
 
 

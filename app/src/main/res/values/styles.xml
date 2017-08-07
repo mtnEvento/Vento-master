@@ -57,6 +57,15 @@
     <style name="searchStyle">
         <item name="android:background">@drawable/say_what_background</item>
     </style>
+    
+    <style name="SearchView">
+        <item name="floatingSearch_backgroundColor">
+            @color/colorBackground
+        </item>
+        <item name="floatingSearch_viewSearchInputTextColor">
+            @color/colorBackground
+        </item>
+    </style>
 
 
 </resources>

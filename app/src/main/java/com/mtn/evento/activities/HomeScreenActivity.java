@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
@@ -34,6 +35,7 @@ import com.mtn.evento.data.Event;
 import com.mtn.evento.fragments.EventsFragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -134,8 +136,10 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
-        MenuItem item = menu.findItem(R.id.action_spinner);
-        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+        List<MenuItemImpl> items =  searchEdit.getCurrentMenuItems();
+
+        MenuItem menuItem = items.get(R.id.spinner);
+        Spinner spinner = (Spinner) MenuItemCompat.getActionView(menuItem);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.regions, android.R.layout.simple_spinner_item);

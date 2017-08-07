@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
     tools:context="com.mtn.evento.activities.SplashScreenActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
