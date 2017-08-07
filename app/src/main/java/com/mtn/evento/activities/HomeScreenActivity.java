@@ -2,6 +2,7 @@ package com.mtn.evento.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -22,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
@@ -41,6 +43,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     SearchRegionRequestListener regionRequestListener;
     com.arlib.floatingsearchview.FloatingSearchView searchEdit;
     MenuItem Loginlogout;
+    TextView nav_username, nav_email;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +57,13 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         NavigationView navigationView = (NavigationView) findViewById(R.id.mNavigationView);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View headerView = navigationView.getHeaderView(0);
+        de.hdodenhof.circleimageview.CircleImageView imageView =  (de.hdodenhof.circleimageview.CircleImageView) headerView. findViewById(R.id.nav_user);
+
+        nav_username = (TextView) headerView. findViewById(R.id.nav_username);
+        nav_email = (TextView) headerView. findViewById(R.id.nav_email);
+
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Events"));

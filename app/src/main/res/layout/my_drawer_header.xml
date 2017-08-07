@@ -8,13 +8,14 @@
     >
 
     <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/nav_user"
         android:layout_width="100sp"
         android:layout_height="100sp"
         android:src="@drawable/user"
         android:layout_marginLeft="@dimen/margin_standard"
         />
     <TextView
-        android:id="@+id/username"
+        android:id="@+id/nav_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="?android:attr/textAppearanceLarge"
@@ -24,6 +25,7 @@
         />
 
     <TextView
+        android:id="@+id/nav_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="?android:attr/textAppearanceMedium"
