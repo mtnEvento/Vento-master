@@ -58,6 +58,14 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         initUI();
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+        }
+
+
     }
 
     public void initUI(){
@@ -110,21 +118,35 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 //        searchBar.inflateMenu(R.menu.main_menu);
 //        searchBar.getMenu().setOnMenuItemClickListener(this);
 //
-//        MenuItem item = searchBar.getMenu().getMenu().findItem(R.id.action_spinner);
-//        item.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
 //
-//        if(spinner.getId() == R.id.action_spinner){
-//            Log.d(LOGMESSAGE, "spinner found: ");
-//        }
-//
-//        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
-//                R.array.regions, android.R.layout.simple_spinner_item);
-//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinner.setAdapter(spinnerAdapter);
-//        Log.d(LOGMESSAGE, "count: " + spinner.getCount());
-//        spinner.setOnItemSelectedListener(spinnerItemSelected());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+
+        MenuItem item = menu.findItem(R.id.action_spinner);
+        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+
+
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.regions, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+        Log.d(LOGMESSAGE, "count: " + spinner.getCount());
+        spinner.setOnItemSelectedListener(spinnerItemSelected());
         // searchRequestListener.onSearch(newQuery);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(Gravity.START);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
