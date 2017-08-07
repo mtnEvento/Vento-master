@@ -55,7 +55,8 @@
     </style>
 
     <style name="searchStyle">
-        <item name="android:background">@drawable/say_what_background</item>
+        <item name="android:tint">@color/colorBackground</item>
+
     </style>
     
     <style name="SearchView">

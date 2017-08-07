@@ -3,7 +3,6 @@ package com.mtn.evento.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.MenuCompat;
@@ -13,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.menu.MenuItemImpl;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mtn.evento.R;
 import com.mtn.evento.adapters.CMPagerAdapter;
 import com.mtn.evento.data.Event;
@@ -41,15 +42,16 @@ import java.util.List;
 
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
-public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener, MaterialSearchBar.OnSearchActionListener {
 
     private static final int LOGIN_REQUEST = 47;
     public static final String LOGINED_IN = "LOGINED_IN";
     SearchRequestListener searchRequestListener;
     SearchRegionRequestListener regionRequestListener;
-    com.arlib.floatingsearchview.FloatingSearchView searchEdit;
+    private MaterialSearchBar searchBar;
     MenuItem Loginlogout;
     TextView nav_username, nav_email;
+    DrawerLayout mDrawerLayout;
     private de.hdodenhof.circleimageview.CircleImageView  imageView;
 
     @Override
@@ -59,38 +61,11 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         initUI();
 
-        searchEdit.inflateOverflowMenu(R.menu.main_menu);
-        List<MenuItemImpl> items =  searchEdit.getCurrentMenuItems();
-
-        MenuItemImpl item = items.get(0);
-
-        Spinner spinner = (Spinner) item.getActionView();
-
-        if(spinner.getId() == R.id.action_spinner){
-            Log.d(LOGMESSAGE, "spinner found: ");
-        }
-
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.regions, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        Log.d(LOGMESSAGE, "count: " + spinner.getCount());
-        spinner.setOnItemSelectedListener(spinnerItemSelected());
-
-        searchEdit.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @Override
-            public void onSearchTextChanged(String oldQuery, final String newQuery) {
-
-                searchRequestListener.onSearch(newQuery);
-            }
-        });
-
     }
 
     public void initUI(){
 
-        searchEdit = (com.arlib.floatingsearchview.FloatingSearchView) findViewById(R.id.searchEdit);
-        final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         NavigationView navigationView = (NavigationView) findViewById(R.id.mNavigationView);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -126,15 +101,33 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         });
         searchRequestListener = (SearchRequestListener) ((EventsFragment)adapter.getItem(0));
         regionRequestListener = (SearchRegionRequestListener) ((EventsFragment)adapter.getItem(0));
-        searchEdit.attachNavigationDrawerToMenuButton(mDrawerLayout);
 
-        searchEdit.setOnHomeActionClickListener(
-                new FloatingSearchView.OnHomeActionClickListener() {
-                    @Override
-                    public void onHomeClicked() {
-                        mDrawerLayout.closeDrawer(Gravity.START);
-                    }
-                });
+//        searchBar = (MaterialSearchBar) findViewById(R.id.searchBar);
+//        searchBar.setHint("Custom hint");
+//        searchBar.setSpeechMode(true);
+//        //enable searchbar callbacks
+//        searchBar.setOnSearchActionListener(this);
+//
+//
+//        //Inflate menu and setup OnMenuItemClickListener
+//        searchBar.inflateMenu(R.menu.main_menu);
+//        searchBar.getMenu().setOnMenuItemClickListener(this);
+//
+//        MenuItem item = searchBar.getMenu().getMenu().findItem(R.id.action_spinner);
+//        item.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+//
+//        if(spinner.getId() == R.id.action_spinner){
+//            Log.d(LOGMESSAGE, "spinner found: ");
+//        }
+//
+//        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
+//                R.array.regions, android.R.layout.simple_spinner_item);
+//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinner.setAdapter(spinnerAdapter);
+//        Log.d(LOGMESSAGE, "count: " + spinner.getCount());
+//        spinner.setOnItemSelectedListener(spinnerItemSelected());
+        // searchRequestListener.onSearch(newQuery);
     }
 
     @Override
@@ -160,45 +153,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        return true;
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_login_logout:
-                CharSequence action_text = item.getTitle();
-                if(action_text.toString().contains("Login")){
-
-                    if ( FirebaseAuth.getInstance().getCurrentUser() == null) {
-                         startActivity(new Intent(this, LoginActivity.class));
-
-                        item.setTitle("Logout");
-                    }else{
-                        startActivity(new Intent(this, LoginActivity.class));
-
-                        item.setTitle("Logout");
-                    }
-                }
-                else
-                if(action_text.toString().contains("Logout")){
-                    if ( FirebaseAuth.getInstance().getCurrentUser() != null) {
-                        FirebaseAuth.getInstance().signOut();
-                        item.setTitle("Login");
-                    }
-
-                }
-
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     public AdapterView.OnItemSelectedListener spinnerItemSelected(){
         final String [] regions = getResources().getStringArray(R.array.regions);
         return  new AdapterView.OnItemSelectedListener() {
@@ -215,7 +169,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+    public boolean onNavigationItemSelected( MenuItem item) {
         int id = item.getItemId();
         switch (id){
             case R.id.action_login_logout:
@@ -248,6 +202,34 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         }
         return false;
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem menuItem) {
+        return false;
+    }
+
+
+    @Override
+    public void onSearchStateChanged(boolean enabled) {
+        String s = enabled ? "enabled" : "disabled";
+        Toast.makeText(HomeScreenActivity.this, "Search " + s, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSearchConfirmed(CharSequence text) {
+        startSearch(text.toString(), true, null, true);
+    }
+
+    @Override
+    public void onButtonClicked(int buttonCode) {
+        switch (buttonCode){
+            case MaterialSearchBar.BUTTON_NAVIGATION:
+                mDrawerLayout.openDrawer(Gravity.LEFT);
+                break;
+            case MaterialSearchBar.BUTTON_SPEECH:
+               break;
+        }
     }
 
 //    --Region--
