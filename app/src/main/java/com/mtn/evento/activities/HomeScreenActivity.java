@@ -66,9 +66,11 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if(getSupportActionBar() != null){
-            getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeButtonEnabled(true);
+
+           // getSupportActionBar().setIcon(R.mipmap.ic_launcher_round);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+
         }
 
 
@@ -112,20 +114,11 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         });
         searchRequestListener = (SearchRequestListener) ((EventsFragment)adapter.getItem(0));
         regionRequestListener = (SearchRegionRequestListener) ((EventsFragment)adapter.getItem(0));
-        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel){
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-            }
-        };
+        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerToggle.setDrawerIndicatorEnabled(false);
+        mDrawerToggle.syncState();
+
+
 
     }
 
@@ -193,6 +186,16 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
             }
         };
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
