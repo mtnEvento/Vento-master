@@ -27,6 +27,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <android.support.v7.widget.SearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="40sp"
+                android:background="@drawable/curved_white"
+                android:queryHint="Search..."
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginRight="@dimen/margin_standard"
+                android:theme="@style/SearchViewStyle"
+                />
 
 
         </android.support.design.widget.CollapsingToolbarLayout>
