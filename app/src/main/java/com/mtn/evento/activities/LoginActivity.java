@@ -1,5 +1,6 @@
 package com.mtn.evento.activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -140,8 +141,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         writeNewUser(user.getUid(), username, user.getEmail());
 
         // Go to MainActivity
-        startActivity(new Intent(LoginActivity.this, ReservationActivity.class));
-        finish();
+        Intent intent = new Intent();
+        intent.putExtra( HomeScreenActivity.LOGINED_IN ,true);
+        setResult(Activity.RESULT_OK,intent);
+        super.onBackPressed();
     }
 
     private String usernameFromEmail(String email) {
@@ -197,4 +200,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    @Override
+    public void onBackPressed() {
+
+        if (mAuth.getCurrentUser() != null) {
+            onAuthSuccess(mAuth.getCurrentUser());
+        }else
+        {
+            Intent intent = new Intent();
+            intent.putExtra( HomeScreenActivity.LOGINED_IN ,false);
+            setResult(Activity.RESULT_OK,intent);
+        }
+
+        super.onBackPressed();
+    }
 }

@@ -35,10 +35,12 @@ import java.util.ArrayList;
 
 public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
+    private static final int LOGIN_REQUEST = 47;
+    public static final String LOGINED_IN = "LOGINED_IN";
     SearchRequestListener searchRequestListener;
     SearchRegionRequestListener regionRequestListener;
     com.arlib.floatingsearchview.FloatingSearchView searchEdit;
-    static MenuItem Loginlogout;
+    MenuItem Loginlogout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +92,23 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                     }
                 });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == LOGIN_REQUEST && resultCode == RESULT_OK){
+
+            boolean loginedIn  = data.getBooleanExtra(LOGINED_IN,false);
+            if(loginedIn){
+                Loginlogout.setIcon(R.drawable.ic_settings_power_black_24dp);
+                Loginlogout.setTitle("Logout");
+            }
+            else{
+                Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
+                Loginlogout.setTitle("Login");
+            }
+        }
     }
 
     @Override
@@ -176,20 +195,14 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             if(action_text.toString().contains("Login")){
 
                 if ( FirebaseAuth.getInstance().getCurrentUser() == null) {
-                    startActivity(new Intent(this, LoginActivity.class));
-
-                    item.setTitle("Logout");
-                }else{
-                    startActivity(new Intent(this, LoginActivity.class));
-
-                    item.setTitle("Logout");
+                     startActivityForResult(new Intent(this, LoginActivity.class),LOGIN_REQUEST);
                 }
             }
             else
             if(action_text.toString().contains("Logout")){
                 if ( FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    FirebaseAuth.getInstance().signOut();
-                    item.setTitle("Login");
+                      FirebaseAuth.getInstance().signOut();
+                      Loginlogout.setTitle("Login");
                 }
 
             }
@@ -212,29 +225,4 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         public ArrayList<Event> onRegionSearch(String query);
     }
 
-    public static void doAction(Context c, String action_text){
-
-        if(action_text.toString().contains("Login")){
-
-            if ( FirebaseAuth.getInstance().getCurrentUser() == null) {
-                c.startActivity(new Intent(c, LoginActivity.class));
-
-                Loginlogout.setTitle("Logout");
-            }else{
-                c.startActivity(new Intent(c, LoginActivity.class));
-                Loginlogout.setTitle("Logout");
-               // Loginlogout.setIcon()
-            }
-        }
-        else
-        if(action_text.toString().contains("Logout")){
-            if ( FirebaseAuth.getInstance().getCurrentUser() != null) {
-                FirebaseAuth.getInstance().signOut();
-                Loginlogout.setTitle("Login");
-               // Loginlogout.setIcon()
-            }
-
-        }
-
-    }
 }
