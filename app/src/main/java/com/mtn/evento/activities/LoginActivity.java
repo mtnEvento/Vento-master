@@ -124,6 +124,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Go to MainActivity
         Intent intent = new Intent();
         intent.putExtra( HomeScreenActivity.LOGINED_IN ,true);
+        intent.putExtra(LoginActivity.EMAIL,user.getEmail());
+        intent.putExtra(LoginActivity.USERNAME,username);
         setResult(Activity.RESULT_OK,intent);
         super.onBackPressed();
     }
@@ -173,7 +175,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startActivityForResult(new Intent(LoginActivity.this, SignUpActivity.class),REQUEST_SIGNUP);
         }
         else if(i == R.id.signUpIcon){
-            startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+            startActivityForResult(new Intent(LoginActivity.this, SignUpActivity.class),REQUEST_SIGNUP);
         }
     }
 
@@ -210,6 +212,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             if(loginedIn){
                 Intent intent = new Intent();
                 intent.putExtra( HomeScreenActivity.LOGINED_IN ,true);
+                intent.putExtra(LoginActivity.EMAIL,data.getStringExtra(LoginActivity.EMAIL));
+                intent.putExtra(LoginActivity.USERNAME,data.getStringExtra(LoginActivity.USERNAME));
                 setResult(Activity.RESULT_OK,intent);
                 LoginActivity.this.onBackPressed();
             }
