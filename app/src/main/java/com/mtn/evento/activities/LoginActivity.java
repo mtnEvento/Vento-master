@@ -3,7 +3,6 @@ package com.mtn.evento.activities;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -94,7 +93,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    public void onComplete( Task<AuthResult> task) {
                         Log.d(LOGMESSAGE, "signIn:onComplete:" + task.isSuccessful());
                        // hideProgressDialog();
                         processLogin.hide();
@@ -104,7 +103,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onFailure( Exception e) {
                 Toast.makeText(LoginActivity.this, "Sign In Failed \n\n" +e.getLocalizedMessage(),
                         Toast.LENGTH_SHORT).show();
                 if (e.getLocalizedMessage().contains("There is no user record")){

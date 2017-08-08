@@ -9,10 +9,10 @@
         android:icon="@drawable/ic_arrow_drop_down_black_24dp"
         android:background="@color/colorPrimary"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/action_login_logout"
-        android:orderInCategory="100"
-        android:title="Login"
-        app:showAsAction="never" />
+    <!--<item-->
+        <!--android:id="@+id/action_login_logout"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="Login"-->
+        <!--app:showAsAction="never" />-->
 
 </menu>

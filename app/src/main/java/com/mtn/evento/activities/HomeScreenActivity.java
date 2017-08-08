@@ -60,20 +60,17 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-
-        initUI();
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if(getSupportActionBar() != null){
 
-           // getSupportActionBar().setIcon(R.mipmap.ic_launcher_round);
+            // getSupportActionBar().setIcon(R.mipmap.ic_launcher_round);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
         }
 
-
+        initUI();
     }
 
     public void initUI(){
@@ -114,9 +111,9 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         });
         searchRequestListener = (SearchRequestListener) ((EventsFragment)adapter.getItem(0));
         regionRequestListener = (SearchRegionRequestListener) ((EventsFragment)adapter.getItem(0));
-        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
+      //  mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel);
+     //   mDrawerLayout.setDrawerListener(mDrawerToggle);
+      //  mDrawerToggle.syncState();
 
 
 
@@ -204,30 +201,33 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         switch (id){
             case R.id.action_login_logout:
                 Loginlogout = item;
-            CharSequence action_text = item.getTitle();
-            if(action_text.toString().contains("Login")){
+                CharSequence action_text = item.getTitle();
+                if(action_text.toString().contains("Login")){
 
-                if ( FirebaseAuth.getInstance().getCurrentUser() == null) {
-                     startActivityForResult(new Intent(this, LoginActivity.class),LOGIN_REQUEST);
-                }
-            }
-            else
-            if(action_text.toString().contains("Logout")){
-                if ( FirebaseAuth.getInstance().getCurrentUser() != null) {
-                      FirebaseAuth.getInstance().signOut();
-                      Loginlogout.setTitle("Login");
-                      Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-                      nav_username.setText("Username");
-                      nav_email.setText("Email");
+                    if ( FirebaseAuth.getInstance().getCurrentUser() == null) {
+                         startActivityForResult(new Intent(this, LoginActivity.class),LOGIN_REQUEST);
+                    }
+                    else{
+                        startActivityForResult(new Intent(this, LoginActivity.class),LOGIN_REQUEST);
+                    }
                 }
                 else
-                {
-                    nav_username.setText("Username");
-                    nav_email.setText("Email");
-                    Loginlogout.setTitle("Login");
-                    Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
+                if(action_text.toString().contains("Logout")){
+                    if ( FirebaseAuth.getInstance().getCurrentUser() != null) {
+                          FirebaseAuth.getInstance().signOut();
+                          Loginlogout.setTitle("Login");
+                          Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
+                          nav_username.setText("Username");
+                          nav_email.setText("Email");
+                    }
+                    else
+                    {
+                        nav_username.setText("Username");
+                        nav_email.setText("Email");
+                        Loginlogout.setTitle("Login");
+                        Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
+                    }
                 }
-            }
             return true;
 
         }

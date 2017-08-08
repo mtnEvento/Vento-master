@@ -3,7 +3,6 @@ package com.mtn.evento.activities;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -35,6 +36,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private EditText mEmailField ,mPasswordField;
     private Button mSignUpButton;
     private EditText mUsername;
+    private ImageView signInIcon;
+    private TextView signInText;
+    private boolean signUpTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +56,13 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         mPasswordField = (EditText) findViewById(R.id.password);
         mSignUpButton = (Button) findViewById(R.id.signUpBtn);
 
+        signInIcon = (ImageView) findViewById(R.id.signInIcon);
+        signInText = (TextView) findViewById(R.id.loginText);
+
         mSignUpButton.setOnClickListener(this);
 
+        signInText.setOnClickListener(this);
+        signInIcon.setOnClickListener(this);
     }
 
     @Override
@@ -80,11 +89,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    public void onComplete( Task<AuthResult> task) {
                         Log.d(LOGMESSAGE, "createUser:onComplete:" + task.isSuccessful());
-                        //   hideProgressDialog();
                         processSignUp.hide();
-
                         if (task.isSuccessful()) {
 
                             onAuthSuccess(task.getResult().getUser());
@@ -93,22 +100,17 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             intent.putExtra( LoginActivity.USERNAME,mUsername.getText().toString());
                             intent.putExtra( LoginActivity.EMAIL,mEmailField.getText().toString());
                             setResult(Activity.RESULT_OK,intent);
+                            signUpTracker = true ;
                             SignUpActivity.super.onBackPressed();
                         }
                     }
                 })
                 .addOnFailureListener(SignUpActivity.this, new OnFailureListener() {
                      @Override
-                     public void onFailure(@NonNull Exception e) {
-//                         Toast.makeText(SignUpActivity.this, "Sign Up Failed :"+e.getLocalizedMessage(),
-//                                 Toast.LENGTH_SHORT).show();
-//                        if(e.getLocalizedMessage().contains("")){
-//
-//                        }
-                         Intent intent = new Intent();
-                         intent.putExtra( LoginActivity.SIGNED_UP ,false);
-                         setResult(Activity.RESULT_OK,intent);
-                         SignUpActivity.super.onBackPressed();
+                     public void onFailure( Exception e) {
+
+                         signUpTracker = false ;
+                         Toast.makeText(SignUpActivity.this,e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
                      }
                 });
     }
@@ -168,6 +170,14 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         if (i == R.id.signUpBtn) {
             signUp();
         }
+        else  if (i == R.id.signInIcon) {
+            SignUpActivity.super.onBackPressed();
+           // startActivity(new Intent(SignUpActivity.this, SignUpActivity.class));
+        }
+        else  if (i == R.id.loginText) {
+           // startActivity(new Intent(SignUpActivity.this, SignUpActivity.class));
+            SignUpActivity.super.onBackPressed();
+        }
     }
 
     @Override
@@ -178,5 +188,18 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         if (mAuth.getCurrentUser() != null) {
             onAuthSuccess(mAuth.getCurrentUser());
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if(!signUpTracker){
+            Intent intent = new Intent();
+            intent.putExtra( LoginActivity.SIGNED_UP ,false);
+            setResult(Activity.RESULT_OK,intent);
+            SignUpActivity.super.onBackPressed();
+        }
+
+
     }
 }
