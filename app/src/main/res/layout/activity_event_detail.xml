@@ -1,200 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mtn.evento.activities.EventDetailActivity">
+    android:fitsSystemWindows="true">
 
-    <include layout="@layout/toolbar"/>
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:fitsSystemWindows="true">
 
-    <ScrollView
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginStart="48dp"
+            app:expandedTitleMarginEnd="64dp"
+            android:fitsSystemWindows="true">
+
+            <ImageView
+                android:id="@+id/event_banner"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:scaleType="centerCrop"
+                android:fitsSystemWindows="true"
+                android:src="@drawable/banner"
+                app:layout_collapseMode="parallax"/>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:layout_collapseMode="pin" />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar"
-        >
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-   <RelativeLayout
-       android:layout_width="match_parent"
-       android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-       <android.support.v7.widget.CardView
-           android:id="@+id/image_card"
-           android:layout_width="match_parent"
-           android:layout_height="350dp"
-           >
+            <android.support.v7.widget.CardView
+                android:id="@+id/name_card"
+                android:layout_below="@+id/image_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
 
-           <ImageView
-               android:id="@+id/event_banner"
-               android:layout_width="match_parent"
-               android:layout_height="match_parent"
-               android:src="@drawable/banner"
-               android:scaleType="fitXY"
-               />
+                <ImageView
+                    android:id="@+id/event_name_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_event_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
 
-       </android.support.v7.widget.CardView>
+                    />
+                <TextView
+                    android:id="@+id/evt_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Event Name"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    />
 
-       <android.support.v7.widget.CardView
-           android:id="@+id/name_card"
-           android:layout_below="@+id/image_card"
-           android:layout_width="match_parent"
-           android:layout_height="80dp">
+            </android.support.v7.widget.CardView>
 
-           <ImageView
-               android:id="@+id/event_name_icon"
-               android:layout_width="30dp"
-               android:layout_height="30dp"
-               app:srcCompat="@drawable/ic_event_black_24dp"
-               android:layout_gravity="center_vertical|right"
-               android:layout_margin="@dimen/margin_standard"
+            <android.support.v7.widget.CardView
+                android:id="@+id/event_date_card"
+                android:layout_below="@+id/name_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
 
-               />
-           <TextView
-               android:id="@+id/evt_name"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center_vertical"
-               android:text="Event Name"
-               android:textAppearance="?android:attr/textAppearanceMedium"
-               android:layout_marginLeft="@dimen/margin_standard"
-               />
+                <ImageView
+                    android:id="@+id/event_date_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_date_range_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
+                    />
+                <TextView
+                    android:id="@+id/evt_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Event Date"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </android.support.v7.widget.CardView>
 
-       </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:id="@+id/available_seat_card"
+                android:layout_below="@+id/event_date_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
 
-       <android.support.v7.widget.CardView
-           android:id="@+id/event_date_card"
-           android:layout_below="@+id/name_card"
-           android:layout_width="match_parent"
-           android:layout_height="80dp">
+                <ImageView
+                    android:id="@+id/available_seat_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_event_seat_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
+                    />
+                <TextView
+                    android:id="@+id/evt_available_seat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Available Seats"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </android.support.v7.widget.CardView>
 
-           <ImageView
-               android:id="@+id/event_date_icon"
-               android:layout_width="30dp"
-               android:layout_height="30dp"
-               app:srcCompat="@drawable/ic_date_range_black_24dp"
-               android:layout_gravity="center_vertical|right"
-               android:layout_margin="@dimen/margin_standard"
-               />
-           <TextView
-               android:id="@+id/evt_date"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center_vertical"
-               android:text="Event Date"
-               android:layout_marginLeft="@dimen/margin_standard"
-               android:textAppearance="?android:attr/textAppearanceMedium"
-               />
-       </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:id="@+id/venue_card"
+                android:layout_below="@+id/available_seat_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
 
-       <android.support.v7.widget.CardView
-           android:id="@+id/available_seat_card"
-           android:layout_below="@+id/event_date_card"
-           android:layout_width="match_parent"
-           android:layout_height="80dp">
+                <ImageView
+                    android:id="@+id/venue_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_business_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
+                    />
+                <TextView
+                    android:id="@+id/evt_venue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Venue"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </android.support.v7.widget.CardView>
 
-           <ImageView
-               android:id="@+id/available_seat_icon"
-               android:layout_width="30dp"
-               android:layout_height="30dp"
-               app:srcCompat="@drawable/ic_event_seat_black_24dp"
-               android:layout_gravity="center_vertical|right"
-               android:layout_margin="@dimen/margin_standard"
-               />
-           <TextView
-               android:id="@+id/evt_available_seat"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center_vertical"
-               android:text="Available Seats"
-               android:layout_marginLeft="@dimen/margin_standard"
-               android:textAppearance="?android:attr/textAppearanceMedium"
-               />
-       </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:id="@+id/region_card"
+                android:layout_below="@+id/venue_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
 
-       <android.support.v7.widget.CardView
-           android:id="@+id/venue_card"
-           android:layout_below="@+id/available_seat_card"
-           android:layout_width="match_parent"
-           android:layout_height="80dp">
+                <ImageView
+                    android:id="@+id/region_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_casino_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
+                    />
+                <TextView
+                    android:id="@+id/evt_region"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Region"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </android.support.v7.widget.CardView>
 
-           <ImageView
-               android:id="@+id/venue_icon"
-               android:layout_width="30dp"
-               android:layout_height="30dp"
-               app:srcCompat="@drawable/ic_business_black_24dp"
-               android:layout_gravity="center_vertical|right"
-               android:layout_margin="@dimen/margin_standard"
-               />
-           <TextView
-               android:id="@+id/evt_venue"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center_vertical"
-               android:text="Venue"
-               android:layout_marginLeft="@dimen/margin_standard"
-               android:textAppearance="?android:attr/textAppearanceMedium"
-               />
-       </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:id="@+id/description_card"
+                android:layout_below="@+id/region_card"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
 
-       <android.support.v7.widget.CardView
-           android:id="@+id/region_card"
-           android:layout_below="@+id/venue_card"
-           android:layout_width="match_parent"
-           android:layout_height="80dp">
-
-           <ImageView
-               android:id="@+id/region_icon"
-               android:layout_width="30dp"
-               android:layout_height="30dp"
-               app:srcCompat="@drawable/ic_casino_black_24dp"
-               android:layout_gravity="center_vertical|right"
-               android:layout_margin="@dimen/margin_standard"
-               />
-           <TextView
-               android:id="@+id/evt_region"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center_vertical"
-               android:text="Region"
-               android:layout_marginLeft="@dimen/margin_standard"
-               android:textAppearance="?android:attr/textAppearanceMedium"
-               />
-       </android.support.v7.widget.CardView>
-
-       <android.support.v7.widget.CardView
-           android:id="@+id/description_card"
-           android:layout_below="@+id/region_card"
-           android:layout_width="match_parent"
-           android:layout_height="80dp">
-
-           <ImageView
-               android:id="@+id/description_icon"
-               android:layout_width="30dp"
-               android:layout_height="30dp"
-               app:srcCompat="@drawable/ic_description_black_24dp"
-               android:layout_gravity="center_vertical|right"
-               android:layout_margin="@dimen/margin_standard"
-               />
-           <TextView
-               android:id="@+id/evt_description"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center_vertical"
-               android:text="Description"
-               android:layout_marginLeft="@dimen/margin_standard"
-               android:textAppearance="?android:attr/textAppearanceMedium"
-               />
-       </android.support.v7.widget.CardView>
+                <ImageView
+                    android:id="@+id/description_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    app:srcCompat="@drawable/ic_description_black_24dp"
+                    android:layout_gravity="center_vertical|right"
+                    android:layout_margin="@dimen/margin_standard"
+                    />
+                <TextView
+                    android:id="@+id/evt_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Description"
+                    android:layout_marginLeft="@dimen/margin_standard"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </android.support.v7.widget.CardView>
 
 
+        </RelativeLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
 
-
-   </RelativeLayout>
-
-
-    </ScrollView>
-
-
-
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>
