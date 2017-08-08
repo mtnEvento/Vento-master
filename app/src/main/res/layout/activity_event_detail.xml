@@ -59,6 +59,9 @@
                 android:id="@+id/name_card"
                 android:layout_below="@+id/image_card"
                 android:layout_width="match_parent"
+                app:cardElevation="@dimen/margin_standard"
+                android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -86,6 +89,9 @@
                 android:id="@+id/event_date_card"
                 android:layout_below="@+id/name_card"
                 android:layout_width="match_parent"
+                app:cardElevation="@dimen/margin_standard"
+                android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -111,6 +117,9 @@
                 android:id="@+id/available_seat_card"
                 android:layout_below="@+id/event_date_card"
                 android:layout_width="match_parent"
+                app:cardElevation="@dimen/margin_standard"
+                android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -136,6 +145,9 @@
                 android:id="@+id/venue_card"
                 android:layout_below="@+id/available_seat_card"
                 android:layout_width="match_parent"
+                app:cardElevation="@dimen/margin_standard"
+                android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -161,6 +173,9 @@
                 android:id="@+id/region_card"
                 android:layout_below="@+id/venue_card"
                 android:layout_width="match_parent"
+                app:cardElevation="@dimen/margin_standard"
+                android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -186,6 +201,9 @@
                 android:id="@+id/description_card"
                 android:layout_below="@+id/region_card"
                 android:layout_width="match_parent"
+                app:cardElevation="@dimen/margin_standard"
+                android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
