@@ -33,10 +33,11 @@ public class ReservedDetailActivity extends AppCompatActivity {
         Event event = (Event) serz;
         mEvent =  event ;
         //TODO: change the current url to the event banner url
-        Glide.with(this)
+        /*  Glide.with(this)
                 .load(event.getBanner())
                 .asBitmap()
-                .into(( (ImageView)findViewById(R.id.event_banner))) ;
+                .into(( (ImageView)findViewById(R.id.event_banner))) ;*/
+        ((ImageView) findViewById(R.id.event_banner)).setImageBitmap(event.getBitmap());
         ( (TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
         ( (TextView)findViewById(R.id.evt_venue)).setText(event.getVenue());
