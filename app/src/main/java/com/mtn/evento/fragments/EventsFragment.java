@@ -69,6 +69,8 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
 
                 Log.d(LOGMESSAGE, "onDataChange: Events " + events);
 
+                Log.d(LOGMESSAGE, "onDataChange: Event Title " + events.get(0).getTitle());
+
                 eventAdapter.setEvents(events);
                 eventRecycler.setAdapter(eventAdapter);
 

@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.mtn.evento.R;
 import com.mtn.evento.activities.EventDetailActivity;
+import com.mtn.evento.activities.ReservedDetailActivity;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
 
@@ -31,7 +32,7 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
 
     }
 
-    public void setReservedEventsEvents(ArrayList<Event> reservedEvents) {
+    public void setReservedEvents(ArrayList<Event> reservedEvents) {
         this.reservedEvents = reservedEvents;
     }
     @Override
@@ -79,10 +80,9 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
 
         @Override
         public void onClick(View v) {
-            //TODO: change EventDetailActivity.class to the class that displays the Reserved Events
             //TODO get Bundle At event detail page and set it's values events.get(getAdapterPosition())
             Event event = (Event) v.getTag();
-            Intent intent = new Intent(context, EventDetailActivity.class);
+            Intent intent = new Intent(context, ReservedDetailActivity.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable(Constants.EVENT,event);
             intent.putExtra(Constants.BUNDLE,bundle);
