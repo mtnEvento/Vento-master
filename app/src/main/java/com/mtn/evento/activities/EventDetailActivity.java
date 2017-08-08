@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
@@ -34,7 +35,12 @@ public class EventDetailActivity extends AppCompatActivity {
         Serializable serz =   ser.getSerializable(Constants.EVENT);
         Event event = (Event) serz;
 
-        ( (ImageView)findViewById(R.id.event_banner))
+
+
+        Glide.with(getParent())
+                .load("http://via.placeholder.com/300.png")
+                .asBitmap()
+                .into(( (ImageView)findViewById(R.id.event_banner))) ;    
         ( (TextView)findViewById(R.id.evt_name)).setText(event.getEvent_name());
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
         ( (TextView)findViewById(R.id.evt_available_seat)).setText("");
