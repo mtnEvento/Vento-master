@@ -21,6 +21,7 @@
             android:windowSoftInputMode="stateHidden"
             />
         <activity android:name=".activities.EventDetailActivity" />
+        <activity android:name=".activities.EditorActivity" />
         <activity android:name=".activities.ReservationActivity" />
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.ReservedDetailActivity" />
