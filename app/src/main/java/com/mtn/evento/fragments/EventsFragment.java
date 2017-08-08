@@ -1,6 +1,7 @@
 package com.mtn.evento.fragments;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -56,40 +57,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        eventsRef.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                Event evt = dataSnapshot.getValue(Event.class);
-//                events.add(evt);
-//              //  eventRecycler.invalidate();
-//
-//                Log.d(LOGMESSAGE, "onChildAdded: eventRecycler : " + eventRecycler);
-//            }
-//
-//
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                Event evt = dataSnapshot.getValue(Event.class);
-//                events.remove(evt);
-//               // eventRecycler.invalidate();
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
+        final ProgressDialog processSignUp =  ProgressDialog.show(view.getContext(),null,"Signing up and logging in....",true,false);
         eventsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -105,7 +73,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                 eventAdapter.setEvents(events);
                 eventRecycler.setAdapter(eventAdapter);
 
-                //   Toast.makeText(getActivity(),"Data |:\n "+dataSnapshot, Toast.LENGTH_LONG).show();
+                processSignUp.hide();
             }
 
             @Override
@@ -136,17 +104,40 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     @Override
     public ArrayList<Event> onSearch(String query) {
 
-      //  Toast.makeText(getActivity(),"onSearch query : "+query, Toast.LENGTH_LONG).show();
+        Log.d(LOGMESSAGE,"onSearch query : "+query);
+
+        Log.d(LOGMESSAGE, "onSearch: Events " + events);
+
+        if(!query.isEmpty()){
+
+                ArrayList<Event> filteredEvents = new ArrayList<>();
+                for (Event e: events ) {
+                    if(e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
+                        filteredEvents.add(e);
+                    }
+                }
+                eventAdapter.setEvents(filteredEvents);
+                eventRecycler.setAdapter(eventAdapter);
+        }
+        else
+        {
+              if(events != null && !events.isEmpty() )
+              {
+                    eventAdapter.setEvents(events);
+                    eventRecycler.setAdapter(eventAdapter);
+                    Log.d(LOGMESSAGE, "onSearch: Events " + events);
+                    Log.d(LOGMESSAGE, "onSearch: Events Obj title" + events.get(0));
+              }
+        }
 
 
-    return null;
+        return null;
     }
 
     @Override
     public ArrayList<Event> onRegionSearch(String query) {
 
         Log.d(LOGMESSAGE,"onRegionSearch query : "+query);
-
         Log.d(LOGMESSAGE, "onRegionSearch: Events " + events);
 
         if(!query.isEmpty()){
@@ -158,24 +149,18 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                     Log.d(LOGMESSAGE, "onRegionSearch: Events " + events);
                     Log.d(LOGMESSAGE, "onRegionSearch: Events Obj title" + events.get(0));
                 }
-
             }
             else {
                 ArrayList<Event> filteredEvents = new ArrayList<>();
                 for (Event e: events ) {
-                    if(e != null  && e.getRegions() != null && e.getRegions().toLowerCase().contains(query)){
+                    if(e != null  && e.getRegion() != null && e.getRegion().toLowerCase().contains(query)){
                         filteredEvents.add(e);
                     }
                 }
-
                 eventAdapter.setEvents(filteredEvents);
                 eventRecycler.setAdapter(eventAdapter);
             }
-
-
         }
-
-
         return null;
     }
 }

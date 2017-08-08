@@ -20,10 +20,13 @@ import com.mtn.evento.data.Database;
 import com.mtn.evento.data.EncodeData;
 import com.mtn.evento.data.Event;
 import com.mtn.evento.data.Location;
+import com.mtn.evento.data.Ticket;
 import com.mtn.evento.data.Ticket_Type;
+import com.mtn.evento.utils.SmartGet;
 
 import net.glxn.qrgen.android.QRCode;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -38,20 +41,17 @@ public class EventoMainPage extends AppCompatActivity {
 
         long ts= System.currentTimeMillis();
         Event a = new Event();
-        a.setTotal_seats(800);
+        a.setTotal_seats("800");
         a.setEvent_name("VGMA");
-        a.setEvent_id(ts);
+        a.setEvent_id(""+ts);
         a.setVenue("Conference Centre");
-        a.setDate_published(""+new Date());
-        a.setEvent_date(""+new Date(12,9,2017));
+        a.setDate_published(""+SmartGet.getDateTimeFromTimeStamp(""+ts));
+        a.setEvent_date(""+ SmartGet.getDateTimeFromTimeStamp(""+ts));
         a.setEvent_type("Music Awards");
         a.setTitle("Vodafone Ghana Music Awards, 2018");
         a.setLocation(new Location(3.27772,-1.455));
-        a.setRegions("Volta");
-        Ticket_Type ticketType = new Ticket_Type();
-        ticketType.setRegular("200");
-        ticketType.setVip("500");
-        ticketType.setVvip("800");
+        a.setRegion("Volta");
+        Ticket_Type ticketType = new Ticket_Type(new ArrayList<Ticket>());
         a.setTicket_type(ticketType);
         eventsRef.child("evt-"+ ts).getRef().setValue(a);
 

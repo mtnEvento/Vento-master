@@ -37,7 +37,7 @@ public class EventDetailActivity extends AppCompatActivity {
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
         ( (TextView)findViewById(R.id.evt_available_seat)).setText("");
         ( (TextView)findViewById(R.id.evt_venue)).setText(event.getVenue());
-        ( (TextView)findViewById(R.id.evt_region)).setText(event.getRegions());
+        ( (TextView)findViewById(R.id.evt_region)).setText(event.getRegion());
         ( (TextView)findViewById(R.id.evt_description)).setText(event.getDescription());
     }
 

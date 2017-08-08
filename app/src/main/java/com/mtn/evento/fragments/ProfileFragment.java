@@ -16,9 +16,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.mtn.evento.Evento;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.EditorActivity;
 import com.mtn.evento.activities.SignUpActivity;
+
+import static com.mtn.evento.data.Constants.APP_USERNAME;
+import static com.mtn.evento.data.Constants.APP_USER_EMAIL;
+import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,11 +75,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     editIntent.putExtra(EditorActivity.EDIT_PHONE,getValue(phone));
                     mContext.startActivityForResult(editIntent,PHONE_EDIT_REQUEST);
                     break;
-                case R.id.emailCardView:
-                    editIntent = new Intent(mContext, EditorActivity.class);
-                    editIntent.putExtra(EditorActivity.EDIT_EMAIL,getValue(email));
-                    mContext.startActivityForResult(editIntent,EMAIL_EDIT_REQUEST);
-                    break;
+//                case R.id.emailCardView:
+//                    editIntent = new Intent(mContext, EditorActivity.class);
+//                    editIntent.putExtra(EditorActivity.EDIT_EMAIL,getValue(email));
+//                    mContext.startActivityForResult(editIntent,EMAIL_EDIT_REQUEST);
+//                    break;
             }
         }
         else
@@ -88,12 +93,34 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = (AppCompatActivity) getActivity();
+        if( !((Evento)mContext.getApplication()).getSettings().contains(APP_USER_EMAIL) ){
+
+        }
+        else
+        {
+
+        }
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mContext = (AppCompatActivity) getActivity();
+        if( ((Evento)mContext.getApplication()).getSettings().contains(APP_USER_EMAIL) ){
+            String str_email =  ((Evento)mContext.getApplication()).getSettings().getString(APP_USER_EMAIL,"Email Address");
+            email.setText(str_email);
+        }
+
+        if( ((Evento)mContext.getApplication()).getSettings().contains(APP_USER_PHONE) ){
+            String str_phone =  ((Evento)mContext.getApplication()).getSettings().getString(APP_USER_PHONE,"Phone Number");
+            phone.setText(str_phone);
+        }
+
+        if( ((Evento)mContext.getApplication()).getSettings().contains(APP_USERNAME) ){
+            String str_username = ((Evento)mContext.getApplication()).getSettings().getString(APP_USERNAME,"Username");
+            username.setText(str_username);
+        }
+
     }
 
     private String getValue(TextView v){
@@ -122,14 +149,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             }
         }
-        else  if(requestCode == EMAIL_EDIT_REQUEST && resultCode == Activity.RESULT_OK){
-            if(data != null ){
-
-                if(data.hasExtra(EditorActivity.EDIT_EMAIL)){
-                    email.setText(data.getStringExtra(EditorActivity.EDIT_EMAIL));
-                }
-
-            }
-        }
+//        else  if(requestCode == EMAIL_EDIT_REQUEST && resultCode == Activity.RESULT_OK){
+//            if(data != null ){
+//
+//                if(data.hasExtra(EditorActivity.EDIT_EMAIL)){
+//                    email.setText(data.getStringExtra(EditorActivity.EDIT_EMAIL));
+//                }
+//
+//            }
+//        }
     }
 }

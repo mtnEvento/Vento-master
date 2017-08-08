@@ -43,7 +43,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
 
     @Override
     public void onBindViewHolder(EventHolder holder, int position) {
-        holder.imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(),events.get(position).getBanner()));
+
+       //TODO holder.imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(),events.get(position).getBanner()));
         holder.title.setText(events.get(position).getTitle());
         holder.venue.setText(events.get(position).getVenue());
         holder.layout.setTag(events.get(position));

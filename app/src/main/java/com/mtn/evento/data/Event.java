@@ -7,17 +7,17 @@ import java.io.Serializable;
  */
 
 public class Event implements Serializable {
-    private long event_id;
+    private String event_id;
     private String event_name;
     private String title;
     private String event_type;
     private String description;
-    private String regions;
+    private String region;
     private String date_published;
     private String event_date;
     private String venue;
-    private int banner;
-    private long total_seats;
+    private String banner;
+    private String total_seats;
     private Ticket_Type ticket_type;
     private Location location;
 
@@ -29,11 +29,11 @@ public class Event implements Serializable {
         this.event_name = event_name;
     }
 
-    public long getEvent_id() {
+    public String getEvent_id() {
         return event_id;
     }
 
-    public void setEvent_id(long event_id) {
+    public void setEvent_id(String event_id) {
         this.event_id = event_id;
     }
 
@@ -61,12 +61,12 @@ public class Event implements Serializable {
         this.description = description;
     }
 
-    public String getRegions() {
-        return regions;
+    public String getRegion() {
+        return region;
     }
 
-    public void setRegions(String regions) {
-        this.regions = regions;
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public String getDate_published() {
@@ -93,19 +93,19 @@ public class Event implements Serializable {
         this.venue = venue;
     }
 
-    public int getBanner() {
+    public String getBanner() {
         return banner;
     }
 
-    public void setBanner(int banner) {
+    public void setBanner(String banner) {
         this.banner = banner;
     }
 
-    public long getTotal_seats() {
+    public String getTotal_seats() {
         return total_seats;
     }
 
-    public void setTotal_seats(long total_seats) {
+    public void setTotal_seats(String total_seats) {
         this.total_seats = total_seats;
     }
 

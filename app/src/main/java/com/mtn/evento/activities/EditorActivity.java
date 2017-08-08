@@ -47,7 +47,6 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
-
         if(mAuth != null && mAuth.getCurrentUser() != null ){
             mIntent =  getIntent();
             if(mIntent != null ){
@@ -66,8 +65,6 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }
         }
-
-
     }
 
     @Override
@@ -134,5 +131,4 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
     // [END basic_write]
-
 }

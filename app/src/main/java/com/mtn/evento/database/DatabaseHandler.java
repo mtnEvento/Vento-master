@@ -3,14 +3,17 @@ package com.mtn.evento.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.mtn.evento.data.Event;
+import com.mtn.evento.data.Location;
+import com.mtn.evento.data.Ticket;
+import com.mtn.evento.data.Ticket_Type;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -99,31 +102,46 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             List<Event> eventList = new ArrayList<Event>();
             // Select All Query
             String selectQuery = "SELECT  * FROM " + TABLE_RESERVED_EVENT;
-
             SQLiteDatabase db = this.getWritableDatabase();
             Cursor cursor = db.rawQuery(selectQuery, null);
-
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
                 do {
                     Event event = new Event();
                     String str_event =  cursor.getString(3);
                     JSONObject object = new JSONObject(str_event);
-                    JSONObject locationOject =  object.getJSONObject("location");
-                    String latitude = locationOject.getString("latitude");
-                    String longitude = locationOject.getString("longitude");
+                    event.setEvent_id(object.getString("event_id"));
+                    event.setEvent_type(object.getString("event_type"));
+                    event.setRegion(object.getString("region"));
+                    event.setBanner(object.getString("banner"));
+                    event.setTotal_seats(object.getString("total_seats"));
+                    event.setDescription(object.getString("description"));
+                    event.setDate_published(object.getString("date_published"));
+                    event.setVenue(object.getString("venue"));
+                    event.setEvent_name(object.getString("event_name"));
+                    event.setTitle(object.getString("title"));
+                    event.setEvent_date(object.getString("event_date"));
+                    JSONObject locationObject =  object.getJSONObject("location");
+                    String latitude = locationObject.getString("latitude");
+                    String longitude = locationObject.getString("longitude");
+                    event.setLocation(new Location(Double.parseDouble(latitude),Double.parseDouble(longitude)));
+                    ArrayList<Ticket> tickets = new ArrayList<>();
+                    JSONArray ticketTypeArr =  object.getJSONArray("ticket_type");
 
-                    JSONObject ticketTypeOject =  object.getJSONObject("ticket_type");
-
+                    for (int i = 0; i < ticketTypeArr.length(); i++) {
+                        JSONObject mTicket =  ticketTypeArr.getJSONObject(i);
+                        String ticket_name = mTicket.getString("name");
+                        String ticket_amount = mTicket.getString("amount");
+                        Ticket ticket = new Ticket(ticket_name,ticket_amount);
+                        tickets.add(ticket);
+                    }
+                    event.setTicket_type(new Ticket_Type(tickets));
                     // Adding event to list
                     eventList.add(event);
                 } while (cursor.moveToNext());
             }
-
             // return event list
             return eventList;
-
-
         } catch (JSONException e) {
             e.printStackTrace();
             return  null;
@@ -138,7 +156,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         cursor.close();
-
         // return count
         return cursor.getCount();
     }
@@ -146,10 +163,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // [Updating single event]
     public int updateContact(Event event) {
-
-
         // updating row
-
         try
         {
             SQLiteDatabase db = this.getWritableDatabase();
