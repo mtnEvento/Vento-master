@@ -8,9 +8,18 @@ import java.io.Serializable;
 
 public class User implements Serializable{
 
+    private String id;
     private String username;
     private String email;
     private String phone;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
@@ -34,6 +43,19 @@ public class User implements Serializable{
 
     }
 
+    public  User(String id, String username, String email){
+        this.username = username ;
+        this.email = email;
+        this.id = id ;
+    }
+
+    public  User(String id, String username, String email,String phone){
+        this.username = username ;
+        this.email = email;
+        this.id = id ;
+        this.phone = phone;
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -42,6 +64,6 @@ public class User implements Serializable{
         this.phone = phone;
     }
 
-    public  User(){
+    public User(){
     }
 }
