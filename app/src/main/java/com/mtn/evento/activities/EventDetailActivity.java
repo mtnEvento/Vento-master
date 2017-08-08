@@ -40,7 +40,7 @@ public class EventDetailActivity extends AppCompatActivity {
         Glide.with(getParent())
                 .load("http://via.placeholder.com/300.png")
                 .asBitmap()
-                .into(( (ImageView)findViewById(R.id.event_banner))) ;    
+                .into(( (ImageView)findViewById(R.id.event_banner))) ;
         ( (TextView)findViewById(R.id.evt_name)).setText(event.getEvent_name());
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
         ( (TextView)findViewById(R.id.evt_available_seat)).setText("");
