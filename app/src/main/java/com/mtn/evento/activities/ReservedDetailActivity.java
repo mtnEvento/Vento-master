@@ -1,6 +1,7 @@
 package com.mtn.evento.activities;
 
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,11 +35,11 @@ public class ReservedDetailActivity extends AppCompatActivity {
         Event event = (Event) serz;
         mEvent =  event ;
         //TODO: change the current url to the event banner url
-        /*  Glide.with(this)
+         Glide.with(this)
                 .load(event.getBanner())
                 .asBitmap()
-                .into(( (ImageView)findViewById(R.id.event_banner))) ;*/
-        ((ImageView) findViewById(R.id.event_banner)).setImageBitmap(event.getBitmap());
+                .into(( (ImageView)findViewById(R.id.event_banner))) ;
+
         ( (TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
         ( (TextView)findViewById(R.id.evt_venue)).setText(event.getVenue());

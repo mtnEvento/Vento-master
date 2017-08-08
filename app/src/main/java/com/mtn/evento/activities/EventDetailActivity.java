@@ -40,11 +40,11 @@ public class EventDetailActivity extends AppCompatActivity {
         event = (Event) serz;
 
         //TODO: change the current url to the event banner url
-         /* Glide.with(this)
+         Glide.with(this)
                 .load(event.getBanner())
                 .asBitmap()
-                .into(( (ImageView)findViewById(R.id.event_banner))) ;*/
-        ((ImageView) findViewById(R.id.event_banner)).setImageBitmap(event.getBitmap());
+                .into(( (ImageView)findViewById(R.id.event_banner))) ;
+
         ( (TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
         ( (TextView)findViewById(R.id.evt_available_seat)).setText("");

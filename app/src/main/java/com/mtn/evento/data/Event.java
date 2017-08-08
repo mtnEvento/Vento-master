@@ -22,13 +22,13 @@ public class Event implements Serializable {
     private String total_seats;
     private Ticket_Type ticket_type;
     private Location location;
-    private Bitmap bitmap;
+    private CustomBitmap bitmap;
 
-    public Bitmap getBitmap() {
+    public CustomBitmap getBitmap() {
         return bitmap;
     }
 
-    public void setBitmap(Bitmap bitmap) {
+    public void setBitmap(CustomBitmap bitmap) {
         this.bitmap = bitmap;
     }
 

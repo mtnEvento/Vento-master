@@ -19,14 +19,11 @@ import com.mtn.evento.R;
 import com.mtn.evento.activities.EventDetailActivity;
 import com.mtn.evento.activities.ReservedDetailActivity;
 import com.mtn.evento.data.Constants;
+import com.mtn.evento.data.CustomBitmap;
 import com.mtn.evento.data.Event;
 
 import java.util.ArrayList;
 
-
-/**
- * Created by Summy on 8/8/2017.
- */
 
 public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAdapter.ReservedEventHolder> {
 
@@ -89,11 +86,9 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
         @Override
         public void onClick(View v) {
             //TODO get Bundle At event detail page and set it's values events.get(getAdapterPosition())
-            Bitmap bitmap = ((BitmapDrawable)((LayerDrawable)imageView.getDrawable()).getDrawable(0)).getBitmap();
             Event event = (Event) v.getTag();
             Intent intent = new Intent(context, ReservedDetailActivity.class);
             Bundle bundle = new Bundle();
-            event.setBitmap(bitmap);
             bundle.putSerializable(Constants.EVENT,event);
             intent.putExtra(Constants.BUNDLE,bundle);
             context.startActivity(intent);

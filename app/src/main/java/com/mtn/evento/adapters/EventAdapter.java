@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.EventDetailActivity;
 import com.mtn.evento.data.Constants;
+import com.mtn.evento.data.CustomBitmap;
 import com.mtn.evento.data.Event;
 
 import java.util.ArrayList;
@@ -87,11 +88,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
         @Override
         public void onClick(View v) {
 
-            Bitmap bitmap = ((BitmapDrawable)((LayerDrawable)imageView.getDrawable()).getDrawable(0)).getBitmap();
             Event event = (Event) v.getTag();
             Intent intent = new Intent(context, EventDetailActivity.class);
             Bundle bundle = new Bundle();
-            event.setBitmap(bitmap);
             bundle.putSerializable(Constants.EVENT,event);
             intent.putExtra(Constants.BUNDLE,bundle);
             //TODO: get Bundle At event detail page and set it's values events.get(getAdapterPosition())
