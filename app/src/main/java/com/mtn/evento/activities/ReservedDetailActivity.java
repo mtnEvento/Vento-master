@@ -1,6 +1,7 @@
 package com.mtn.evento.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -69,11 +70,22 @@ public class ReservedDetailActivity extends AppCompatActivity {
         switch (item.getItemId()){
 
             case R.id.share:
-//TODO: share post
+
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT,"Delivery service is just an App away from you!");
+                startActivity(intent);
                 break;
             case R.id.directMe:
-//TODO:  pass location to google map for direction
+
+                double longitude = mEvent.getLocation().getLongitude();
+                double latitude = mEvent.getLocation().getLatitude();
+                Uri location = Uri.parse("geo:"+String.valueOf(latitude)+","+String.valueOf(longitude)+"?q="+mEvent.getVenue()+", "+mEvent.getRegion());
+                Intent mapLocation = new Intent(Intent.ACTION_VIEW,location);
+                startActivity(mapLocation);
                 break;
+
             case android.R.id.home:
                 super.onBackPressed();
                 break;

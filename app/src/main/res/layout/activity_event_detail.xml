@@ -59,7 +59,6 @@
                 android:id="@+id/name_card"
                 android:layout_below="@+id/image_card"
                 android:layout_width="match_parent"
-                app:cardElevation="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -69,11 +68,10 @@
                     app:srcCompat="@drawable/ic_event_black_24dp"
                     android:layout_gravity="center_vertical|right"
                     android:layout_margin="@dimen/margin_standard"
-
                     />
                 <TextView
                     android:id="@+id/evt_name"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="Event Name"
@@ -87,9 +85,6 @@
                 android:id="@+id/event_date_card"
                 android:layout_below="@+id/name_card"
                 android:layout_width="match_parent"
-                app:cardElevation="@dimen/margin_standard"
-                android:layout_marginLeft="@dimen/margin_standard"
-                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -115,9 +110,6 @@
                 android:id="@+id/available_seat_card"
                 android:layout_below="@+id/event_date_card"
                 android:layout_width="match_parent"
-                app:cardElevation="@dimen/margin_standard"
-                android:layout_marginLeft="@dimen/margin_standard"
-                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -143,9 +135,6 @@
                 android:id="@+id/venue_card"
                 android:layout_below="@+id/available_seat_card"
                 android:layout_width="match_parent"
-                app:cardElevation="@dimen/margin_standard"
-                android:layout_marginLeft="@dimen/margin_standard"
-                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -171,9 +160,6 @@
                 android:id="@+id/region_card"
                 android:layout_below="@+id/venue_card"
                 android:layout_width="match_parent"
-                app:cardElevation="@dimen/margin_standard"
-                android:layout_marginLeft="@dimen/margin_standard"
-                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
@@ -199,9 +185,6 @@
                 android:id="@+id/description_card"
                 android:layout_below="@+id/region_card"
                 android:layout_width="match_parent"
-                app:cardElevation="@dimen/margin_standard"
-                android:layout_marginLeft="@dimen/margin_standard"
-                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView
