@@ -94,13 +94,31 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == USERNAME_EDIT_REQUEST && resultCode == Activity.RESULT_OK){
+            if(data != null ){
 
+                if(data.hasExtra(EditorActivity.EDIT_USERNAME)){
+                   username.setText(data.getStringExtra(EditorActivity.EDIT_USERNAME));
+                }
+
+            }
         }
         else  if(requestCode == PHONE_EDIT_REQUEST && resultCode == Activity.RESULT_OK){
+            if(data != null ){
 
+                if(data.hasExtra(EditorActivity.EDIT_PHONE)){
+                    phone .setText(data.getStringExtra(EditorActivity.EDIT_PHONE));
+                }
+
+            }
         }
         else  if(requestCode == EMAIL_EDIT_REQUEST && resultCode == Activity.RESULT_OK){
+            if(data != null ){
 
+                if(data.hasExtra(EditorActivity.EDIT_EMAIL)){
+                    email.setText(data.getStringExtra(EditorActivity.EDIT_EMAIL));
+                }
+
+            }
         }
     }
 }

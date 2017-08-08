@@ -2,6 +2,7 @@ package com.mtn.evento.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.NavigationView;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.mtn.evento.Evento;
 import com.mtn.evento.R;
 import com.mtn.evento.adapters.CMPagerAdapter;
 import com.mtn.evento.data.Event;
@@ -42,6 +44,10 @@ import com.mtn.evento.fragments.EventsFragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mtn.evento.data.Constants.APP_USERNAME;
+import static com.mtn.evento.data.Constants.APP_USER_EMAIL;
+import static com.mtn.evento.data.Constants.APP_USER_ID;
+import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -69,8 +75,8 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
         }
-
         initUI();
+        initSetting();
     }
 
     public void initUI(){
@@ -111,14 +117,28 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         });
         searchRequestListener = (SearchRequestListener) ((EventsFragment)adapter.getItem(0));
         regionRequestListener = (SearchRegionRequestListener) ((EventsFragment)adapter.getItem(0));
-      //  mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel);
-     //   mDrawerLayout.setDrawerListener(mDrawerToggle);
-      //  mDrawerToggle.syncState();
+        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+    }
+    private void initSetting(){
 
+        if( !((Evento)getApplication()).getSettings().contains(APP_USER_ID) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_ID,"").commit();;
+        }
 
+        if( !((Evento)getApplication()).getSettings().contains(APP_USERNAME) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,"").commit();;
+        }
+
+        if( !((Evento)getApplication()).getSettings().contains(APP_USER_PHONE) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_PHONE,"").commit();;
+        }
+        if( !((Evento)getApplication()).getSettings().contains(APP_USER_EMAIL) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_EMAIL,"").commit();;
+        }
 
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu,menu);

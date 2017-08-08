@@ -5,9 +5,9 @@
             android:id="@+id/action_login_logout"
             android:icon="@drawable/ic_lock_open_black_24dp"
             />
-        <item android:title="gygygy"
-            android:id="@+id/second"
-            android:icon="@drawable/ic_search_black_24dp"
-            />
+        <!--<item android:title="gygygy"-->
+            <!--android:id="@+id/second"-->
+            <!--android:icon="@drawable/ic_search_black_24dp"-->
+            <!--/>-->
     </group>
 </menu>

@@ -24,9 +24,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.mtn.evento.Evento;
 import com.mtn.evento.R;
 import com.mtn.evento.data.User;
 
+import static com.mtn.evento.data.Constants.APP_USERNAME;
+import static com.mtn.evento.data.Constants.APP_USER_EMAIL;
+import static com.mtn.evento.data.Constants.APP_USER_ID;
+import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -120,7 +125,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Write new user
         writeNewUser(user.getUid(), username, user.getEmail());
 
-        // Go to MainActivity
+        if( !((Evento)getApplication()).getSettings().contains(APP_USER_ID) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_ID,user.getUid()).commit();
+        }
+        else{
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_ID,user.getUid()).commit();
+        }
+
+        if( !((Evento)getApplication()).getSettings().contains(APP_USERNAME) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,username).commit();
+        }
+        else{
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,username).commit();
+        }
+
+
+        if( !((Evento)getApplication()).getSettings().contains(APP_USER_EMAIL) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_EMAIL,user.getEmail()).commit();
+        }
+        else
+        {
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_EMAIL,user.getEmail()).commit();
+        }
+
+        if( !((Evento)getApplication()).getSettings().contains(APP_USER_PHONE) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_PHONE,"###-###-####").commit();
+        }
+
         Intent intent = new Intent();
         intent.putExtra( HomeScreenActivity.LOGINED_IN ,true);
         intent.putExtra(LoginActivity.EMAIL,user.getEmail());
@@ -158,8 +189,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     // [START basic_write]
     private void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email);
-
+        User user = new User();
+        user.setUsername(name);
+        user.setEmail(email);
+        user.setPhone("###-###-####");
+        user.setId(userId);
         mDatabase.child("users").child(userId).setValue(user);
     }
     // [END basic_write]

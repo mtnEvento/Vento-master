@@ -24,9 +24,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.mtn.evento.Evento;
 import com.mtn.evento.R;
 import com.mtn.evento.data.User;
 
+import static com.mtn.evento.data.Constants.APP_USERNAME;
+import static com.mtn.evento.data.Constants.APP_USER_EMAIL;
+import static com.mtn.evento.data.Constants.APP_USER_ID;
+import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
@@ -162,10 +167,38 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         user.setUsername(name);
         user.setEmail(email);
-        user.setPhone("fddfdf");
+        user.setPhone("###-###-####");
         user.setId(userId);
 
         mDatabase.child("users").child(userId).setValue(user);
+
+        if( !((Evento)getApplication()).getSettings().contains(APP_USER_ID) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_ID,userId).commit();
+        }
+        else{
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_ID,userId).commit();
+        }
+
+        if( !((Evento)getApplication()).getSettings().contains(APP_USERNAME) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,name).commit();
+        }
+        else{
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,name).commit();
+        }
+
+
+        if( !((Evento)getApplication()).getSettings().contains(APP_USER_EMAIL) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_EMAIL,email).commit();
+        }
+        else
+        {
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_EMAIL,email).commit();
+        }
+
+        if( !((Evento)getApplication()).getSettings().contains(APP_USER_PHONE) ){
+            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_PHONE,"###-###-####").commit();
+        }
+
     }
     // [END basic_write]
 
