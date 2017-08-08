@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.EventDetailActivity;
 import com.mtn.evento.activities.ReservedDetailActivity;
@@ -44,7 +45,11 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
 
     @Override
     public void onBindViewHolder(ReservedEventHolder reservedEventHolder, int position) {
-        //TODO: holder.imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(),events.get(position).getBanner()));
+
+        Glide.with(context)
+                .load(reservedEvents.get(position).getBanner())
+                .asBitmap()
+                .into(reservedEventHolder.imageView) ;
         reservedEventHolder.title.setText(reservedEvents.get(position).getTitle());
         reservedEventHolder.venue.setText(reservedEvents.get(position).getVenue());
         reservedEventHolder.layout.setTag(reservedEvents.get(position));
@@ -89,4 +94,6 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
             context.startActivity(intent);
         }
     }
+
+
 }

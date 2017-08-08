@@ -37,10 +37,10 @@ public class EventDetailActivity extends AppCompatActivity {
 
         //TODO: change the current url to the event banner url
         Glide.with(getParent())
-                .load("http://via.placeholder.com/300.png")
+                .load(event.getBanner())
                 .asBitmap()
                 .into(( (ImageView)findViewById(R.id.event_banner))) ;
-        ( (TextView)findViewById(R.id.evt_name)).setText(event.getEvent_name());
+        ( (TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
         ( (TextView)findViewById(R.id.evt_available_seat)).setText("");
         ( (TextView)findViewById(R.id.evt_venue)).setText(event.getVenue());

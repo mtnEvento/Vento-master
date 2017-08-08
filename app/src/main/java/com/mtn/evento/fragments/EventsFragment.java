@@ -78,7 +78,6 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                //  Toast.makeText(getActivity(),"Error |:\n "+databaseError.toException(), Toast.LENGTH_LONG).show();
             }
         });
 

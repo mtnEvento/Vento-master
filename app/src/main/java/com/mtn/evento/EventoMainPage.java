@@ -42,7 +42,7 @@ public class EventoMainPage extends AppCompatActivity {
         long ts= System.currentTimeMillis();
         Event a = new Event();
         a.setTotal_seats("800");
-        a.setEvent_name("VGMA");
+        a.setEvent_publisher("Vodafone");
         a.setEvent_id(""+ts);
         a.setVenue("Conference Centre");
         a.setDate_published(""+SmartGet.getDateTimeFromTimeStamp(""+ts));

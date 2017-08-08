@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.EventDetailActivity;
 import com.mtn.evento.data.Constants;
@@ -43,8 +44,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
 
     @Override
     public void onBindViewHolder(EventHolder holder, int position) {
-
-       //TODO: holder.imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(),events.get(position).getBanner()));
+        Glide.with(context)
+                .load(events.get(position).getBanner())
+                .asBitmap()
+                .into(holder.imageView) ;
         holder.title.setText(events.get(position).getTitle());
         holder.venue.setText(events.get(position).getVenue());
         holder.layout.setTag(events.get(position));

@@ -118,7 +118,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     event.setDescription(object.getString("description"));
                     event.setDate_published(object.getString("date_published"));
                     event.setVenue(object.getString("venue"));
-                    event.setEvent_name(object.getString("event_name"));
+                    event.setEvent_publisher(object.getString("event_publisher"));
                     event.setTitle(object.getString("title"));
                     event.setEvent_date(object.getString("event_date"));
                     JSONObject locationObject =  object.getJSONObject("location");

@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class Event implements Serializable {
     private String event_id;
-    private String event_name;
+    private String event_publisher;
     private String title;
     private String event_type;
     private String description;
@@ -21,12 +21,12 @@ public class Event implements Serializable {
     private Ticket_Type ticket_type;
     private Location location;
 
-    public String getEvent_name() {
-        return event_name;
+    public String getEvent_publisher() {
+        return event_publisher;
     }
 
-    public void setEvent_name(String event_name) {
-        this.event_name = event_name;
+    public void setEvent_publisher(String event_publisher) {
+        this.event_publisher = event_publisher;
     }
 
     public String getEvent_id() {
