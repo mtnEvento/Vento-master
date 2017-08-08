@@ -51,7 +51,12 @@ public class EventoMainPage extends AppCompatActivity {
         a.setTitle("Vodafone Ghana Music Awards, 2018");
         a.setLocation(new Location(3.27772,-1.455));
         a.setRegion("Volta");
-        Ticket_Type ticketType = new Ticket_Type(new ArrayList<Ticket>());
+        a.setBanner("https://firebasestorage.googleapis.com/v0/b/evento-14a5b.appspot.com/o/banner.jpg?alt=media&token=4c828fa6-5589-40eb-ac46-bc18e599e35d");
+
+        ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+        tickets.add(new Ticket("vvip","200"));
+        tickets.add(new Ticket("regular","100"));
+        Ticket_Type ticketType = new Ticket_Type(tickets);
         a.setTicket_type(ticketType);
         eventsRef.child("evt-"+ ts).getRef().setValue(a);
 

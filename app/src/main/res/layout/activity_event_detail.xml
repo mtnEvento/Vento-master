@@ -60,8 +60,6 @@
                 android:layout_below="@+id/image_card"
                 android:layout_width="match_parent"
                 app:cardElevation="@dimen/margin_standard"
-                android:layout_marginLeft="@dimen/margin_standard"
-                android:layout_marginRight="@dimen/margin_standard"
                 android:layout_height="80dp">
 
                 <ImageView

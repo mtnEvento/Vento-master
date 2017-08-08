@@ -21,10 +21,18 @@
         <meta-data android:name="com.mtn.evento.utils.GlideConfiguration"
             android:value="GlideModule"/>
 
-        <activity android:name=".EventoMainPage"/>
+        <activity android:name=".EventoMainPage">
+
+        </activity>
         <activity android:name=".activities.HomeScreenActivity"
             android:windowSoftInputMode="stateHidden"
-            />
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            </activity>
         <activity android:name=".activities.EventDetailActivity" />
         <activity android:name=".activities.EditorActivity" />
         <activity android:name=".activities.ReservationActivity" />
@@ -32,14 +40,10 @@
         <activity android:name=".activities.ReservedDetailActivity" />
         <activity android:name=".activities.BarcodeActivity" />
         <activity android:name=".activities.SplashScreenActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
-        <activity android:name=".Payment"></activity>
-        <activity android:name=".activities.SignUpActivity"></activity>
+        <activity android:name=".Payment"/>
+        <activity android:name=".activities.SignUpActivity"/>
     </application>
 
 </manifest>

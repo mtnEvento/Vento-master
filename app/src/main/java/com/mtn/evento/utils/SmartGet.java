@@ -14,7 +14,7 @@ public class SmartGet {
 
     public static String getDateTimeFromTimeStamp(String timeStamp){
         String pattern = "dd-MM-yyyy HH:mm:ss a";
-        Timestamp stamp = new Timestamp(Long.getLong(timeStamp));
+        Timestamp stamp = new Timestamp(Long.parseLong(timeStamp));
         Date date = new Date(stamp.getTime());
         SimpleDateFormat format = new SimpleDateFormat(pattern);
         return format.format(date).toString();

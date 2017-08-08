@@ -58,7 +58,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final ProgressDialog processSignUp =  ProgressDialog.show(view.getContext(),null,"Signing up and logging in....",true,false);
+        final ProgressDialog processSignUp =  ProgressDialog.show(view.getContext(),null,"Loading Events....",true,false);
         eventsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
