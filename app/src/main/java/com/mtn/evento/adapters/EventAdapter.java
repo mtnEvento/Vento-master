@@ -2,7 +2,10 @@ package com.mtn.evento.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -83,9 +86,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
 
         @Override
         public void onClick(View v) {
+
+            Bitmap bitmap = ((BitmapDrawable)((LayerDrawable)imageView.getDrawable()).getDrawable(0)).getBitmap();
             Event event = (Event) v.getTag();
             Intent intent = new Intent(context, EventDetailActivity.class);
             Bundle bundle = new Bundle();
+            event.setBitmap(bitmap);
             bundle.putSerializable(Constants.EVENT,event);
             intent.putExtra(Constants.BUNDLE,bundle);
             //TODO: get Bundle At event detail page and set it's values events.get(getAdapterPosition())

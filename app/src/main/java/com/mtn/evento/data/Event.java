@@ -1,5 +1,7 @@
 package com.mtn.evento.data;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 /**
@@ -20,6 +22,15 @@ public class Event implements Serializable {
     private String total_seats;
     private Ticket_Type ticket_type;
     private Location location;
+    private Bitmap bitmap;
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
 
     public String getEvent_publisher() {
         return event_publisher;
