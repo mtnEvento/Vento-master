@@ -35,8 +35,7 @@ public class EventDetailActivity extends AppCompatActivity {
         Serializable serz =   ser.getSerializable(Constants.EVENT);
         Event event = (Event) serz;
 
-
-
+        //TODO: change the current url to the event banner url
         Glide.with(getParent())
                 .load("http://via.placeholder.com/300.png")
                 .asBitmap()
@@ -75,15 +74,15 @@ public class EventDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.reserve_seat:
-//TODO                check if user is logged and open either login or reservation activity
+//TODO: check if user is logged and open either login or reservation activity
                 Toast.makeText(this, "Reserve Seats", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this,ReservationActivity.class));
                 break;
             case R.id.share:
-//TODO                share post
+//TODO: share post
                 break;
             case R.id.directMe:
-//TODO                pass location to google map for direction
+//TODO: pass location to google map for direction
                 break;
             case android.R.id.home:
                 super.onBackPressed();

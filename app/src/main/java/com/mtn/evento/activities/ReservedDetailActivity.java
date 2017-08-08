@@ -32,6 +32,7 @@ public class ReservedDetailActivity extends AppCompatActivity {
         Serializable serz =   ser.getSerializable(Constants.EVENT);
         Event event = (Event) serz;
         mEvent =  event ;
+        //TODO: change the current url to the event banner url
         Glide.with(getParent())
                 .load("http://via.placeholder.com/300.png")
                 .asBitmap()
