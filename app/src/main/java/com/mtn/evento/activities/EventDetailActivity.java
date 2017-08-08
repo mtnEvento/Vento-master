@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ public class EventDetailActivity extends AppCompatActivity {
         Serializable serz =   ser.getSerializable(Constants.EVENT);
         Event event = (Event) serz;
 
+        ( (ImageView)findViewById(R.id.event_banner))
         ( (TextView)findViewById(R.id.evt_name)).setText(event.getEvent_name());
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
         ( (TextView)findViewById(R.id.evt_available_seat)).setText("");

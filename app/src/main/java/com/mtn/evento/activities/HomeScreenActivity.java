@@ -120,6 +120,13 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
+
+    }
+
+    private void initSearch(){
+
+        final android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) findViewById(R.id.searchView);
+       // searchView.
     }
     private void initSetting(){
 
@@ -253,11 +260,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         return false;
     }
-
-
-
-
-
 
     public interface  SearchRequestListener{
         public ArrayList<Event> onSearch(String query);

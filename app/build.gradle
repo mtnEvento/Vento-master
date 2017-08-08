@@ -43,5 +43,10 @@ dependencies {
     compile 'com.github.clans:fab:1.6.4'
     testCompile 'junit:junit:4.12'
     compile files('libs/jackson-all-1.9.0.jar')
+    compile 'com.github.bumptech.glide:glide:3.8.0'
+    compile 'org.jetbrains:annotations-java5:15.0'
+    compile 'jp.wasabeef:glide-transformations:2.0.2'
+    // If you want to use the GPU Filters
+    compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
 }
 apply plugin: 'com.google.gms.google-services'

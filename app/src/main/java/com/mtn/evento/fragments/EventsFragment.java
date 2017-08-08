@@ -4,7 +4,6 @@ package com.mtn.evento.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +25,8 @@ import com.mtn.evento.activities.HomeScreenActivity;
 import com.mtn.evento.adapters.EventAdapter;
 import com.mtn.evento.data.Database;
 import com.mtn.evento.data.Event;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 

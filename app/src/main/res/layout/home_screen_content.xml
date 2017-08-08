@@ -30,7 +30,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="40sp"
                 android:background="@drawable/curved_white"
-                android:queryHint="Search..."
+                android:queryHint="Search Events by title..."
+                app:queryHint="Search Events by title..."
+                app:defaultQueryHint="Search Events by title..."
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="@dimen/margin_standard"
@@ -39,7 +41,6 @@
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7"
                 />
-
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
