@@ -48,7 +48,7 @@ public class Payment extends AppCompatActivity {
                     String transactionId = data.getString("TransactionId");
 
                     DatabaseHandler db = new DatabaseHandler(Payment.this);
-                    
+
 
                     Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
                 } catch (JSONException e) {
