@@ -31,7 +31,7 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
 
     }
 
-    public void setReservedEventsEvents(ArrayList<Event> reservedEvents) {
+    public void setReservedEvents(ArrayList<Event> reservedEvents) {
         this.reservedEvents = reservedEvents;
     }
     @Override

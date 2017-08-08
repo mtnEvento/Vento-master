@@ -95,11 +95,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // [Adding new event]
 
     // [Getting All reserved Events]
-    public List<Event> getAllreservedEvents() {
+    public ArrayList<Event> getAllreservedEvents() {
 
         try
         {
-            List<Event> eventList = new ArrayList<Event>();
+            ArrayList<Event> eventList = new ArrayList<Event>();
             // Select All Query
             String selectQuery = "SELECT  * FROM " + TABLE_RESERVED_EVENT;
             SQLiteDatabase db = this.getWritableDatabase();
