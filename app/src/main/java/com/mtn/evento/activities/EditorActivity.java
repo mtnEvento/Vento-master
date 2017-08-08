@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -46,20 +47,23 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
-        mIntent =  getIntent();
-        if(mIntent != null ){
 
-            if(mIntent.hasExtra(EDIT_EMAIL)){
-                String email = mIntent.getStringExtra(EDIT_EMAIL);
-                editableValue.setText(email);
-            }
-            else  if(mIntent.hasExtra(EDIT_USERNAME)){
-                String username = mIntent.getStringExtra(EDIT_USERNAME);
-                editableValue.setText(username);
-            }
-            else  if(mIntent.hasExtra(EDIT_PHONE)){
-                String phone = mIntent.getStringExtra(EDIT_PHONE);
-                editableValue.setText(phone);
+        if(mAuth != null && mAuth.getCurrentUser() != null ){
+            mIntent =  getIntent();
+            if(mIntent != null ){
+
+                if(mIntent.hasExtra(EDIT_EMAIL)){
+                    String email = mIntent.getStringExtra(EDIT_EMAIL);
+                    editableValue.setText(email);
+                }
+                else  if(mIntent.hasExtra(EDIT_USERNAME)){
+                    String username = mIntent.getStringExtra(EDIT_USERNAME);
+                    editableValue.setText(username);
+                }
+                else  if(mIntent.hasExtra(EDIT_PHONE)){
+                    String phone = mIntent.getStringExtra(EDIT_PHONE);
+                    editableValue.setText(phone);
+                }
             }
         }
 

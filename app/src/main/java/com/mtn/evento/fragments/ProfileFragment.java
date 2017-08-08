@@ -13,9 +13,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.EditorActivity;
+import com.mtn.evento.activities.SignUpActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,9 +29,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private final int EMAIL_EDIT_REQUEST = 120;
     private final int PHONE_EDIT_REQUEST = 121;
     private final int USERNAME_EDIT_REQUEST = 122;
-
+    private FirebaseAuth mAuth;
     public ProfileFragment() {
         // Required empty public constructor
+        mAuth = FirebaseAuth.getInstance();
     }
 
 
@@ -54,23 +58,30 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         Intent editIntent = null;
-        switch (v.getId()){
-            case R.id.usernameCardView:
-                editIntent = new Intent(mContext, EditorActivity.class);
-                editIntent.putExtra(EditorActivity.EDIT_USERNAME,getValue(email));
-                mContext.startActivityForResult(editIntent,USERNAME_EDIT_REQUEST);
-                break;
-            case R.id.phoneCardView:
-                editIntent = new Intent(mContext, EditorActivity.class);
-                editIntent.putExtra(EditorActivity.EDIT_PHONE,getValue(phone));
-                mContext.startActivityForResult(editIntent,PHONE_EDIT_REQUEST);
-                break;
-            case R.id.emailCardView:
-                editIntent = new Intent(mContext, EditorActivity.class);
-                editIntent.putExtra(EditorActivity.EDIT_EMAIL,getValue(email));
-                mContext.startActivityForResult(editIntent,EMAIL_EDIT_REQUEST);
-                break;
+        if(mAuth != null && mAuth.getCurrentUser() != null){
+            switch (v.getId()){
+                case R.id.usernameCardView:
+                    editIntent = new Intent(mContext, EditorActivity.class);
+                    editIntent.putExtra(EditorActivity.EDIT_USERNAME,getValue(email));
+                    mContext.startActivityForResult(editIntent,USERNAME_EDIT_REQUEST);
+                    break;
+                case R.id.phoneCardView:
+                    editIntent = new Intent(mContext, EditorActivity.class);
+                    editIntent.putExtra(EditorActivity.EDIT_PHONE,getValue(phone));
+                    mContext.startActivityForResult(editIntent,PHONE_EDIT_REQUEST);
+                    break;
+                case R.id.emailCardView:
+                    editIntent = new Intent(mContext, EditorActivity.class);
+                    editIntent.putExtra(EditorActivity.EDIT_EMAIL,getValue(email));
+                    mContext.startActivityForResult(editIntent,EMAIL_EDIT_REQUEST);
+                    break;
+            }
         }
+        else
+        {
+            Toast.makeText(mContext,"Please login start in order to edit your profile",Toast.LENGTH_LONG).show();
+        }
+
     }
 
     @Override
