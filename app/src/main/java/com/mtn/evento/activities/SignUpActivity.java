@@ -82,7 +82,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         //showProgressDialog();
-        final  ProgressDialog processSignUp =  ProgressDialog.show(this,"","Signing up and logging in....",true,false);
+        final  ProgressDialog processSignUp =  ProgressDialog.show(this,null,"Signing up and logging in....",true,false);
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
 
@@ -162,7 +162,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         user.setUsername(name);
         user.setEmail(email);
-        user.setPhone("");
+        user.setPhone("fddfdf");
         user.setId(userId);
 
         mDatabase.child("users").child(userId).setValue(user);

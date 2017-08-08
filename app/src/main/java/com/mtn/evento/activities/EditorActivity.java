@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mtn.evento.R;
+import com.mtn.evento.data.User;
 
 /**
  * Created by Summy on 8/8/2017.
@@ -72,4 +73,18 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     }
+
+    // [START basic_write]
+    private void writeNewUser(String userId, String name, String email) {
+        User user = new User();
+
+        user.setUsername(name);
+        user.setEmail(email);
+        user.setPhone("fddfdf");
+        user.setId(userId);
+
+        mDatabase.child("users").child(userId).setValue(user);
+    }
+    // [END basic_write]
+
 }
