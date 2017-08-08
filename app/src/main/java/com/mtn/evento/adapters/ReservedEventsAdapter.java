@@ -2,7 +2,6 @@ package com.mtn.evento.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mtn.evento.R;
 import com.mtn.evento.activities.EventDetailActivity;
@@ -21,49 +19,50 @@ import com.mtn.evento.data.Event;
 import java.util.ArrayList;
 
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder> {
+/**
+ * Created by Summy on 8/8/2017.
+ */
 
-    ArrayList<Event> events;
+public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAdapter.ReservedEventHolder> {
+
+    ArrayList<Event> reservedEvents;
     Context context;
-
-    public EventAdapter() {
+    public ReservedEventsAdapter() {
 
     }
 
-    public void setEvents(ArrayList<Event> events) {
-        this.events = events;
+    public void setReservedEventsEvents(ArrayList<Event> reservedEvents) {
+        this.reservedEvents = reservedEvents;
     }
-
     @Override
-    public EventHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ReservedEventHolder onCreateViewHolder(ViewGroup parent, int i) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_event,parent,false);
         context = parent.getContext();
-        return new EventHolder(view).setEvents(this.events);
+        return new ReservedEventHolder(view).setReservedEvents(this.reservedEvents);
     }
 
     @Override
-    public void onBindViewHolder(EventHolder holder, int position) {
-
-       //TODO: holder.imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(),events.get(position).getBanner()));
-        holder.title.setText(events.get(position).getTitle());
-        holder.venue.setText(events.get(position).getVenue());
-        holder.layout.setTag(events.get(position));
+    public void onBindViewHolder(ReservedEventHolder reservedEventHolder, int position) {
+        //TODO: holder.imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(),events.get(position).getBanner()));
+        reservedEventHolder.title.setText(reservedEvents.get(position).getTitle());
+        reservedEventHolder.venue.setText(reservedEvents.get(position).getVenue());
+        reservedEventHolder.layout.setTag(reservedEvents.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return events.size();
+        return 0;
     }
 
-    static class EventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class ReservedEventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView imageView;
         TextView title,venue;
         RelativeLayout layout;
         Context context;
-        ArrayList<Event> events;
+        ArrayList<Event> reservedEvents;
 
-        public EventHolder(View itemView) {
+        public ReservedEventHolder(View itemView) {
             super(itemView);
             context = itemView.getContext();
             imageView = (ImageView) itemView.findViewById(R.id.image);
@@ -73,22 +72,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
             layout.setOnClickListener(this);
         }
 
-        public   EventHolder  setEvents(ArrayList<Event> events) {
-            this.events = events;
+        public ReservedEventHolder setReservedEvents(ArrayList<Event> reservedEvents) {
+            this.reservedEvents = reservedEvents;
             return this;
         }
 
         @Override
         public void onClick(View v) {
+            //TODO: change EventDetailActivity.class to the class that displays the Reserved Events
+            //TODO get Bundle At event detail page and set it's values events.get(getAdapterPosition())
             Event event = (Event) v.getTag();
             Intent intent = new Intent(context, EventDetailActivity.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable(Constants.EVENT,event);
             intent.putExtra(Constants.BUNDLE,bundle);
-            //TODO: get Bundle At event detail page and set it's values events.get(getAdapterPosition())
             context.startActivity(intent);
         }
     }
-
-
 }
