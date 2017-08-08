@@ -10,6 +10,7 @@ public class User implements Serializable{
 
     private String username;
     private String email;
+    private String phone;
 
     public String getUsername() {
         return username;
@@ -31,6 +32,14 @@ public class User implements Serializable{
         this.username = username ;
         this.email = email;
 
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public  User(){
