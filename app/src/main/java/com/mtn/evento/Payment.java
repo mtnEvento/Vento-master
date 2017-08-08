@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.mtn.evento.data.ServerConnector;
+import com.mtn.evento.database.DatabaseHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +46,9 @@ public class Payment extends AppCompatActivity {
                     JSONObject object = new JSONObject(result);
                     JSONObject data =  object.getJSONObject("data");
                     String transactionId = data.getString("TransactionId");
+
+                    DatabaseHandler db = new DatabaseHandler(Payment.this);
+                    
 
                     Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
                 } catch (JSONException e) {
