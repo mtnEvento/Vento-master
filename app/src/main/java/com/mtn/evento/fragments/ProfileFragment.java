@@ -67,7 +67,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             switch (v.getId()){
                 case R.id.usernameCardView:
                     editIntent = new Intent(mContext, EditorActivity.class);
-                    editIntent.putExtra(EditorActivity.EDIT_USERNAME,getValue(email));
+                    editIntent.putExtra(EditorActivity.EDIT_USERNAME,getValue(username));
                     mContext.startActivityForResult(editIntent,USERNAME_EDIT_REQUEST);
                     break;
                 case R.id.phoneCardView:
@@ -75,11 +75,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     editIntent.putExtra(EditorActivity.EDIT_PHONE,getValue(phone));
                     mContext.startActivityForResult(editIntent,PHONE_EDIT_REQUEST);
                     break;
-//                case R.id.emailCardView:
-//                    editIntent = new Intent(mContext, EditorActivity.class);
-//                    editIntent.putExtra(EditorActivity.EDIT_EMAIL,getValue(email));
-//                    mContext.startActivityForResult(editIntent,EMAIL_EDIT_REQUEST);
-//                    break;
             }
         }
         else

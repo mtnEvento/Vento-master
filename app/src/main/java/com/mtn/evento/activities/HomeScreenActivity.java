@@ -61,16 +61,18 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
     private static final int LOGIN_REQUEST = 47;
     public static final String LOGINED_IN = "LOGINED_IN";
-    SearchRequestListener searchRequestListener;
-    SearchRegionRequestListener regionRequestListener;
-    MenuItem Loginlogout;
-    TextView nav_username, nav_email;
-    DrawerLayout mDrawerLayout;
+    private SearchRequestListener searchRequestListener;
+    private SearchRegionRequestListener regionRequestListener;
+    private MenuItem Loginlogout;
+    private TextView nav_username, nav_email;
+    private DrawerLayout mDrawerLayout;
     private de.hdodenhof.circleimageview.CircleImageView  imageView;
     private ActionBarDrawerToggle mDrawerToggle;
-    ImageView customSearchIcon;
+    private ImageView customSearchIcon;
     private EditText searchEditText;
     private SearchView searchView;
+    private ViewPager viewPager;
+    CMPagerAdapter tabAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,9 +108,9 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         tabLayout.addTab(tabLayout.newTab().setText("Reserved"));
         tabLayout.addTab(tabLayout.newTab().setText("Profile"));
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        final CMPagerAdapter adapter = new CMPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        tabAdapter  = new CMPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(tabAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -126,8 +128,8 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
             }
         });
-        searchRequestListener = (SearchRequestListener) ((EventsFragment)adapter.getItem(0));
-        regionRequestListener = (SearchRegionRequestListener) ((EventsFragment)adapter.getItem(0));
+        searchRequestListener = (SearchRequestListener) ((EventsFragment)tabAdapter.getItem(0));
+        regionRequestListener = (SearchRegionRequestListener) ((EventsFragment)tabAdapter.getItem(0));
         mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
@@ -170,6 +172,13 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                     customSearchIcon.setVisibility(View.VISIBLE);
                     searchEditText.setHint("           Search Events by Titles...");
                 }
+            }
+        });
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(HomeScreenActivity.this,""+ v.getId(),Toast.LENGTH_LONG).show();
             }
         });
 
@@ -251,6 +260,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                   regionRequestListener.onRegionSearch(regions[position].toLowerCase());
+                  viewPager.setCurrentItem(0);
             }
 
             @Override

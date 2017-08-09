@@ -81,18 +81,21 @@ public class EditorActivity extends AppCompatActivity implements View.OnClickLis
                 intent = new Intent();
                 intent.putExtra(EDIT_EMAIL,editableValue.getText().toString());
                 setResult(Activity.RESULT_OK,intent);
+                finish();
             }
             else  if(mIntent.hasExtra(EDIT_USERNAME)){
                 updateUserInfo(userId, "username",editableValue.getText().toString());
                 intent = new Intent();
                 intent.putExtra(EDIT_USERNAME,editableValue.getText().toString());
                 setResult(Activity.RESULT_OK,intent);
+                finish();
             }
             else  if(mIntent.hasExtra(EDIT_PHONE)){
                 updateUserInfo(userId, "phone",editableValue.getText().toString());
                 intent = new Intent();
                 intent.putExtra(EDIT_PHONE,editableValue.getText().toString());
                 setResult(Activity.RESULT_OK,intent);
+                finish();
             }
         }
     }
