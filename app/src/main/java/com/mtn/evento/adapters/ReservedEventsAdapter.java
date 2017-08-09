@@ -2,9 +2,6 @@ package com.mtn.evento.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,10 +13,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
-import com.mtn.evento.activities.EventDetailActivity;
 import com.mtn.evento.activities.ReservedDetailActivity;
 import com.mtn.evento.data.Constants;
-import com.mtn.evento.data.CustomBitmap;
 import com.mtn.evento.data.Event;
 
 import java.util.ArrayList;

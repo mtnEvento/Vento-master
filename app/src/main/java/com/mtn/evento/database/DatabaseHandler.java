@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.mtn.evento.data.Event;
 import com.mtn.evento.data.Location;
 import com.mtn.evento.data.Ticket;
-import com.mtn.evento.data.Ticket_Type;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
@@ -19,7 +18,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Summy on 8/8/2017.
@@ -132,10 +130,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         JSONObject mTicket =  ticketTypeArr.getJSONObject(i);
                         String ticket_name = mTicket.getString("name");
                         String ticket_amount = mTicket.getString("amount");
-                        Ticket ticket = new Ticket(ticket_name,ticket_amount);
+                        String ticket_total_seats = mTicket.getString("total_seats");
+                        String ticket_available_seats = mTicket.getString("available_seats");
+                        Ticket ticket = new Ticket(ticket_name,ticket_amount,ticket_available_seats,ticket_total_seats);
                         tickets.add(ticket);
                     }
-                    event.setTicket_type(new Ticket_Type(tickets));
+                    event.setTicket_type(tickets);
                     // Adding event to list
                     eventList.add(event);
                 } while (cursor.moveToNext());

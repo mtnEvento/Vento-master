@@ -19,6 +19,19 @@ public class Ticket implements Serializable{
        this.amount = amount ;
     }
 
+    public Ticket(String name, String amount,String total_seats ){
+        this.name = name ;
+        this.amount = amount ;
+        this. total_seats = total_seats;
+    }
+
+    public Ticket(String name, String amount,String available_seats ,String total_seats ){
+        this.name = name ;
+        this.amount = amount ;
+        this.total_seats = total_seats;
+        this.available_seats =  available_seats ;
+    }
+
     public String getName() {
         return name;
     }

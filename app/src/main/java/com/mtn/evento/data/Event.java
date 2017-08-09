@@ -3,6 +3,7 @@ package com.mtn.evento.data;
 import android.graphics.Bitmap;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by user on 8/4/2017.
@@ -20,17 +21,9 @@ public class Event implements Serializable {
     private String venue;
     private String banner;
     private String total_seats;
-    private Ticket_Type ticket_type;
+    private ArrayList<Ticket> ticket_type;
     private Location location;
-    private CustomBitmap bitmap;
 
-    public CustomBitmap getBitmap() {
-        return bitmap;
-    }
-
-    public void setBitmap(CustomBitmap bitmap) {
-        this.bitmap = bitmap;
-    }
 
     public String getEvent_publisher() {
         return event_publisher;
@@ -120,12 +113,13 @@ public class Event implements Serializable {
         this.total_seats = total_seats;
     }
 
-    public Ticket_Type getTicket_type() {
-        return ticket_type;
+
+    public void setTicket_type(ArrayList<Ticket> ticket_type) {
+        this.ticket_type = ticket_type;
     }
 
-    public void setTicket_type(Ticket_Type ticket_type) {
-        this.ticket_type = ticket_type;
+    public ArrayList<Ticket> getTicket_type() {
+        return ticket_type;
     }
 
     public Location getLocation() {
