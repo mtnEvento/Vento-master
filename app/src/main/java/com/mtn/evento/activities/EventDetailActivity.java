@@ -81,6 +81,12 @@ public class EventDetailActivity extends AppCompatActivity {
             case R.id.reserve_seat:
 //TODO: check if user is logged and open either login or reservation activity
                 Toast.makeText(this, "Reserve Seats", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(Constants.EVENT,event);
+                intent.putExtra(Constants.BUNDLE,bundle);
+                context.startActivity(intent);
                 startActivity(new Intent(this,ReservationActivity.class));
                 break;
             case R.id.share:

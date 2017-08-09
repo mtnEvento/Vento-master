@@ -1,29 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:weightSum="1"
-    android:orientation="horizontal"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-        <com.jaredrummler.materialspinner.MaterialSpinner
-            android:id="@+id/spinner"
-            android:layout_width="0dp"
-            android:layout_weight=".5"
-            app:ms_background_color="@color/colorAccent"
-            app:ms_hide_arrow="false"
-            app:ms_arrow_tint="@color/white"
-            app:ms_text_color="@color/white"
-            android:background="@drawable/yellow_btn"
-            android:layout_marginRight="12dp"
-            android:layout_height="wrap_content"/>
-        <EditText
-            android:layout_marginBottom="2dp"
-            android:background="@drawable/seat_background"
-            android:layout_width="0dp"
-            android:layout_gravity="bottom"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/margin_standard"
-            android:layout_weight="0.5"/>
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-</LinearLayout>
+        <LinearLayout
+            android:weightSum="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            >
+                <com.jaredrummler.materialspinner.MaterialSpinner
+                    android:id="@+id/spinner"
+                    android:layout_width="0dp"
+                    android:layout_weight=".5"
+                    app:ms_background_color="@color/colorAccent"
+                    app:ms_hide_arrow="false"
+                    app:ms_arrow_tint="@color/white"
+                    app:ms_text_color="@color/white"
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/yellow_btn"
+                    android:layout_marginRight="12dp"
+                    android:layout_height="wrap_content"/>
+                <EditText
+                    android:layout_marginBottom="2dp"
+                    android:background="@drawable/seat_background"
+                    android:layout_width="0dp"
+                    android:layout_gravity="bottom"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/margin_standard"
+                    android:layout_weight="0.5"/>
+
+        </LinearLayout>
+
+
+</android.support.v7.widget.CardView>
 

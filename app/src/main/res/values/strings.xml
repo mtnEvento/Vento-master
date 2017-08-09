@@ -20,4 +20,7 @@
     <string name="phone">Phone Number</string>
     <string name="sign_up">Register With Us</string>
     <string name="signUpText">SignUp</string>
+    <string name="add_ticket">Add Ticket</string>
+    <string name="remove_ticket">Remove Ticket</string>
+    <string name="seatTypeCount">Cart : 1</string>
 </resources>

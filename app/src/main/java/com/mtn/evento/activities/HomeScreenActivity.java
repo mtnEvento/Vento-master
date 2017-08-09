@@ -73,6 +73,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     private SearchView searchView;
     private ViewPager viewPager;
     CMPagerAdapter tabAdapter;
+    Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +117,13 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+                if(tab.getPosition() == 2 ){
+                    spinner.setVisibility(View.GONE);
+                }
+                else
+                {
+                    spinner.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -208,7 +216,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         getMenuInflater().inflate(R.menu.main_menu,menu);
 
         MenuItem item = menu.findItem(R.id.action_spinner);
-        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+        spinner = (Spinner) MenuItemCompat.getActionView(item);
 
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,

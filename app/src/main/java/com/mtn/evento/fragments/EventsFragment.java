@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -136,9 +137,6 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
 
     @Override
     public ArrayList<Event> onRegionSearch(String query, ViewPager vp) {
-        vp.setCurrentItem(0,true);
-        Log.d(LOGMESSAGE,"onRegionSearch query : "+query);
-        Log.d(LOGMESSAGE, "onRegionSearch: Events " + events);
 
         if(!query.isEmpty()){
             if(query.contains("--region--")){
@@ -146,9 +144,20 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                     eventAdapter.setEvents(events);
                     eventRecycler.setAdapter(eventAdapter);
 
-                    Log.d(LOGMESSAGE, "onRegionSearch: Events " + events);
-                    Log.d(LOGMESSAGE, "onRegionSearch: Events Obj title" + events.get(0));
                 }
+                else
+                {
+                    ArrayList<Event> filteredEvents = new ArrayList<>();
+                    for (Event e: events ) {
+                        if(e != null  && e.getRegion() != null && e.getRegion().toLowerCase().contains(query)){
+                            filteredEvents.add(e);
+                        }
+                    }
+                    eventAdapter.setEvents(filteredEvents);
+                    eventRecycler.setAdapter(eventAdapter);
+
+                }
+
             }
             else {
                 ArrayList<Event> filteredEvents = new ArrayList<>();
@@ -159,8 +168,16 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                 }
                 eventAdapter.setEvents(filteredEvents);
                 eventRecycler.setAdapter(eventAdapter);
+
+
             }
         }
+        if( vp.getCurrentItem() != 0){
+            vp.setCurrentItem(0,true);
+            eventRecycler.invalidate();
+        }
+
+
         return null;
     }
 }
