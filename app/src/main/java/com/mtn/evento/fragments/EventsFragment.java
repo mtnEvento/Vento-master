@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -134,8 +135,8 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     }
 
     @Override
-    public ArrayList<Event> onRegionSearch(String query) {
-
+    public ArrayList<Event> onRegionSearch(String query, ViewPager vp) {
+        vp.setCurrentItem(0,true);
         Log.d(LOGMESSAGE,"onRegionSearch query : "+query);
         Log.d(LOGMESSAGE, "onRegionSearch: Events " + events);
 

@@ -259,8 +259,9 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         return  new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                  regionRequestListener.onRegionSearch(regions[position].toLowerCase());
-                  viewPager.setCurrentItem(0);
+
+                  regionRequestListener.onRegionSearch(regions[position].toLowerCase(),viewPager);
+
             }
 
             @Override
@@ -357,7 +358,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     }
 
     public interface  SearchRegionRequestListener{
-        public ArrayList<Event> onRegionSearch(String query);
+        public ArrayList<Event> onRegionSearch(String query, ViewPager  vp);
     }
 
 
