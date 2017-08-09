@@ -55,11 +55,9 @@
     </style>
 
     <style name="SearchViewStyle">
-        <item name="android:textColorSecondary">@color/colorPrimaryDark</item>
-        <item name="android:textColorPrimary">#1B5E20</item>
-        <item name="android:textColorHint">@color/colorPrimaryDark</item>
-        <item name="android:hint">Search Events by title...</item>
 
+        <!--<item name="android:textColorPrimary">@color/colorPrimary</item>-->
+        <item name="android:hint">Search Events by title...</item>
     </style>
 
 </resources>

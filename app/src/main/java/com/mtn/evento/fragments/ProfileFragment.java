@@ -144,7 +144,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             if (((Evento) mContext.getApplication()).getSettings().contains(APP_USER_PHONE)) {
                 String str_phone = ((Evento) mContext.getApplication()).getSettings().getString(APP_USER_PHONE, "Phone Number");
-                phone.setText(str_phone.isEmpty() ? "No Phone number":str_phone);
+                phone.setText(str_phone.isEmpty() ? "No Phone number":str_phone );
             }
 
             if (((Evento) mContext.getApplication()).getSettings().contains(APP_USERNAME)) {

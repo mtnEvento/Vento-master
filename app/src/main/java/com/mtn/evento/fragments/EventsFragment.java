@@ -37,7 +37,7 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
  */
 public class EventsFragment extends Fragment implements HomeScreenActivity.SearchRequestListener,HomeScreenActivity.SearchRegionRequestListener {
 
-
+    ProgressDialog processSignUp;
     static RecyclerView eventRecycler;
     RecyclerView.LayoutManager layoutManager;
     static EventAdapter eventAdapter;
@@ -58,7 +58,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final ProgressDialog processSignUp =  ProgressDialog.show(view.getContext(),null,"Loading Events....",true,false);
+        processSignUp =  ProgressDialog.show(view.getContext(),"","Loading Events....",true,false);
         eventsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

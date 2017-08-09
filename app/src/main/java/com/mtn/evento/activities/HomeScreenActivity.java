@@ -3,8 +3,14 @@ package com.mtn.evento.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.res.ResourcesCompat;
@@ -18,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -50,7 +57,7 @@ import static com.mtn.evento.data.Constants.APP_USER_ID;
 import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
-public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,SearchView.OnCloseListener,SearchView.OnClickListener {
 
     private static final int LOGIN_REQUEST = 47;
     public static final String LOGINED_IN = "LOGINED_IN";
@@ -61,6 +68,9 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     DrawerLayout mDrawerLayout;
     private de.hdodenhof.circleimageview.CircleImageView  imageView;
     private ActionBarDrawerToggle mDrawerToggle;
+    ImageView customSearchIcon;
+    private EditText searchEditText;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +87,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         initUI();
         initSetting();
+        initSearch();
     }
 
     public void initUI(){
@@ -124,9 +135,46 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     }
 
     private void initSearch(){
+        searchView = (SearchView) findViewById(R.id.eventSearchView);
+        searchEditText = (EditText)searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        ImageView closeButtonImage = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        closeButtonImage.setVisibility(View.GONE);
+        closeButtonImage.removeOnLayoutChangeListener(null);
+        closeButtonImage.setOnFocusChangeListener(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            closeButtonImage.setRevealOnFocusHint(false);
+        }
+        searchEditText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        searchEditText.setHintTextColor(Color.LTGRAY);
+        searchEditText.setHint("           Search Events by Titles...");
+        ImageView mSearchHintIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+                customSearchIcon.setVisibility(View.GONE);
+                searchEditText.setHint("       Search Events by Titles...");
+            }
+        });
 
-        final android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) findViewById(R.id.searchView);
-       // searchView.
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+                    customSearchIcon.setVisibility(View.GONE);
+                    searchEditText.setHint("       Search Events by Titles...");
+                }
+                else{
+                    customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+                    customSearchIcon.setVisibility(View.VISIBLE);
+                    searchEditText.setHint("           Search Events by Titles...");
+                }
+            }
+        });
+
+
+        // searchView.
     }
     private void initSetting(){
 
@@ -214,11 +262,23 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
     @Override
     public void onBackPressed() {
+
+        if(searchEditText.getText().toString().isEmpty()){
+            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+            customSearchIcon.setVisibility(View.VISIBLE);
+        }
+        else {
+            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+            customSearchIcon.setVisibility(View.GONE);
+        }
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+
             super.onBackPressed();
+
         }
     }
 
@@ -261,6 +321,27 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         return false;
     }
 
+    @Override
+    public boolean onClose() {
+
+        if(searchEditText.getText().toString().isEmpty()){
+            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+            customSearchIcon.setVisibility(View.VISIBLE);
+        }
+        else {
+            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+            customSearchIcon.setVisibility(View.GONE);
+        }
+        return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId()== android.support.v7.appcompat.R.id.search_close_btn){
+            searchEditText.setText("dgdfgfgfcdgv");
+        }
+    }
+
     public interface  SearchRequestListener{
         public ArrayList<Event> onSearch(String query);
     }
@@ -268,5 +349,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     public interface  SearchRegionRequestListener{
         public ArrayList<Event> onRegionSearch(String query);
     }
+
+
 
 }

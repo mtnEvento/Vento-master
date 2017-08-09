@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/button_radius"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/curved_white"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/button_radius"
+        android:layout_marginLeft="25dp"
+        app:srcCompat="@drawable/ic_search_svg"
+        android:layout_marginTop="8dp"
+        tools:ignore="VectorDrawableCompat"
+        android:id="@+id/imageView4" />
+    <EditText
+        android:id="@+id/eventSearchView"
+        android:layout_width="wrap_content"
+        android:layout_height="40sp"
+        android:layout_centerVertical="true"
+        android:hint="\t\t\t\t\tSearch here...."
+        android:layout_toRightOf="@+id/imageView4"
+        android:layout_toLeftOf="@+id/imageView2"
+        android:layout_toStartOf="@+id/imageView2" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/button_radius"
+        app:srcCompat="@drawable/ic_cross"
+        android:layout_marginRight="12dp"
+        android:id="@+id/imageView2"
+        android:layout_marginEnd="12dp"
+        android:layout_alignTop="@+id/imageView4"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
