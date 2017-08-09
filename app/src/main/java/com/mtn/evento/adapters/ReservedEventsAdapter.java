@@ -16,19 +16,20 @@ import com.mtn.evento.R;
 import com.mtn.evento.activities.ReservedDetailActivity;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
+import com.mtn.evento.data.ResultSet;
 
 import java.util.ArrayList;
 
 
 public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAdapter.ReservedEventHolder> {
 
-    ArrayList<Event> reservedEvents;
+    ArrayList<ResultSet> reservedEvents;
     Context context;
     public ReservedEventsAdapter() {
 
     }
 
-    public void setReservedEvents(ArrayList<Event> reservedEvents) {
+    public void setReservedEvents(ArrayList<ResultSet> reservedEvents) {
         this.reservedEvents = reservedEvents;
     }
     @Override
@@ -42,17 +43,17 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
     public void onBindViewHolder(ReservedEventHolder reservedEventHolder, int position) {
 
         Glide.with(context)
-                .load(reservedEvents.get(position).getBanner())
+                .load( reservedEvents.get(position).getmEvent().get(position).getBanner())
                 .asBitmap()
                 .into(reservedEventHolder.imageView) ;
-        reservedEventHolder.title.setText(reservedEvents.get(position).getTitle());
-        reservedEventHolder.venue.setText(reservedEvents.get(position).getVenue());
-        reservedEventHolder.layout.setTag(reservedEvents.get(position));
+        reservedEventHolder.title.setText(reservedEvents.get(position).getmEvent().get(position).getTitle());
+        reservedEventHolder.venue.setText(reservedEvents.get(position).getmEvent().get(position).getVenue());
+        reservedEventHolder.layout.setTag(reservedEvents.get(position).getmEvent().get(position));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return reservedEvents.size();
     }
 
     static class ReservedEventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -61,7 +62,7 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
         TextView title,venue;
         RelativeLayout layout;
         Context context;
-        ArrayList<Event> reservedEvents;
+        ArrayList<ResultSet> reservedEvents;
 
         public ReservedEventHolder(View itemView) {
             super(itemView);
@@ -73,7 +74,7 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
             layout.setOnClickListener(this);
         }
 
-        public ReservedEventHolder setReservedEvents(ArrayList<Event> reservedEvents) {
+        public ReservedEventHolder setReservedEvents(ArrayList<ResultSet> reservedEvents) {
             this.reservedEvents = reservedEvents;
             return this;
         }

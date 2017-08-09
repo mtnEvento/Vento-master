@@ -5,9 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import com.mtn.evento.data.DisplayTicket;
 import com.mtn.evento.data.Event;
 import com.mtn.evento.data.Location;
+import com.mtn.evento.data.ResultSet;
 import com.mtn.evento.data.Ticket;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -18,6 +21,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 /**
  * Created by Summy on 8/8/2017.
@@ -26,7 +32,7 @@ import java.util.ArrayList;
 public class DatabaseHandler extends SQLiteOpenHelper {
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Database Name
     private static final String DATABASE_NAME = "ReservedManager";
@@ -36,7 +42,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
-    private static final String KEY_EVENT_TITLE = "evt_title";
+    private static final String KEY_EVENT_DISPLAYS = "evt_title";
     private static final String KEY_EVENT_ID = "evt_id";
     private static final String KEY_EVENT = "evt_event";
 
@@ -49,7 +55,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_RESERVED_EVENT_TABLE = "CREATE TABLE " + TABLE_RESERVED_EVENT + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EVENT_ID + " TEXT,"
-                + KEY_EVENT_TITLE + " TEXT,"
+                + KEY_EVENT_DISPLAYS + " TEXT,"
                 + KEY_EVENT + " TEXT" + ")";
         db.execSQL(CREATE_RESERVED_EVENT_TABLE);
     }
@@ -66,46 +72,68 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     // [Adding new event]
-    public void addEvent(Event event) {
+    public void addEvent(Event event,  List<DisplayTicket> displayTickets) {
 
         try
         {
             SQLiteDatabase db = this.getWritableDatabase();
-            String json = "";
+            String json = "",display ="";
 
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             json = ow.writeValueAsString(event);
 
+            ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            display = ow.writeValueAsString(displayTickets);
+
             ContentValues values = new ContentValues();
             values.put(KEY_EVENT_ID, event.getEvent_id());
-            values.put(KEY_EVENT_TITLE,event.getTitle());
+            values.put(KEY_EVENT_DISPLAYS,"{\"displays\":"+display+"}");
             values.put(KEY_EVENT,json);
 
             // Inserting Row
             db.insert(TABLE_RESERVED_EVENT, null, values);
             db.close(); // Closing database connection
-
+            Log.d(LOGMESSAGE, "addEvent: SUCCESSFUL");
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d(LOGMESSAGE, "ERROR : Add event : " + e.getMessage());
         }
 
     }
     // [Adding new event]
 
     // [Getting All reserved Events]
-    public ArrayList<Event> getAllreservedEvents() {
-
+    public ArrayList<ResultSet> getAllreservedEvents() {
+        Log.d(LOGMESSAGE, "getAllreservedEvents: ");
         try
         {
             ArrayList<Event> eventList = new ArrayList<Event>();
-            // Select All Query
+            ArrayList<ResultSet> resultSets = new ArrayList<>();
             String selectQuery = "SELECT  * FROM " + TABLE_RESERVED_EVENT;
             SQLiteDatabase db = this.getWritableDatabase();
             Cursor cursor = db.rawQuery(selectQuery, null);
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
+                Log.d(LOGMESSAGE, "Cursor moved to first: ");
                 do {
                     Event event = new Event();
+
+                    String str_display =  cursor.getString(2);
+                    JSONObject displayObject = new JSONObject(str_display);
+                    JSONArray displayArr = displayObject.getJSONArray("displays");
+                    List<DisplayTicket>  displayTickets = new ArrayList<>();
+
+                    for (int i = 0; i < displayArr.length(); i++) {
+                        DisplayTicket displayTicket = new DisplayTicket();
+
+                        displayTicket.setTransactionId( displayArr.getJSONObject(i).getString("transactionId"));
+                        displayTicket.setName( displayArr.getJSONObject(i).getString("name"));
+                        displayTicket.setQrCode( displayArr.getJSONObject(i).getString("qrCode"));
+                        displayTickets.add(displayTicket);
+                    }
+                // TODO:   displayObject.
+                  //  handler.addEvent(mEvent,); handler.addEvent(mEvent,);
+
                     String str_event =  cursor.getString(3);
                     JSONObject object = new JSONObject(str_event);
                     event.setEvent_id(object.getString("event_id"));
@@ -138,12 +166,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     event.setTicket_type(tickets);
                     // Adding event to list
                     eventList.add(event);
+                    resultSets.add(new ResultSet(eventList,displayTickets));
                 } while (cursor.moveToNext());
+
+                Log.d(LOGMESSAGE, "success : get db: " + resultSets);
             }
             // return event list
-            return eventList;
+            return resultSets;
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.d(LOGMESSAGE, "ERROR : get db : " + e.getMessage());
             return  null;
         }
 
@@ -162,19 +194,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // [Getting events Count]
 
     // [Updating single event]
-    public int updateContact(Event event) {
+    public int updateEvent(Event event, List<DisplayTicket> displayTickets) {
         // updating row
         try
         {
             SQLiteDatabase db = this.getWritableDatabase();
-            String json = "";
+            String json = "",display ="";
 
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             json = ow.writeValueAsString(event);
 
+            ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            display = ow.writeValueAsString(displayTickets);
+
+
+
             ContentValues values = new ContentValues();
             values.put(KEY_EVENT_ID, event.getEvent_id());
-            values.put(KEY_EVENT_TITLE,event.getTitle());
+            values.put(KEY_EVENT_DISPLAYS,display);
             values.put(KEY_EVENT,json);
 
             // Inserting Row

@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,8 @@ import com.mtn.evento.database.DatabaseHandler;
 
 import java.util.ArrayList;
 
+import static com.mtn.evento.data.Constants.LOGMESSAGE;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -31,6 +34,8 @@ public class ReservedFragment extends Fragment {
     AppCompatActivity appContext;
 
     public ReservedFragment() {
+
+        Log.d(LOGMESSAGE, "ReservedFragment: CALLED ");
         reservedEvents = new ArrayList<>();
         reservedEventsAdapter = new ReservedEventsAdapter();
     }
@@ -45,16 +50,12 @@ public class ReservedFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         reservedRecycler.setLayoutManager(layoutManager);
         reservedRecycler.setHasFixedSize(true);
-        return v;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         DatabaseHandler db = new DatabaseHandler(appContext);
         reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
         reservedRecycler.setAdapter(reservedEventsAdapter);
+        return v;
     }
+
 
     @Override
     public void onAttach(Context context) {
@@ -62,9 +63,4 @@ public class ReservedFragment extends Fragment {
         this.appContext = (AppCompatActivity) context;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.appContext = (AppCompatActivity) activity;
-    }
 }

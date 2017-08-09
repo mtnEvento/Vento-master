@@ -172,10 +172,10 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
 
             }
         }
-        if( vp.getCurrentItem() != 0){
-            vp.setCurrentItem(0,true);
-            eventRecycler.invalidate();
-        }
+//        if( vp.getCurrentItem() != 0){
+//            vp.setCurrentItem(0,true);
+//            eventRecycler.invalidate();
+//        }
 
 
         return null;

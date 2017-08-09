@@ -166,6 +166,9 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 //            }
 //        }).connectToServer();
 
+        DatabaseHandler handler = new DatabaseHandler(getActivity());
+
+
 //TODO  add all purchased tickets to list of DisplayTicket object
 
         List<DisplayTicket> displayTickets = new ArrayList<>();
@@ -180,7 +183,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         ticket1.setQrCode("paernnnerrr_asdfads");
         ticket1.setTransactionId("1234778345");
         displayTickets.add(ticket1);
-
+        handler.addEvent(mEvent,displayTickets);
         Intent intent = new Intent(getActivity(), BarcodeActivity.class);
 
         intent.putExtra(Constants.TICKET, (Serializable) displayTickets);
