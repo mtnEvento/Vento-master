@@ -117,12 +117,18 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                if(tab.getPosition() == 2 ){
-                    spinner.setVisibility(View.GONE);
+                if(tab.getPosition() > 0 ){
+                    if(spinner!= null ){
+                        spinner.setVisibility(View.GONE);
+                    }
+
                 }
                 else
                 {
-                    spinner.setVisibility(View.VISIBLE);
+                    if(spinner!= null ){
+                        spinner.setVisibility(View.VISIBLE);
+                    }
+
                 }
             }
 
@@ -357,7 +363,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     @Override
     public void onClick(View v) {
         if(v.getId()== android.support.v7.appcompat.R.id.search_close_btn){
-            searchEditText.setText("dgdfgfgfcdgv");
+            searchEditText.setText("         ");
         }
     }
 
