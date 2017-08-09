@@ -92,34 +92,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mContext = (AppCompatActivity) getActivity();
-        if( !((Evento)mContext.getApplication()).getSettings().contains(APP_USER_EMAIL) ){
+        mContext = (AppCompatActivity) context;
 
-        }
-        else
-        {
 
-        }
     }
-
-    @Override
+        @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mContext = (AppCompatActivity) getActivity();
-        if( ((Evento)mContext.getApplication()).getSettings().contains(APP_USER_EMAIL) ){
-            String str_email =  ((Evento)mContext.getApplication()).getSettings().getString(APP_USER_EMAIL,"Email Address");
-            email.setText(str_email);
-        }
-
-        if( ((Evento)mContext.getApplication()).getSettings().contains(APP_USER_PHONE) ){
-            String str_phone =  ((Evento)mContext.getApplication()).getSettings().getString(APP_USER_PHONE,"Phone Number");
-            phone.setText(str_phone);
-        }
-
-        if( ((Evento)mContext.getApplication()).getSettings().contains(APP_USERNAME) ){
-            String str_username = ((Evento)mContext.getApplication()).getSettings().getString(APP_USERNAME,"Username");
-            username.setText(str_username);
-        }
 
     }
 
@@ -149,14 +129,30 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             }
         }
-//        else  if(requestCode == EMAIL_EDIT_REQUEST && resultCode == Activity.RESULT_OK){
-//            if(data != null ){
-//
-//                if(data.hasExtra(EditorActivity.EDIT_EMAIL)){
-//                    email.setText(data.getStringExtra(EditorActivity.EDIT_EMAIL));
-//                }
-//
-//            }
-//        }
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if( mAuth  != null && mAuth.getCurrentUser()!=null){
+            if (((Evento) mContext.getApplication()).getSettings().contains(APP_USER_EMAIL)) {
+                String str_email = ((Evento) mContext.getApplication()).getSettings().getString(APP_USER_EMAIL, "Email Address");
+                email.setText(str_email);
+            }
+
+            if (((Evento) mContext.getApplication()).getSettings().contains(APP_USER_PHONE)) {
+                String str_phone = ((Evento) mContext.getApplication()).getSettings().getString(APP_USER_PHONE, "Phone Number");
+                phone.setText(str_phone.isEmpty() ? "No Phone number":str_phone);
+            }
+
+            if (((Evento) mContext.getApplication()).getSettings().contains(APP_USERNAME)) {
+                String str_username = ((Evento) mContext.getApplication()).getSettings().getString(APP_USERNAME, "Username");
+                username.setText(str_username);
+            }
+        }
+
+
     }
 }
