@@ -51,6 +51,7 @@ public class BarcodeFragment extends Fragment implements View.OnClickListener {
         Button shareBtn = (Button) view.findViewById(R.id.shareBtn);
         Button printBtn = (Button) view.findViewById(R.id.printBtn);
         shareBtn.setOnClickListener(this);
+        printBtn.setOnClickListener(this);
 
         if(displayTicket != null){
 
@@ -80,7 +81,7 @@ public class BarcodeFragment extends Fragment implements View.OnClickListener {
             case R.id.printBtn:
                 Toast.makeText(getContext(), "Print", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.share:
+            case R.id.shareBtn:
                 Toast.makeText(getContext(), "Share", Toast.LENGTH_SHORT).show();
                 break;
         }

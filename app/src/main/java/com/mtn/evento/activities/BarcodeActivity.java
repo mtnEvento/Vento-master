@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
@@ -45,8 +46,12 @@ public class BarcodeActivity extends AppCompatActivity {
 
         viewpager.setAdapter(adapter);
 
+    }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onBackPressed();
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
