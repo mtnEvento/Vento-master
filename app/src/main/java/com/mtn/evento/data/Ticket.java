@@ -9,6 +9,8 @@ import java.io.Serializable;
 public class Ticket implements Serializable{
     private String name;
     private String amount;
+    private String total_seats;
+    private String available_seats;
 
     public Ticket(){}
 
@@ -31,5 +33,21 @@ public class Ticket implements Serializable{
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getTotal_seats() {
+        return total_seats;
+    }
+
+    public void setTotal_seats(String total_seats) {
+        this.total_seats = total_seats;
+    }
+
+    public String getAvailable_seats() {
+        return available_seats;
+    }
+
+    public void setAvailable_seats(String available_seats) {
+        this.available_seats = available_seats;
     }
 }

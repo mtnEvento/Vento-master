@@ -22,6 +22,8 @@ import com.github.clans.fab.FloatingActionButton;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mtn.evento.Payment;
 import com.mtn.evento.R;
+import com.mtn.evento.data.Constants;
+import com.mtn.evento.data.Event;
 import com.mtn.evento.data.ServerConnector;
 import com.mtn.evento.database.DatabaseHandler;
 
@@ -37,7 +39,9 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
  */
 public class ReserveSeatFragment extends Fragment implements View.OnClickListener {
     Context context;
-    ReservationHolder holder;
+    private ReservationHolder holder;
+    private Event mEvent;
+    private Button makePayment;
     public ReserveSeatFragment() {
         // Required empty public constructor
 
@@ -50,9 +54,12 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         // Inflate the layout for this fragment
 
         View view = inflater.inflate(R.layout.fragment_reserve_seat, container, false);
-        Button makePayment = (Button) view.findViewById(R.id.makePayment);
+        makePayment = (Button) view.findViewById(R.id.makePayment);
         makePayment.setOnClickListener(this);
         holder = new ReservationHolder(view,this);
+        Bundle bag = getArguments();
+        mEvent = (Event) bag.getSerializable(Constants.EVENT);
+        makePayment.setTag(mEvent);
         return view;
     }
 
@@ -83,6 +90,11 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 break;
 
             case R.id.makePayment:
+                childs = holder.seats_group.getChildCount();
+                if(childs > 0){
+
+                }
+
             confirmPayment("1000.00");
                 break;
 
@@ -139,7 +151,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                     String transactionId = data.getString("TransactionId");
 
                     DatabaseHandler db = new DatabaseHandler(getContext());
-                   // db.addEvent();
+                    db.addEvent(mEvent);
 
                     Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
                 } catch (JSONException e) {

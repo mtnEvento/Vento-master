@@ -39,26 +39,26 @@ public class EventoMainPage extends AppCompatActivity {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference eventsRef = firebaseDatabase.getReference(Database.Tables.EVENTS);
 
-        long ts= System.currentTimeMillis();
-        Event a = new Event();
-        a.setTotal_seats("800");
-        a.setEvent_publisher("Vodafone");
-        a.setEvent_id(""+ts);
-        a.setVenue("Conference Centre");
-        a.setDate_published(""+SmartGet.getDateTimeFromTimeStamp(""+ts));
-        a.setEvent_date(""+ SmartGet.getDateTimeFromTimeStamp(""+ts));
-        a.setEvent_type("Music Awards");
-        a.setTitle("Vodafone Ghana Music Awards, 2018");
-        a.setLocation(new Location(3.27772,-1.455));
-        a.setRegion("Volta");
-        a.setBanner("https://firebasestorage.googleapis.com/v0/b/evento-14a5b.appspot.com/o/banner.jpg?alt=media&token=4c828fa6-5589-40eb-ac46-bc18e599e35d");
-
-        ArrayList<Ticket> tickets = new ArrayList<Ticket>();
-        tickets.add(new Ticket("vvip","200"));
-        tickets.add(new Ticket("regular","100"));
-        Ticket_Type ticketType = new Ticket_Type(tickets);
-        a.setTicket_type(ticketType);
-        eventsRef.child("evt-"+ ts).getRef().setValue(a);
+//        long ts= System.currentTimeMillis();
+//        Event a = new Event();
+//        a.setTotal_seats("800");
+//        a.setEvent_publisher("Vodafone");
+//        a.setEvent_id(""+ts);
+//        a.setVenue("Conference Centre");
+//        a.setDate_published(""+SmartGet.getDateTimeFromTimeStamp(""+ts));
+//        a.setEvent_date(""+ SmartGet.getDateTimeFromTimeStamp(""+ts));
+//        a.setEvent_type("Music Awards");
+//        a.setTitle("Vodafone Ghana Music Awards, 2018");
+//        a.setLocation(new Location(3.27772,-1.455));
+//        a.setRegion("Volta");
+//        a.setBanner("https://firebasestorage.googleapis.com/v0/b/evento-14a5b.appspot.com/o/banner.jpg?alt=media&token=4c828fa6-5589-40eb-ac46-bc18e599e35d");
+//
+//        ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+//        tickets.add(new Ticket("vvip","200"));
+//        tickets.add(new Ticket("regular","100"));
+//        Ticket_Type ticketType = new Ticket_Type(tickets);
+//        a.setTicket_type(ticketType);
+//        eventsRef.child("evt-"+ ts).getRef().setValue(a);
 
         Button button2 = (Button) findViewById(R.id.button2);
         final EditText ref = (EditText) findViewById(R.id.editText2);
@@ -68,7 +68,7 @@ public class EventoMainPage extends AppCompatActivity {
             public void onClick(View view) {
                 EncodeData.getInstance();
                 String encoded =  EncodeData.encode(name.getText().toString()+ " "+ref.getText().toString());
-                Bitmap myBitmap = QRCode.from( encoded).withColor(0x0a80c9AA, 0xffb907AA).bitmap();
+                Bitmap myBitmap = QRCode.from( encoded).withColor(0xFFCC00, 0xCCCCCCAA).bitmap();
                 ImageView myImage = (ImageView) findViewById(R.id.imageView);
                 myImage.setImageBitmap(myBitmap);
                 TextView securedQR = (TextView) findViewById(R.id.securedQR);
@@ -77,35 +77,35 @@ public class EventoMainPage extends AppCompatActivity {
             }
         });
 
-        eventsRef.getRef().addChildEventListener(new ChildEventListener() {
-
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Toast.makeText(EventoMainPage.this,"Data : "+dataSnapshot, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-              //  Toast.makeText(EventoMainPage.this,"Data : "+dataSnapshot, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Toast.makeText(EventoMainPage.this,"Data : "+dataSnapshot, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-               // Toast.makeText(EventoMainPage.this,"Data : "+dataSnapshot, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(EventoMainPage.this,"Data : "+databaseError, Toast.LENGTH_LONG).show();
-            }
-
-
-        });
+//        eventsRef.getRef().addChildEventListener(new ChildEventListener() {
+//
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                Toast.makeText(EventoMainPage.this,"Data : "+dataSnapshot, Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//              //  Toast.makeText(EventoMainPage.this,"Data : "+dataSnapshot, Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                Toast.makeText(EventoMainPage.this,"Data : "+dataSnapshot, Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//               // Toast.makeText(EventoMainPage.this,"Data : "+dataSnapshot, Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Toast.makeText(EventoMainPage.this,"Data : "+databaseError, Toast.LENGTH_LONG).show();
+//            }
+//
+//
+//        });
 
 
 

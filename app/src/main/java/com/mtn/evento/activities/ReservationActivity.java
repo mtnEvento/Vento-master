@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.mtn.evento.R;
+import com.mtn.evento.data.Constants;
 import com.mtn.evento.fragments.ReserveSeatFragment;
 
 public class ReservationActivity extends AppCompatActivity {
@@ -23,8 +24,9 @@ public class ReservationActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if(getSupportActionBar() != null)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        getSupportFragmentManager().beginTransaction().add(R.id.container,new ReserveSeatFragment()).commit();
+        ReserveSeatFragment seatFragment = new ReserveSeatFragment();
+        seatFragment.setArguments(getIntent().getBundleExtra(Constants.BUNDLE));
+        getSupportFragmentManager().beginTransaction().add(R.id.container,seatFragment).commit();
     }
 
     @Override

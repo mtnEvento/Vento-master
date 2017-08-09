@@ -22,16 +22,16 @@
             android:value="GlideModule"/>
 
         <activity android:name=".EventoMainPage">
-
-        </activity>
-        <activity android:name=".activities.HomeScreenActivity"
-            android:windowSoftInputMode="stateHidden"
-            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".activities.HomeScreenActivity"
+            android:windowSoftInputMode="stateHidden"
+            >
+
             </activity>
         <activity android:name=".activities.EventDetailActivity" />
         <activity android:name=".activities.EditorActivity" />
