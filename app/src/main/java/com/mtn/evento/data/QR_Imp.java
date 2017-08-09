@@ -43,7 +43,7 @@ public class QR_Imp {
 // override default colors (black on white)
 // notice that the color format is "0x(alpha: 1 byte)(RGB: 3 bytes)"
 // so in the example below it's red for foreground and yellowish for background, both 100% alpha (FF).
-        QRCode.from("Hello World").withColor(0xFFFF0000, 0xFFFFFFAA).file();
+        QRCode.from("Hello World").withColor(0xFFFF0000, 0x00FFCCAA).file();
 
 // supply own outputstream
    //     QRCode.from("Hello World").to(ImageType.PNG).writeTo(outputStream);

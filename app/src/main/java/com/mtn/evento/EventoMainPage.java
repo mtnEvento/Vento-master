@@ -66,9 +66,9 @@ public class EventoMainPage extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EncodeData.getInstance();
-                String encoded =  EncodeData.encode(name.getText().toString()+ " "+ref.getText().toString());
-                Bitmap myBitmap = QRCode.from( encoded).withColor(0xFFCC00, 0xCCCCCCAA).bitmap();
+                EncodeData.getInstance();//  0xFF0000AA -bg :blue  rgb
+                String encoded =  EncodeData.encode(name.getText().toString().trim()+ " "+ref.getText().toString().trim());
+                Bitmap myBitmap = QRCode.from( encoded).withColor(0x000000, 0xFd0012AC).bitmap();
                 ImageView myImage = (ImageView) findViewById(R.id.imageView);
                 myImage.setImageBitmap(myBitmap);
                 TextView securedQR = (TextView) findViewById(R.id.securedQR);
