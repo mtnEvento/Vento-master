@@ -79,15 +79,15 @@ public class EventDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.reserve_seat:
-//TODO: check if user is logged and open either login or reservation activity
+              //TODO: check if user is logged and open either login or reservation activity
                 Toast.makeText(this, "Reserve Seats", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent();
+                Intent mIntent = new Intent(this,ReservationActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(Constants.EVENT,event);
-                intent.putExtra(Constants.BUNDLE,bundle);
-                context.startActivity(intent);
-                startActivity(new Intent(this,ReservationActivity.class));
+                mIntent.putExtra(Constants.BUNDLE,bundle);
+                this.getParent().startActivity(mIntent);
+
                 break;
             case R.id.share:
 
