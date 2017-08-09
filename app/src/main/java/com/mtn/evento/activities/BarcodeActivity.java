@@ -6,12 +6,15 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 
 import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.DisplayTicket;
 import com.mtn.evento.fragments.BarcodeFragment;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +22,9 @@ public class BarcodeActivity extends AppCompatActivity {
 
     ViewPager viewpager;
     MyPagerAdapter adapter;
+    Toolbar toolbar;
 
     List<DisplayTicket> mDisplayTickets;
-    DisplayTicket displayTicket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +35,12 @@ public class BarcodeActivity extends AppCompatActivity {
         adapter = new MyPagerAdapter(getSupportFragmentManager());
 
 //       pass list of tickets into this activity and set it to mDisplayTickets
-        Bundle bundle = getIntent().getBundleExtra(Constants.BUNDLE);
 
-        if(displayTicket != null)
-        mDisplayTickets = displayTicket.getDisplayTickets();
+        mDisplayTickets = (List<DisplayTicket>) getIntent().getSerializableExtra(Constants.TICKET);
 
-        adapter.setBundle(bundle);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         adapter.setDisplayTickets(mDisplayTickets);
 
         viewpager.setAdapter(adapter);
@@ -46,27 +49,28 @@ public class BarcodeActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
 
-     class MyPagerAdapter extends FragmentStatePagerAdapter {
+    private class MyPagerAdapter extends FragmentStatePagerAdapter {
         private List<DisplayTicket> displayTickets;
-         Bundle bundle;
 
-        public MyPagerAdapter(FragmentManager fm) {
+
+         MyPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
-         public void setBundle(Bundle bundle) {
-             this.bundle = bundle;
-         }
-
-         public void setDisplayTickets(List<DisplayTicket> displayTickets) {
+          void setDisplayTickets(List<DisplayTicket> displayTickets) {
             this.displayTickets = displayTickets;
         }
 
         @Override
         public Fragment getItem(int position) {
             Fragment fragment = new BarcodeFragment();
-//          bundle.putInt(BarcodeFragment.ARG_OBJECT, position + 1);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(Constants.TICKET, displayTickets.get(position));
             fragment.setArguments(bundle);
             return fragment;
         }

@@ -14,4 +14,5 @@ public class Constants {
     public static final String APP_USER_ID = "com.mtn.evento.data.APP_USER_ID";
     public static final String PREFS_NAME = "evento";
     public static final String TICKET = "com.mtn.evento.data.TICKET";
+    public static final String ARG_OBJECT = "com.mtn.evento.data.ARG_OBJECT";
 }

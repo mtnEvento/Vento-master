@@ -34,6 +34,7 @@ import com.mtn.evento.database.DatabaseHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -169,18 +170,20 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
         List<DisplayTicket> displayTickets = new ArrayList<>();
         DisplayTicket ticket = new DisplayTicket();
-
         ticket.setName("VVIP");
-        ticket.setQrCode(BitmapFactory.decodeResource(getContext().getResources(),R.drawable.banner));
+        ticket.setQrCode("jjjasdfddadsf_a_adsfd");
         ticket.setTransactionId("1234778345");
         displayTickets.add(ticket);
 
-        ticket.setDisplayTickets(displayTickets);
+        DisplayTicket ticket1 = new DisplayTicket();
+        ticket1.setName("Regular");
+        ticket1.setQrCode("paernnnerrr_asdfads");
+        ticket1.setTransactionId("1234778345");
+        displayTickets.add(ticket1);
 
         Intent intent = new Intent(getActivity(), BarcodeActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(Constants.TICKET,ticket);
-        intent.putExtra(Constants.BUNDLE,bundle);
+
+        intent.putExtra(Constants.TICKET, (Serializable) displayTickets);
         startActivity(intent);
 
     }
