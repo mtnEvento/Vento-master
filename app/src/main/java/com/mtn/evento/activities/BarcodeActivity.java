@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.mtn.evento.R;
+import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.DisplayTicket;
 import com.mtn.evento.fragments.BarcodeFragment;
 
@@ -20,6 +21,7 @@ public class BarcodeActivity extends AppCompatActivity {
     MyPagerAdapter adapter;
 
     List<DisplayTicket> mDisplayTickets;
+    DisplayTicket displayTicket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,33 +32,41 @@ public class BarcodeActivity extends AppCompatActivity {
         adapter = new MyPagerAdapter(getSupportFragmentManager());
 
 //       pass list of tickets into this activity and set it to mDisplayTickets
-        mDisplayTickets = new ArrayList<>();
+        Bundle bundle = getIntent().getBundleExtra(Constants.BUNDLE);
+
+        if(displayTicket != null)
+        mDisplayTickets = displayTicket.getDisplayTickets();
+
+        adapter.setBundle(bundle);
+        adapter.setDisplayTickets(mDisplayTickets);
+
+        viewpager.setAdapter(adapter);
 
 
 
     }
 
 
-    public class MyPagerAdapter extends FragmentStatePagerAdapter {
+     class MyPagerAdapter extends FragmentStatePagerAdapter {
         private List<DisplayTicket> displayTickets;
+         Bundle bundle;
 
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
-        public List<DisplayTicket> getDisplayTickets() {
-            return displayTickets;
-        }
+         public void setBundle(Bundle bundle) {
+             this.bundle = bundle;
+         }
 
-        public void setDisplayTickets(List<DisplayTicket> displayTickets) {
+         public void setDisplayTickets(List<DisplayTicket> displayTickets) {
             this.displayTickets = displayTickets;
         }
 
         @Override
         public Fragment getItem(int position) {
             Fragment fragment = new BarcodeFragment();
-            Bundle bundle = new Bundle();
-//            bundle.putInt(BarcodeFragment.ARG_OBJECT, position + 1);
+//          bundle.putInt(BarcodeFragment.ARG_OBJECT, position + 1);
             fragment.setArguments(bundle);
             return fragment;
         }

@@ -86,7 +86,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(Constants.EVENT,event);
                 mIntent.putExtra(Constants.BUNDLE,bundle);
-                this.getParent().startActivity(mIntent);
+                startActivity(mIntent);
 
                 break;
             case R.id.share:

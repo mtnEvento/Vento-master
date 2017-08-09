@@ -4,6 +4,8 @@ package com.mtn.evento.fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -22,7 +24,9 @@ import com.github.clans.fab.FloatingActionButton;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mtn.evento.Payment;
 import com.mtn.evento.R;
+import com.mtn.evento.activities.BarcodeActivity;
 import com.mtn.evento.data.Constants;
+import com.mtn.evento.data.DisplayTicket;
 import com.mtn.evento.data.Event;
 import com.mtn.evento.data.ServerConnector;
 import com.mtn.evento.database.DatabaseHandler;
@@ -30,7 +34,9 @@ import com.mtn.evento.database.DatabaseHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
@@ -130,35 +136,53 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
     private void makePayment() {
 
-        HashMap<String,String> contentValue = new HashMap<>();
-        contentValue.put("CustomerName","Daniel");
-        contentValue.put("CustomerMsisdn","233241361156");
-        contentValue.put("CustomerEmail","user@gmail.com");
-        contentValue.put("Channel","mtn-gh");
-        contentValue.put("Amount","1");
-        contentValue.put("Description","T Shirt");
+//        HashMap<String,String> contentValue = new HashMap<>();
+//        contentValue.put("CustomerName","Daniel");
+//        contentValue.put("CustomerMsisdn","233241361156");
+//        contentValue.put("CustomerEmail","user@gmail.com");
+//        contentValue.put("Channel","mtn-gh");
+//        contentValue.put("Amount","1");
+//        contentValue.put("Description","T Shirt");
+//
+//        String url = "http://10.13.56.107/payment.php";
+//        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
+//            @Override
+//            public void getResult(String result) {
+//                if(result == null || result.isEmpty()){return; }
+//                Log.d(LOGMESSAGE, "getResult: " + result);
+//                try {
+//                    JSONObject object = new JSONObject(result);
+//                    JSONObject data =  object.getJSONObject("data");
+//                    String transactionId = data.getString("TransactionId");
+//
+//                    DatabaseHandler db = new DatabaseHandler(getContext());
+//                    db.addEvent(mEvent);
+//
+//                    Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).connectToServer();
 
-        String url = "http://10.13.56.107/payment.php";
+//TODO  add all purchased tickets to list of DisplayTicket object
 
-        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
-            @Override
-            public void getResult(String result) {
-                if(result == null || result.isEmpty()){return; }
-                Log.d(LOGMESSAGE, "getResult: " + result);
-                try {
-                    JSONObject object = new JSONObject(result);
-                    JSONObject data =  object.getJSONObject("data");
-                    String transactionId = data.getString("TransactionId");
+        List<DisplayTicket> displayTickets = new ArrayList<>();
+        DisplayTicket ticket = new DisplayTicket();
 
-                    DatabaseHandler db = new DatabaseHandler(getContext());
-                    db.addEvent(mEvent);
+        ticket.setName("VVIP");
+        ticket.setQrCode(BitmapFactory.decodeResource(getContext().getResources(),R.drawable.banner));
+        ticket.setTransactionId("1234778345");
+        displayTickets.add(ticket);
 
-                    Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).connectToServer();
+        ticket.setDisplayTickets(displayTickets);
+
+        Intent intent = new Intent(getActivity(), BarcodeActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(Constants.TICKET,ticket);
+        intent.putExtra(Constants.BUNDLE,bundle);
+        startActivity(intent);
+
     }
 
     @Override
