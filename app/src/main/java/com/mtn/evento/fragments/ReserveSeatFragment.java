@@ -281,25 +281,32 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
         DatabaseHandler handler = new DatabaseHandler(getActivity());
         //TODO  add all purchased tickets to list of DisplayTicket object
+        EncodeData.getInstance();
         List<DisplayTicket> displayTickets = new ArrayList<>();
+        String transId = System.currentTimeMillis()+""+ (new Random().nextInt()) * 100000 ;
         for (SinglePurchaseData purchaseData: singlePurchaseData ) {
-            DisplayTicket  displayTicket = new DisplayTicket();
-            displayTicket.setName(purchaseData.getType());
-            displayTicket.setTransactionId(System.currentTimeMillis()+""+ (new Random().nextInt()) * 100000 );
-            //Generate QR code //client_id  transactional_id  secrets
-            EncodeData.getInstance();
-            String timestamp = "" +System.currentTimeMillis() ;
-            String secret = ( FirebaseAuth.getInstance().getCurrentUser().getUid() +timestamp ).trim();
-            String encoded =  EncodeData.encode( (FirebaseAuth.getInstance().getCurrentUser()+" "+displayTicket.getTransactionId()+ " " +secret ).trim());
-            displayTicket.setQrCode(encoded);
-            displayTickets.add(displayTicket);
 
-            com.mtn.evento.bookings.Ticket ticket = new com.mtn.evento.bookings.Ticket();
-            ticket.setType(displayTicket.getName());
-            ticket.setSecrets(secret);
-            ticket.setSecrets(timestamp);
-            mDatabase.child("bookings").child(mEvent.getEvent_id()).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(secret).setValue(ticket);
-            Log.d(LOGMESSAGE," path:  "+mEvent.getEvent_id()+ "  "+FirebaseAuth.getInstance().getCurrentUser().getUid() +  "  "+secret);
+            int qty = Integer.parseInt(purchaseData.getQuantity());
+
+            for (int i = 0; i < qty ; i++) {
+                DisplayTicket  displayTicket = new DisplayTicket();
+                displayTicket.setName(purchaseData.getType().toUpperCase());
+                displayTicket.setTransactionId(transId);
+
+                String timestamp = "" +System.currentTimeMillis() ;
+                String secret = ( FirebaseAuth.getInstance().getCurrentUser().getUid() +timestamp ).trim();
+                String encoded =  EncodeData.encode( (FirebaseAuth.getInstance().getCurrentUser()+" "+displayTicket.getTransactionId()+ " " +secret ).trim());
+                displayTicket.setQrCode(encoded);
+                displayTickets.add(displayTicket);
+
+                com.mtn.evento.bookings.Ticket ticket = new com.mtn.evento.bookings.Ticket();
+                ticket.setType(displayTicket.getName());
+                ticket.setSecrets(secret);
+                ticket.setSecrets(timestamp);
+                mDatabase.child("bookings").child(mEvent.getEvent_id()).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(secret).setValue(ticket);
+                Log.d(LOGMESSAGE," path:  "+mEvent.getEvent_id()+ "  "+FirebaseAuth.getInstance().getCurrentUser().getUid() +  "  "+secret);
+            }
+
         }
         handler.addEvent(mEvent,displayTickets);
         Intent intent = new Intent(getActivity(), BarcodeActivity.class);

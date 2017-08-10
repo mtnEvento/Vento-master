@@ -46,49 +46,57 @@ public class SmartGet {
         return format.format(date);
     }
 
-    public static void printToFile(Activity activity, Bitmap bitmap , String filename){
+    public static String printToFile(Activity activity, Bitmap bitmap , String filename){
         Bitmap mBitmap;
         OutputStream output;
 
         mBitmap =  bitmap ;
         /*  // Retrieve the image from the res folder  BitmapFactory.decodeResource(getResources(),R.drawable.wallpaper);*/
-        // Find the SD Card path
-        File filepath = Environment.getExternalStorageDirectory();
 
-        // Create a new folder AndroidBegin in SD Card
-        File dir = new File(filepath.getAbsolutePath() + "/Evento-tickets/");
-        dir.mkdirs();
+        if (Environment.MEDIA_MOUNTED.equals(Environment
+                .getExternalStorageState())) {
 
-        // Create a name for the saved image
-        File file = new File(dir, filename+".png");
+            // Find the SD Card path
+            File filepath = Environment.getExternalStorageDirectory();
 
-        try {
+            // Create a new folder AndroidBegin in SD Card
+            File dir = new File(filepath.getAbsolutePath() + "/Evento-tickets/");
+            dir.mkdirs();
 
-            // Share Intent
-            Intent share = new Intent(Intent.ACTION_SEND);
+            // Create a name for the saved image
+            File file = new File(dir, filename+".png");
 
-            // Type of file to share
-            share.setType("image/jpeg");
+            try {
 
-            output = new FileOutputStream(file);
+                // Share Intent
+                Intent share = new Intent(Intent.ACTION_SEND);
 
-            // Compress into png format image from 0% - 100%
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
-            output.flush();
-            output.close();
+                // Type of file to share
+                share.setType("image/jpeg");
 
-            // Locate the image to Share
-            Uri uri = Uri.fromFile(file);
+                output = new FileOutputStream(file);
 
-            // Pass the image into an Intnet
-            share.putExtra(Intent.EXTRA_STREAM, uri);
+                // Compress into png format image from 0% - 100%
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
+                output.flush();
+                output.close();
 
-            // Show the social share chooser list
-            activity.startActivity(Intent.createChooser(share, "Share Image Tutorial"));
+                // Locate the image to Share
+                Uri uri = Uri.fromFile(file);
 
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+                // Pass the image into an Intnet
+                share.putExtra(Intent.EXTRA_STREAM, uri);
+
+                // Show the social share chooser list
+                activity.startActivity(Intent.createChooser(share, "Share Image Tutorial"));
+                return  file.getAbsolutePath();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+
+            }
+
         }
+        return  null;  
     }
 }
