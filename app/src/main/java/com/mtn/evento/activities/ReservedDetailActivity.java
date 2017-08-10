@@ -37,17 +37,19 @@ public class ReservedDetailActivity extends AppCompatActivity {
         Serializable serz =   ser.getSerializable(Constants.RESERVED_SEAT);
 
         reservedSeatData  = ( ReservedSeatData )  serz;
+        if( reservedSeatData != null){
+            //TODO: change the current url to the event banner url
+            Glide.with(this)
+                    .load(reservedSeatData.getEvent().getBanner())
+                    .asBitmap()
+                    .into(( (ImageView)findViewById(R.id.event_banner))) ;
 
-        //TODO: change the current url to the event banner url
-         Glide.with(this)
-                .load(reservedSeatData.getEvent().getBanner())
-                .asBitmap()
-                .into(( (ImageView)findViewById(R.id.event_banner))) ;
+            ( (TextView)findViewById(R.id.reserved_evt_name)).setText(reservedSeatData.getEvent().getTitle() == null ? "N/A": reservedSeatData.getEvent().getTitle());
+            ( (TextView)findViewById(R.id.reserved_evt_date)).setText(reservedSeatData.getEvent().getEvent_date() == null ? "N/A": reservedSeatData.getEvent().getEvent_date());
+            ( (TextView)findViewById(R.id.reserved_evt_venue)).setText(reservedSeatData.getEvent().getVenue()== null ? "N/A" : reservedSeatData.getEvent().getVenue());
+            ( (TextView)findViewById(R.id.reserved_evt_description)).setText(reservedSeatData.getEvent().getDescription()== null ? "N/A": reservedSeatData.getEvent().getDescription());
+        }
 
-        ( (TextView)findViewById(R.id.evt_name)).setText(reservedSeatData.getEvent().getTitle());
-        ( (TextView)findViewById(R.id.evt_date)).setText(reservedSeatData.getEvent().getEvent_date());
-        ( (TextView)findViewById(R.id.evt_venue)).setText(reservedSeatData.getEvent().getVenue());
-        ( (TextView)findViewById(R.id.evt_description)).setText(reservedSeatData.getEvent().getDescription());
     }
     @Override
     protected void onNewIntent(Intent intent) {
@@ -80,7 +82,7 @@ public class ReservedDetailActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT,"Did you know "+reservedSeatData.getEvent().getTitle() +" is happening on "+reservedSeatData.getEvent().getEvent_date());
+                intent.putExtra(Intent.EXTRA_TEXT,"Did you know "+reservedSeatData.getEvent().getTitle() +" is happening on "+reservedSeatData.getEvent().getEvent_date() +" ? To get the ticket, just download the Evento Android App from the Google Play Store and reserve a seat because i just did. please don't miss this event.");
                 startActivity(intent);
                 break;
             case R.id.directMe:

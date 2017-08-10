@@ -94,7 +94,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT,"Delivery service is just an App away from you!");
+                intent.putExtra(Intent.EXTRA_TEXT,"Did you know "+ event.getTitle() +" is happening on "+event.getEvent_date() +" ? To get the ticket, just download the Evento Android App from the Google Play Store and reserve a seat because i just did. please don't miss this event.");
                 startActivity(intent);
                 break;
             case R.id.directMe:
