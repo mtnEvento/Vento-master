@@ -97,6 +97,11 @@ public class ReservedDetailActivity extends AppCompatActivity {
             case android.R.id.home:
                 super.onBackPressed();
                 break;
+
+            case R.id.view_tickets:
+
+       // TODO: 8/10/2017  click should lead to barcode detail page
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

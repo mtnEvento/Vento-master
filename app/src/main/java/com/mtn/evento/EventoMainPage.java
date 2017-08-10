@@ -3,6 +3,7 @@ package com.mtn.evento;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +22,8 @@ import com.mtn.evento.utils.SmartGet;
 import net.glxn.qrgen.android.QRCode;
 
 import java.util.ArrayList;
+
+import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 
 public class EventoMainPage extends AppCompatActivity {
@@ -59,7 +62,9 @@ public class EventoMainPage extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 EncodeData.getInstance();//  0xFF0000AA -bg :blue  rgb
-                String encoded =  EncodeData.encode(name.getText().toString().trim()+ " "+ref.getText().toString().trim());
+                String encoded =  EncodeData.encode(name.getText().toString().trim()+ ""+ref.getText().toString().trim());
+
+                Log.d(LOGMESSAGE, "encoded : " + encoded);
                 Bitmap myBitmap = QRCode.from( encoded).withColor(0x000000, 0xFd0012AC).bitmap();
                 ImageView myImage = (ImageView) findViewById(R.id.imageView);
                 myImage.setImageBitmap(myBitmap);
