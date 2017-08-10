@@ -16,6 +16,7 @@ import com.mtn.evento.R;
 import com.mtn.evento.activities.ReservedDetailActivity;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
+import com.mtn.evento.data.ReservedSeatData;
 import com.mtn.evento.data.ResultSet;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
 
     ArrayList<ResultSet> reservedEvents;
     Context context;
+
     public ReservedEventsAdapter() {
 
     }
@@ -48,7 +50,8 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
                 .into(reservedEventHolder.imageView) ;
         reservedEventHolder.title.setText(reservedEvents.get(position).getmEvent().get(position).getTitle());
         reservedEventHolder.venue.setText(reservedEvents.get(position).getmEvent().get(position).getVenue());
-        reservedEventHolder.layout.setTag(reservedEvents.get(position).getmEvent().get(position));
+        reservedEventHolder.layout.setTag(new ReservedSeatData(reservedEvents.get(position).getmEvent().get(position),reservedEvents.get(position).getmDisplayTickets()));
+
     }
 
     @Override
@@ -82,10 +85,10 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
         @Override
         public void onClick(View v) {
             //TODO get Bundle At event detail page and set it's values events.get(getAdapterPosition())
-            Event event = (Event) v.getTag();
+            ReservedSeatData reservedSeatData = (ReservedSeatData) v.getTag();
             Intent intent = new Intent(context, ReservedDetailActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putSerializable(Constants.EVENT,event);
+            bundle.putSerializable(Constants.RESERVED_SEAT,reservedSeatData);
             intent.putExtra(Constants.BUNDLE,bundle);
             context.startActivity(intent);
         }

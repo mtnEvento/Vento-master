@@ -16,12 +16,15 @@ import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
+import com.mtn.evento.data.ReservedSeatData;
+import com.mtn.evento.data.ResultSet;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class ReservedDetailActivity extends AppCompatActivity {
     Intent mIntent;
-    Event mEvent;
+    private ReservedSeatData reservedSeatData;
     private Toolbar toolbar;
 
     @Override
@@ -31,19 +34,20 @@ public class ReservedDetailActivity extends AppCompatActivity {
         init();
         this.mIntent =  getIntent() ;
         Bundle ser =  this.mIntent.getBundleExtra(Constants.BUNDLE);
-        Serializable serz =   ser.getSerializable(Constants.EVENT);
-        Event event = (Event) serz;
-        mEvent =  event ;
+        Serializable serz =   ser.getSerializable(Constants.RESERVED_SEAT);
+
+        reservedSeatData  = ( ReservedSeatData )  serz;
+
         //TODO: change the current url to the event banner url
          Glide.with(this)
-                .load(event.getBanner())
+                .load(reservedSeatData.getEvent().getBanner())
                 .asBitmap()
                 .into(( (ImageView)findViewById(R.id.event_banner))) ;
 
-        ( (TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
-        ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
-        ( (TextView)findViewById(R.id.evt_venue)).setText(event.getVenue());
-        ( (TextView)findViewById(R.id.evt_description)).setText(event.getDescription());
+        ( (TextView)findViewById(R.id.evt_name)).setText(reservedSeatData.getEvent().getTitle());
+        ( (TextView)findViewById(R.id.evt_date)).setText(reservedSeatData.getEvent().getEvent_date());
+        ( (TextView)findViewById(R.id.evt_venue)).setText(reservedSeatData.getEvent().getVenue());
+        ( (TextView)findViewById(R.id.evt_description)).setText(reservedSeatData.getEvent().getDescription());
     }
     @Override
     protected void onNewIntent(Intent intent) {
@@ -76,14 +80,14 @@ public class ReservedDetailActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT,"Delivery service is just an App away from you!");
+                intent.putExtra(Intent.EXTRA_TEXT,"Did you know "+reservedSeatData.getEvent().getTitle() +" is happening on "+reservedSeatData.getEvent().getEvent_date());
                 startActivity(intent);
                 break;
             case R.id.directMe:
 
-                double longitude = mEvent.getLocation().getLongitude();
-                double latitude = mEvent.getLocation().getLatitude();
-                Uri location = Uri.parse("geo:"+String.valueOf(latitude)+","+String.valueOf(longitude)+"?q="+mEvent.getVenue()+", "+mEvent.getRegion());
+                double longitude = reservedSeatData.getEvent().getLocation().getLongitude();
+                double latitude = reservedSeatData.getEvent().getLocation().getLatitude();
+                Uri location = Uri.parse("geo:"+String.valueOf(latitude)+","+String.valueOf(longitude)+"?q="+reservedSeatData.getEvent().getVenue()+", "+reservedSeatData.getEvent().getRegion());
                 Intent mapLocation = new Intent(Intent.ACTION_VIEW,location);
                 startActivity(mapLocation);
                 break;

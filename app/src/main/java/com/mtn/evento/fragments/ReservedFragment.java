@@ -19,6 +19,7 @@ import com.mtn.evento.R;
 import com.mtn.evento.adapters.EventAdapter;
 import com.mtn.evento.adapters.ReservedEventsAdapter;
 import com.mtn.evento.data.Event;
+import com.mtn.evento.data.ResultSet;
 import com.mtn.evento.database.DatabaseHandler;
 
 import java.util.ArrayList;
@@ -32,13 +33,13 @@ public class ReservedFragment extends Fragment {
     RecyclerView reservedRecycler;
     RecyclerView.LayoutManager layoutManager;
     ReservedEventsAdapter reservedEventsAdapter;
-    ArrayList<Event> reservedEvents;
+    ArrayList<ResultSet> reservedEvents;
     AppCompatActivity appContext;
 
     public ReservedFragment() {
 
         Log.d(LOGMESSAGE, "ReservedFragment: CALLED ");
-        reservedEvents = new ArrayList<>();
+       // reservedEvents = new ArrayList<>();
         reservedEventsAdapter = new ReservedEventsAdapter();
     }
 

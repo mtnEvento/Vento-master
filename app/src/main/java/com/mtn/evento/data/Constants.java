@@ -15,4 +15,5 @@ public class Constants {
     public static final String PREFS_NAME = "evento";
     public static final String TICKET = "com.mtn.evento.data.TICKET";
     public static final String ARG_OBJECT = "com.mtn.evento.data.ARG_OBJECT";
+    public static final String RESERVED_SEAT ="com.mtn.evento.data.RESERVED_SEAT" ;
 }
