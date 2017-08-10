@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/printable_surface"
+    tools:context="com.mtn.evento.activities.BarcodeActivity">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/image_card"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_below="@+id/toolbar"
+                android:elevation="10dp"
+                android:layout_margin="@dimen/margin_standard"
+                >
+
+                <ImageView
+                    android:id="@+id/image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/name_card"
+                android:layout_width="match_parent"
+                android:layout_marginRight="@dimen/margin_standard"
+                android:layout_marginLeft="@dimen/margin_standard"
+
+                android:layout_below="@+id/image_card"
+                android:elevation="10dp"
+                android:layout_height="50dp">
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="type"
+                    android:gravity="center_horizontal"
+                    />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/transactionId_card"
+                android:layout_width="match_parent"
+                android:layout_marginRight="@dimen/margin_standard"
+                android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginBottom="@dimen/margin_standard"
+                android:layout_below="@+id/name_card"
+                android:elevation="10dp"
+                android:layout_height="50dp">
+
+                <TextView
+                    android:id="@+id/transactionId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="transaction Id"
+                    android:gravity="center_horizontal"
+                    />
+
+            </android.support.v7.widget.CardView>
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
