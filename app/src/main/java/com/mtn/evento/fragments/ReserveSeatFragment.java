@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -225,7 +227,45 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    public boolean isInternetOn() {
 
+        // get Connectivity Manager object to check connection
+        ConnectivityManager connec =
+                (ConnectivityManager) getActivity(). getSystemService(getActivity().getBaseContext().CONNECTIVITY_SERVICE);
+
+        // Check for network connections
+        if (connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
+
+
+            return true;
+
+        } else if (
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
+                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED)
+        {
+
+            return false;
+        }
+        return false;
+    }
+    private boolean isNetworkOn(){
+        ConnectivityManager ConnectionManager=(ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected()==true )
+        {
+            return true;
+        }
+        else
+        {
+            return  false;
+        }
+    }
+    private boolean isNetworkAndInternetAvailable(){
+        return  isNetworkOn()&& isInternetOn() ;
+    }
 
 
 }
