@@ -27,10 +27,12 @@
                 <EditText
                     android:layout_marginBottom="2dp"
                     android:background="@drawable/seat_background"
+                    android:hint="@string/quauntity"
                     android:layout_width="0dp"
                     android:layout_gravity="bottom"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/margin_standard"
+                    android:inputType="numberDecimal"
                     android:layout_weight="0.5"/>
 
         </LinearLayout>

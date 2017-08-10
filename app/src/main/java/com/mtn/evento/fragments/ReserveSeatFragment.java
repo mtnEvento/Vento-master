@@ -11,26 +11,41 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatEditText;
+import android.support.v7.widget.CardView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mtn.evento.Payment;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.BarcodeActivity;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.DisplayTicket;
+import com.mtn.evento.data.EncodeData;
 import com.mtn.evento.data.Event;
 import com.mtn.evento.data.ServerConnector;
+import com.mtn.evento.data.SinglePurchaseData;
+import com.mtn.evento.data.Ticket;
 import com.mtn.evento.database.DatabaseHandler;
 
 import org.json.JSONException;
@@ -40,6 +55,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
@@ -51,12 +67,20 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     private ReservationHolder holder;
     private Event mEvent;
     private Button makePayment;
+    MenuItem cartView;
+    private DatabaseReference mDatabase;
+    private
+    FirebaseUser client;
     public ReserveSeatFragment() {
         // Required empty public constructor
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
 
+    public void setCartView(MenuItem cartView ){
+        this.cartView = cartView ;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -65,10 +89,11 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         View view = inflater.inflate(R.layout.fragment_reserve_seat, container, false);
         makePayment = (Button) view.findViewById(R.id.makePayment);
         makePayment.setOnClickListener(this);
-        holder = new ReservationHolder(view,this);
         Bundle bag = getArguments();
         mEvent = (Event) bag.getSerializable(Constants.EVENT);
         makePayment.setTag(mEvent);
+        holder = new ReservationHolder(view,this,mEvent);
+
         return view;
     }
 
@@ -76,7 +101,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.menu_add :
-
                int childs = holder.seats_group.getChildCount();
                View mView =   LayoutInflater.from( this.context).inflate(R.layout.add_seats,null);
 
@@ -89,44 +113,131 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                     }
                 });
                 holder.seats_group.addView(mView);
+                if( cartView != null &&  cartView.getTitle()!= null){
 
+                    if(!cartView.getTitle().toString().isEmpty()){
+                        String numberOnly = cartView.getTitle().toString().replaceAll("[^0-9]", "");
+                        cartView.setTitle( "Cart : "+ ( (Integer.parseInt(numberOnly)) + 1));
+                    }
+                }
                 break;
             case R.id.menu_remove:
                  childs = holder.seats_group.getChildCount();
 
                 if( childs > 0)
-                   holder.seats_group.removeViewAt(childs-1);
+                {
+                    holder.seats_group.removeViewAt(childs-1);
+                    if( cartView != null &&  cartView.getTitle()!= null){
+
+                        if(!cartView.getTitle().toString().isEmpty()){
+                            String numberOnly = cartView.getTitle().toString().replaceAll("[^0-9]", "");
+                            cartView.setTitle( "Cart : "+ ( (Integer.parseInt(numberOnly))- 1));
+                        }
+                    }
+                }
                 break;
 
             case R.id.makePayment:
                 childs = holder.seats_group.getChildCount();
-                if(childs > 0){
+                int errrorCount = 0  ;
+                String amount = "";
+                String strQnt = "";
+                if(!cartView.getTitle().toString().isEmpty()){
+                       String numberOnly = cartView.getTitle().toString().replaceAll("[^0-9]", "");
 
+                       if (Integer.parseInt(numberOnly) > 0 ){
+
+                           ArrayList<SinglePurchaseData> singlePurchaseDataArrayList = new ArrayList<>();
+
+                           for (int i = 0; i < childs; i++) {
+                                 double dubleAmount= 0.00;
+                                 int quantity = 0 ;
+                                 SinglePurchaseData  singlePurchaseData = new SinglePurchaseData();
+                                 CardView crd = (CardView) holder.seats_group.getChildAt(i);
+                                 LinearLayout layout = (LinearLayout) crd.getChildAt(0);
+
+                                 MaterialSpinner spiner = (MaterialSpinner) layout.getChildAt(0);
+                                 String typeName =  holder.ticketCategories[spiner.getSelectedIndex()];
+                                 ArrayList<Ticket>   tickets  =  mEvent.getTicket_type();
+                                 ArrayList<String>   strTickets  = new ArrayList<>();
+                                 for (Ticket  ticket : tickets  )
+                                 {
+                                      if(typeName.contentEquals(ticket.getName())){
+                                          amount =   ticket.getAmount().trim();
+                                          dubleAmount = Double.parseDouble(amount);
+                                          singlePurchaseData.setType(typeName);
+                                          break;
+                                      }
+                                 }
+
+                               AppCompatEditText qty = (AppCompatEditText) layout.getChildAt(1);
+                               if (TextUtils.isEmpty(qty.getText().toString().trim())) {
+                                   qty.setError("Quantity Required!");
+                                   errrorCount += 1 ;
+                                   break;
+                               } else {
+                                   qty.setError(null);
+                                   strQnt = qty.getText().toString().trim();
+                                   singlePurchaseData.setQuantity(strQnt);
+                                   singlePurchaseData.setPrice( "" + (dubleAmount * Integer.parseInt(strQnt)) );
+                                   errrorCount = 0  ;
+                               }
+
+                               singlePurchaseDataArrayList.add(singlePurchaseData);
+                           }
+
+                           if(errrorCount <= 0){
+                               double total_price = 0.00 ;
+                               for(SinglePurchaseData data : singlePurchaseDataArrayList){
+                                   total_price += Double.parseDouble(data.getPrice());
+                               }
+                               confirmPayment(String.format("%.2f",total_price),singlePurchaseDataArrayList);
+                           }
+                           else{
+                               Toast.makeText(getActivity(),"You may have not specified the quantity of some ticket type",Toast.LENGTH_LONG).show();
+                           }
+                       }
+                       else
+                       {
+                           //TODO: Alert nothing added to chart.
+                           Toast.makeText(getActivity(),"Sorry! you cannot make payment because anything added to the ticket cart.",Toast.LENGTH_LONG).show();
+                       }
                 }
-
-            confirmPayment("1000.00");
                 break;
-
         }
     }
 
-    private void confirmPayment(String amount) {
+    private void confirmPayment(String amount, ArrayList<SinglePurchaseData> singlePurchaseDataArrayList) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Confirm Reservation");
         builder.setMessage("Total Price : "+ amount);
-        builder.setNegativeButton("Cancel", confirmListener());
-        builder.setPositiveButton("Confirm", confirmListener());
+        builder.setNegativeButton("Cancel", confirmListener(null));
+        builder.setPositiveButton("Confirm", confirmListener(singlePurchaseDataArrayList));
 
         builder.create().show();
     }
 
-    private DialogInterface.OnClickListener confirmListener() {
+    private DialogInterface.OnClickListener confirmListener(final ArrayList<SinglePurchaseData> singlePurchaseDataArrayList) {
         return new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        makePayment();
+                        if(isNetworkAndInternetAvailable()){
+                            makePayment(singlePurchaseDataArrayList);
+                        }
+                        else
+                        {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("NO NETWORK AVAILABLE");
+                            builder.setMessage("Sorry, no internet connection available. Please check your network connection and try again!");
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                        }
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         dialog.cancel();
@@ -137,7 +248,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     }
 
 
-    private void makePayment() {
+    private void makePayment( final List<SinglePurchaseData> singlePurchaseData) {
 
 //        HashMap<String,String> contentValue = new HashMap<>();
 //        contentValue.put("CustomerName","Daniel");
@@ -169,28 +280,31 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 //        }).connectToServer();
 
         DatabaseHandler handler = new DatabaseHandler(getActivity());
-
-
-//TODO  add all purchased tickets to list of DisplayTicket object
-
+        //TODO  add all purchased tickets to list of DisplayTicket object
         List<DisplayTicket> displayTickets = new ArrayList<>();
-        DisplayTicket ticket = new DisplayTicket();
-        ticket.setName("VVIP");
-        ticket.setQrCode("jjjasdfddadsf_a_adsfd");
-        ticket.setTransactionId("1234778345");
-        displayTickets.add(ticket);
+        for (SinglePurchaseData purchaseData: singlePurchaseData ) {
+            DisplayTicket  displayTicket = new DisplayTicket();
+            displayTicket.setName(purchaseData.getType());
+            displayTicket.setTransactionId(System.currentTimeMillis()+""+ (new Random().nextInt()) * 100000 );
+            //Generate QR code //client_id  transactional_id  secrets
+            EncodeData.getInstance();
+            String timestamp = "" +System.currentTimeMillis() ;
+            String secret = ( FirebaseAuth.getInstance().getCurrentUser().getUid() +timestamp ).trim();
+            String encoded =  EncodeData.encode( (FirebaseAuth.getInstance().getCurrentUser()+" "+displayTicket.getTransactionId()+ " " +secret ).trim());
+            displayTicket.setQrCode(encoded);
+            displayTickets.add(displayTicket);
 
-        DisplayTicket ticket1 = new DisplayTicket();
-        ticket1.setName("Regular");
-        ticket1.setQrCode("paernnnerrr_asdfads");
-        ticket1.setTransactionId("1234778345");
-        displayTickets.add(ticket1);
+            com.mtn.evento.bookings.Ticket ticket = new com.mtn.evento.bookings.Ticket();
+            ticket.setType(displayTicket.getName());
+            ticket.setSecrets(secret);
+            ticket.setSecrets(timestamp);
+            mDatabase.child("bookings").child(mEvent.getEvent_id()).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(secret).setValue(ticket);
+            Log.d(LOGMESSAGE," path:  "+mEvent.getEvent_id()+ "  "+FirebaseAuth.getInstance().getCurrentUser().getUid() +  "  "+secret);
+        }
         handler.addEvent(mEvent,displayTickets);
         Intent intent = new Intent(getActivity(), BarcodeActivity.class);
-
         intent.putExtra(Constants.TICKET, (Serializable) displayTickets);
         startActivity(intent);
-
     }
 
     @Override
@@ -203,8 +317,19 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         String[]  ticketCategories;
        private FloatingActionButton menu_add ,menu_remove;
        private LinearLayout seats_group;
-        public ReservationHolder(View holder, View.OnClickListener onClickListener){
-            ticketCategories = new String[]{"Ice Cream Sandwich", "Jelly Bean", "KitKat", "Lollipop", "Marshmallow"};
+        public ReservationHolder(View holder, View.OnClickListener onClickListener, Event event){
+
+            ArrayList<Ticket>   tickets  =  event.getTicket_type();
+            ArrayList<String>   strTickets  = new ArrayList<>();
+            for (Ticket  ticket : tickets  ) {
+                strTickets.add(ticket.getName()) ;
+            }
+            String[] types = new String[strTickets.size()];
+            for (int i = 0; i < strTickets.size(); i++) {
+                types[i] = strTickets.get(i);
+            }
+
+            ticketCategories =  types;
             seats_group = (LinearLayout) holder.findViewById(R.id.seats_group);
             menu_add = (FloatingActionButton) holder.findViewById(R.id.menu_add);
             menu_add.setOnClickListener(onClickListener);
@@ -220,11 +345,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
             });
         }
 
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     public boolean isInternetOn() {

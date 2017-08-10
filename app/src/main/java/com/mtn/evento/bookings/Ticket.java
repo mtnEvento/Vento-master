@@ -10,12 +10,23 @@ public class Ticket implements Serializable{
 
     private String type;
     private String secrets;
+    private String timestamp;
+
+    public Ticket(String type, String secrets, String timestamp) {
+        this.type = type;
+        this.secrets = secrets;
+        this.timestamp = timestamp;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 
     public Ticket(){}
-    public Ticket(String type, String secrets){
-        this.type = type ;
-        this.secrets = secrets ;
-    }
 
     public String getType() {
         return type;

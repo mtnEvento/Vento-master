@@ -14,6 +14,7 @@ import com.mtn.evento.fragments.ReserveSeatFragment;
 public class ReservationActivity extends AppCompatActivity {
 
     Toolbar toolbar;
+    ReserveSeatFragment seatFragment ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +25,7 @@ public class ReservationActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if(getSupportActionBar() != null)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ReserveSeatFragment seatFragment = new ReserveSeatFragment();
+        seatFragment = new ReserveSeatFragment();
         seatFragment.setArguments(getIntent().getBundleExtra(Constants.BUNDLE));
         getSupportFragmentManager().beginTransaction().add(R.id.container,seatFragment).commit();
     }
@@ -32,6 +33,7 @@ public class ReservationActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.seat_type_count,menu);
+        seatFragment.setCartView(menu.findItem(R.id.seatTypeCount));
         return super.onCreateOptionsMenu(menu);
     }
 
