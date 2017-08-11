@@ -57,153 +57,169 @@
 
             <android.support.v7.widget.CardView
                 android:id="@+id/name_card"
-                android:layout_below="@+id/image_card"
                 android:layout_width="match_parent"
-                android:layout_height="80dp">
+                android:layout_height="80dp"
+                android:layout_below="@+id/image_card">
 
                 <ImageView
                     android:id="@+id/event_name_icon"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    app:srcCompat="@drawable/ic_event_black_24dp"
                     android:layout_gravity="center_vertical|right"
                     android:layout_margin="@dimen/margin_standard"
-                    />
+                    app:srcCompat="@drawable/ic_event_black_24dp" />
+
                 <TextView
                     android:id="@+id/evt_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="Event Name"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:layout_marginLeft="@dimen/margin_standard"
-                    />
+                    android:text="Event Name"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
                 android:id="@+id/event_date_card"
-                android:layout_below="@+id/name_card"
                 android:layout_width="match_parent"
-                android:layout_height="80dp">
+                android:layout_height="80dp"
+                android:layout_below="@+id/name_card">
 
                 <ImageView
                     android:id="@+id/event_date_icon"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    app:srcCompat="@drawable/ic_date_range_black_24dp"
                     android:layout_gravity="center_vertical|right"
                     android:layout_margin="@dimen/margin_standard"
-                    />
+                    app:srcCompat="@drawable/ic_date_range_black_24dp" />
+
                 <TextView
                     android:id="@+id/evt_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/margin_standard"
                     android:text="Event Date"
-                    android:layout_marginLeft="@dimen/margin_standard"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    />
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/available_seat_card"
-                android:layout_below="@+id/event_date_card"
-                android:layout_width="match_parent"
-                android:layout_height="80dp">
-
-                <ImageView
-                    android:id="@+id/available_seat_icon"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    app:srcCompat="@drawable/ic_event_seat_black_24dp"
-                    android:layout_gravity="center_vertical|right"
-                    android:layout_margin="@dimen/margin_standard"
-                    />
-                <TextView
-                    android:id="@+id/evt_available_seat"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="Available Seats"
-                    android:layout_marginLeft="@dimen/margin_standard"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    />
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
                 android:id="@+id/venue_card"
-                android:layout_below="@+id/available_seat_card"
                 android:layout_width="match_parent"
-                android:layout_height="80dp">
+                android:layout_height="80dp"
+                android:layout_below="@+id/available_seat_card">
 
                 <ImageView
                     android:id="@+id/venue_icon"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    app:srcCompat="@drawable/ic_business_black_24dp"
                     android:layout_gravity="center_vertical|right"
                     android:layout_margin="@dimen/margin_standard"
-                    />
+                    app:srcCompat="@drawable/ic_business_black_24dp" />
+
                 <TextView
                     android:id="@+id/evt_venue"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="Venue"
                     android:layout_marginLeft="@dimen/margin_standard"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    />
+                    android:text="Venue"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
                 android:id="@+id/region_card"
-                android:layout_below="@+id/venue_card"
                 android:layout_width="match_parent"
-                android:layout_height="80dp">
+                android:layout_height="80dp"
+                android:layout_below="@+id/venue_card">
 
                 <ImageView
                     android:id="@+id/region_icon"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    app:srcCompat="@drawable/ic_casino_black_24dp"
                     android:layout_gravity="center_vertical|right"
                     android:layout_margin="@dimen/margin_standard"
-                    />
+                    app:srcCompat="@drawable/ic_casino_black_24dp" />
+
                 <TextView
                     android:id="@+id/evt_region"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="Region"
                     android:layout_marginLeft="@dimen/margin_standard"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    />
+                    android:text="Region"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
                 android:id="@+id/description_card"
-                android:layout_below="@+id/region_card"
                 android:layout_width="match_parent"
-                android:layout_height="80dp">
+                android:layout_height="80dp"
+                android:layout_below="@+id/region_card">
 
                 <ImageView
                     android:id="@+id/description_icon"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    app:srcCompat="@drawable/ic_description_black_24dp"
                     android:layout_gravity="center_vertical|right"
                     android:layout_margin="@dimen/margin_standard"
-                    />
+                    app:srcCompat="@drawable/ic_description_black_24dp" />
+
                 <TextView
                     android:id="@+id/evt_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="Description"
                     android:layout_marginLeft="@dimen/margin_standard"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    />
+                    android:text="Description"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@+id/description_card"
+                >
+
+                <LinearLayout
+                    android:id="@+id/layout_seat_available"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        >
+
+                        <TextView
+                            android:id="@+id/title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Available Seats"
+                            android:layout_centerInParent="true"
+                            android:layout_centerHorizontal="true"
+                            />
+
+                        <ImageView
+                            android:id="@+id/available_seat_icon"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginRight="@dimen/margin_standard"
+                            app:srcCompat="@drawable/ic_event_seat_black_24dp"
+                            android:layout_toLeftOf="@+id/title"
+                            android:tint="@color/darkBlue"
+
+                            />
+
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
             </android.support.v7.widget.CardView>
 
 

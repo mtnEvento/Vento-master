@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.mtn.evento.R;
 import com.mtn.evento.adapters.EventAdapter;
 import com.mtn.evento.adapters.ReservedEventsAdapter;
@@ -53,12 +54,21 @@ public class ReservedFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         reservedRecycler.setLayoutManager(layoutManager);
         reservedRecycler.setHasFixedSize(true);
-        DatabaseHandler db = new DatabaseHandler(appContext);
-        reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
-        reservedRecycler.setAdapter(reservedEventsAdapter);
+
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            DatabaseHandler db = new DatabaseHandler(appContext);
+            reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
+            reservedRecycler.setAdapter(reservedEventsAdapter);
+        }
+
+    }
 
     @Override
     public void onAttach(Context context) {

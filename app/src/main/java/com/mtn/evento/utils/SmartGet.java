@@ -97,6 +97,6 @@ public class SmartGet {
             }
 
         }
-        return  null;  
+        return  null;
     }
 }

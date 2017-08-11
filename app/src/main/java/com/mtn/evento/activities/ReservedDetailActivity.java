@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
+import com.mtn.evento.data.DisplayTicket;
 import com.mtn.evento.data.Event;
 import com.mtn.evento.data.ReservedSeatData;
 import com.mtn.evento.data.ResultSet;
@@ -44,10 +45,10 @@ public class ReservedDetailActivity extends AppCompatActivity {
                     .asBitmap()
                     .into(( (ImageView)findViewById(R.id.event_banner))) ;
 
-            ( (TextView)findViewById(R.id.reserved_evt_name)).setText(reservedSeatData.getEvent().getTitle() == null ? "N/A": reservedSeatData.getEvent().getTitle());
-            ( (TextView)findViewById(R.id.reserved_evt_date)).setText(reservedSeatData.getEvent().getEvent_date() == null ? "N/A": reservedSeatData.getEvent().getEvent_date());
-            ( (TextView)findViewById(R.id.reserved_evt_venue)).setText(reservedSeatData.getEvent().getVenue()== null ? "N/A" : reservedSeatData.getEvent().getVenue());
-            ( (TextView)findViewById(R.id.reserved_evt_description)).setText(reservedSeatData.getEvent().getDescription()== null ? "N/A": reservedSeatData.getEvent().getDescription());
+            ( (TextView)findViewById(R.id.reserved_evt_name)).setText((reservedSeatData.getEvent().getTitle() == null || reservedSeatData.getEvent().getTitle().isEmpty()) ? "N/A": reservedSeatData.getEvent().getTitle());
+            ( (TextView)findViewById(R.id.reserved_evt_date)).setText((reservedSeatData.getEvent().getEvent_date() == null || reservedSeatData.getEvent().getEvent_date().isEmpty()) ? "N/A": reservedSeatData.getEvent().getEvent_date());
+            ( (TextView)findViewById(R.id.reserved_evt_venue)).setText((reservedSeatData.getEvent().getVenue()== null || reservedSeatData.getEvent().getVenue().isEmpty()) ? "N/A" : reservedSeatData.getEvent().getVenue());
+            ( (TextView)findViewById(R.id.reserved_evt_description)).setText((reservedSeatData.getEvent().getDescription()== null || reservedSeatData.getEvent().getDescription().isEmpty()) ? "N/A": reservedSeatData.getEvent().getDescription());
         }
 
     }
@@ -99,6 +100,10 @@ public class ReservedDetailActivity extends AppCompatActivity {
                 break;
 
             case R.id.view_tickets:
+
+                Intent displyIntent = new Intent(this, BarcodeActivity.class);
+                displyIntent.putExtra(Constants.TICKET, (Serializable) reservedSeatData.getDisplayTickets());
+                startActivity(displyIntent);
 
        // TODO: 8/10/2017  click should lead to barcode detail page
                 break;

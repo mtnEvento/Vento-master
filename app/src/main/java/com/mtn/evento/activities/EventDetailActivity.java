@@ -9,7 +9,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
+import com.mtn.evento.data.Ticket;
 
 import java.io.Serializable;
 
@@ -27,6 +30,7 @@ public class EventDetailActivity extends AppCompatActivity {
     Toolbar toolbar;
     Intent mIntent;
     Event event;
+    MenuItem item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +51,16 @@ public class EventDetailActivity extends AppCompatActivity {
 
         ( (TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
-        ( (TextView)findViewById(R.id.evt_available_seat)).setText("");
-        ( (TextView)findViewById(R.id.evt_venue)).setText(event.getVenue());
-        ( (TextView)findViewById(R.id.evt_region)).setText(event.getRegion());
-        ( (TextView)findViewById(R.id.evt_description)).setText(event.getDescription());
+        // TODO: 8/10/2017  set available seats
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.layout_seat_available);
+        for(Ticket ticket : event.getTicket_type()){
+            TextView view = (TextView) getLayoutInflater().inflate(R.layout.seats_available,null);
+            view.setText(ticket.getName() + " : " + ticket.getAvailable_seats());
+            linearLayout.addView(view);
+        }
+        ( (TextView)findViewById(R.id.evt_venue)).setText((event.getVenue() == null || event.getVenue().isEmpty()) ? "Venue not specified " : event.getVenue());
+        ( (TextView)findViewById(R.id.evt_region)).setText((event.getRegion() == null || event.getRegion().isEmpty()) ? "Region not specified " : event.getRegion());
+        ( (TextView)findViewById(R.id.evt_description)).setText((event.getDescription() == null || event.getDescription().isEmpty()) ? "No Description " : event.getDescription());
     }
 
     @Override
@@ -72,6 +82,7 @@ public class EventDetailActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.event_detail_menu, menu);
+        this.item = menu.findItem(R.id.reserve_seat);
         return super.onCreateOptionsMenu(menu);
     }
 

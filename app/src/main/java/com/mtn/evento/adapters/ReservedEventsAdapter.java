@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import com.mtn.evento.data.ResultSet;
 
 import java.util.ArrayList;
 
+import static com.mtn.evento.data.Constants.LOGMESSAGE;
+
 
 public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAdapter.ReservedEventHolder> {
 
@@ -28,11 +31,12 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
     Context context;
 
     public ReservedEventsAdapter() {
-
+        Log.d(LOGMESSAGE, "adapter init ");
     }
 
     public void setReservedEvents(ArrayList<ResultSet> reservedEvents) {
         this.reservedEvents = reservedEvents;
+        Log.d(LOGMESSAGE, "adapter set: ");
     }
     @Override
     public ReservedEventHolder onCreateViewHolder(ViewGroup parent, int i) {
@@ -56,6 +60,7 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
 
     @Override
     public int getItemCount() {
+        Log.d(LOGMESSAGE, "adapter size " + reservedEvents.size());
         return reservedEvents.size();
     }
 
