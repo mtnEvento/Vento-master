@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.mtn.evento.Evento;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.HomeScreenActivity;
 import com.mtn.evento.adapters.EventAdapter;
@@ -36,13 +37,12 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
  * A simple {@link Fragment} subclass.
  */
 public class ReservedFragment extends Fragment implements HomeScreenActivity.LoginLogoutListener {
-    RecyclerView reservedRecycler;
-    RecyclerView.LayoutManager layoutManager;
-    ReservedEventsAdapter reservedEventsAdapter;
-    ArrayList<ResultSet> reservedEvents;
-    AppCompatActivity appContext;
-    DatabaseHandler db;
-    private FirebaseAuth mAuth;
+    static RecyclerView reservedRecycler;
+    static RecyclerView.LayoutManager layoutManager;
+    static ReservedEventsAdapter reservedEventsAdapter;
+    static ArrayList<ResultSet> reservedEvents;
+    static AppCompatActivity appContext;
+    static private FirebaseAuth mAuth;
 
     public ReservedFragment() {
         Log.d(LOGMESSAGE, "ReservedFragment: instantiated ");
@@ -75,16 +75,15 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
             }
             if(mAuth != null && mAuth.getCurrentUser() != null){
 
-                db = new DatabaseHandler(appContext);
+
                 if(reservedEventsAdapter != null && reservedRecycler != null) {
 
-                    if(db != null){
-                        reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
-                        db.close();
+                    reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
+                    if(reservedEvents !=null ){
+                        reservedEventsAdapter.setReservedEvents(reservedEvents);
+                        reservedRecycler.setAdapter(reservedEventsAdapter);
+                        reservedRecycler.invalidate();
                     }
-
-                    reservedRecycler.setAdapter(reservedEventsAdapter);
-                    reservedRecycler.invalidate();
                 }
             }
             else
@@ -148,14 +147,17 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
     public boolean onLoginLogout(String which) {
         switch (which){
             case APP_LOGIN:
-                if(db == null){
-                    db = new DatabaseHandler(appContext);
-                }
+
                 if(reservedEventsAdapter != null && reservedRecycler != null){
-                    reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
-                    db.close();
-                    reservedRecycler.setAdapter(reservedEventsAdapter);
-                    reservedRecycler.invalidate();
+
+                    reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
+                    if(reservedEvents != null){
+                         reservedRecycler.removeAllViews();
+                        reservedEventsAdapter.setReservedEvents(reservedEvents);
+                        reservedRecycler.setAdapter(reservedEventsAdapter);
+                        reservedRecycler.invalidate();
+                    }
+
                 }
 
                 break;

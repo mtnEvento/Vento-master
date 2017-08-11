@@ -42,14 +42,14 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
  */
 public class EventsFragment extends Fragment implements HomeScreenActivity.SearchRequestListener,HomeScreenActivity.SearchRegionRequestListener {
 
-     private RecyclerView eventRecycler;
-     private RecyclerView.LayoutManager layoutManager;
-     EventAdapter eventAdapter;
-     ArrayList<Event> events;
-     private FirebaseDatabase firebaseDatabase ;
-     private DatabaseReference eventsRef;
-     private AppCompatActivity appContext;
-     private EventValueListener eventValueListener;
+    static private RecyclerView eventRecycler;
+    static private RecyclerView.LayoutManager layoutManager;
+    static EventAdapter eventAdapter;
+    static ArrayList<Event> events;
+    static private FirebaseDatabase firebaseDatabase ;
+    static private DatabaseReference eventsRef;
+    static private AppCompatActivity appContext;
+    static private EventValueListener eventValueListener;
 
     public interface EventFilter{
         public void onFilterEvent(String filterTerm, ArrayList<Event> events);
