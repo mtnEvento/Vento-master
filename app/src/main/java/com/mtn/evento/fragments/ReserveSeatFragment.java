@@ -69,11 +69,11 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     private Button makePayment;
     MenuItem cartView;
     private DatabaseReference mDatabase;
-    private
-    FirebaseUser client;
-    public ReserveSeatFragment() {
-        // Required empty public constructor
+    private FirebaseAuth mAuth;
 
+
+    public ReserveSeatFragment() {
+        mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
@@ -224,7 +224,24 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         if(isNetworkAndInternetAvailable()){
-                            makePayment(singlePurchaseDataArrayList);
+                            if(mAuth != null && mAuth.getCurrentUser() != null)
+                            {
+                                makePayment(singlePurchaseDataArrayList);
+                            }
+                            else
+                            {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setTitle("NOT LOGGED IN");
+                                builder.setMessage("Sorry, You need to login first in order to reserve a seat! Goto the Side-Navigation and login if you are already registered.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                builder.show();
+                            }
+
                         }
                         else
                         {
@@ -237,6 +254,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                     dialog.dismiss();
                                 }
                             });
+                            builder.show();
                         }
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:

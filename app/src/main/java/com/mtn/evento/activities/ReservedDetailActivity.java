@@ -48,7 +48,7 @@ public class ReservedDetailActivity extends AppCompatActivity {
             ( (TextView)findViewById(R.id.reserved_evt_name)).setText((reservedSeatData.getEvent().getTitle() == null || reservedSeatData.getEvent().getTitle().isEmpty()) ? "N/A": reservedSeatData.getEvent().getTitle());
             ( (TextView)findViewById(R.id.reserved_evt_date)).setText((reservedSeatData.getEvent().getEvent_date() == null || reservedSeatData.getEvent().getEvent_date().isEmpty()) ? "N/A": reservedSeatData.getEvent().getEvent_date());
             ( (TextView)findViewById(R.id.reserved_evt_venue)).setText((reservedSeatData.getEvent().getVenue()== null || reservedSeatData.getEvent().getVenue().isEmpty()) ? "N/A" : reservedSeatData.getEvent().getVenue());
-            ( (TextView)findViewById(R.id.reserved_evt_description)).setText((reservedSeatData.getEvent().getDescription()== null || reservedSeatData.getEvent().getDescription().isEmpty()) ? "N/A": reservedSeatData.getEvent().getDescription());
+            ( (TextView)findViewById(R.id.reserved_evt_description)).setText((reservedSeatData.getEvent().getDescription()== null || reservedSeatData.getEvent().getDescription()== "null" ||reservedSeatData.getEvent().getDescription().isEmpty()) ? "N/A" : reservedSeatData.getEvent().getDescription());
         }
 
     }

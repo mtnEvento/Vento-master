@@ -2,6 +2,7 @@ package com.mtn.evento.fragments;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.mtn.evento.R;
@@ -36,14 +38,19 @@ public class ReservedFragment extends Fragment {
     ReservedEventsAdapter reservedEventsAdapter;
     ArrayList<ResultSet> reservedEvents;
     AppCompatActivity appContext;
+    DatabaseHandler db;
+    private FirebaseAuth mAuth;
 
     public ReservedFragment() {
 
         Log.d(LOGMESSAGE, "ReservedFragment: CALLED ");
-       // reservedEvents = new ArrayList<>();
         reservedEventsAdapter = new ReservedEventsAdapter();
+
     }
 
+    public void setAppContext(AppCompatActivity appContext){
+        this.appContext = appContext ;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,7 +58,7 @@ public class ReservedFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_reserved, container, false);
         reservedRecycler = (RecyclerView) v.findViewById(R.id.reservedRecycler);
-        layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(appContext);
         reservedRecycler.setLayoutManager(layoutManager);
         reservedRecycler.setHasFixedSize(true);
 
@@ -62,19 +69,33 @@ public class ReservedFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if(FirebaseAuth.getInstance().getCurrentUser() != null){
-            DatabaseHandler db = new DatabaseHandler(appContext);
-            reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
-            reservedRecycler.setAdapter(reservedEventsAdapter);
+        if(isNetworkAndInternetAvailable()){
+
+            if(mAuth == null){
+                mAuth = FirebaseAuth.getInstance();
+            }
+            if(mAuth != null && mAuth.getCurrentUser() != null){
+
+                db = new DatabaseHandler(appContext);
+                reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
+                db.close();
+                reservedRecycler.setAdapter(reservedEventsAdapter);
+                reservedRecycler.invalidate();
+            }
+            else
+            {
+                reservedRecycler.invalidate();
+            }
+           //TODO: User not logged in
+        }
+        else
+        {
+            //TODO: Alert no network connection
+            Toast.makeText(appContext,"No network connection available. Please check your network and try again!",Toast.LENGTH_LONG).show();
         }
 
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.appContext = (AppCompatActivity) context;
-    }
     public boolean isInternetOn() {
 
         // get Connectivity Manager object to check connection

@@ -19,7 +19,7 @@ public class FinishFragment extends Fragment {
 
 
     public FinishFragment() {
-        // Required empty public constructor
+
     }
 
 

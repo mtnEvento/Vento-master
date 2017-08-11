@@ -49,6 +49,8 @@ import com.mtn.evento.R;
 import com.mtn.evento.adapters.CMPagerAdapter;
 import com.mtn.evento.data.Event;
 import com.mtn.evento.fragments.EventsFragment;
+import com.mtn.evento.fragments.ProfileFragment;
+import com.mtn.evento.fragments.ReservedFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +61,7 @@ import static com.mtn.evento.data.Constants.APP_USER_ID;
 import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
-public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,SearchView.OnCloseListener,SearchView.OnClickListener {
+public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,SearchView.OnCloseListener,SearchView.OnClickListener,ProfileFragment.UserProfile {
 
     private static final int LOGIN_REQUEST = 47;
     public static final String LOGINED_IN = "LOGINED_IN";
@@ -76,6 +78,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     private ViewPager viewPager;
     CMPagerAdapter tabAdapter;
     Spinner spinner;
+    TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,43 +109,32 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         nav_username = (TextView) headerView. findViewById(R.id.nav_username);
         nav_email = (TextView) headerView. findViewById(R.id.nav_email);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Events"));
         tabLayout.addTab(tabLayout.newTab().setText("Reserved"));
         tabLayout.addTab(tabLayout.newTab().setText("Profile"));
 
         viewPager = (ViewPager) findViewById(R.id.pager);
-        tabAdapter  = new CMPagerAdapter(getSupportFragmentManager(), 3);
-        viewPager.setAdapter(tabAdapter);
+
+        tabAdapter  = new CMPagerAdapter(HomeScreenActivity.this,getSupportFragmentManager(), 3);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
                 if(tab.getPosition() > 0 ){
-                    if(spinner!= null ){
-                        spinner.setVisibility(View.GONE);
-                    }
-
+                    if(spinner!= null ){spinner.setVisibility(View.GONE);}
                 }
                 else
                 {
-                    if(spinner!= null ){
-                        spinner.setVisibility(View.VISIBLE);
-                    }
-
+                    if(spinner!= null ){ spinner.setVisibility(View.VISIBLE);}
                 }
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
+            public void onTabUnselected(TabLayout.Tab tab) {}
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
         searchRequestListener = (SearchRequestListener) ((EventsFragment)tabAdapter.getItem(0));
         regionRequestListener = (SearchRegionRequestListener) ((EventsFragment)tabAdapter.getItem(0));
@@ -150,6 +142,12 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        viewPager.setAdapter(tabAdapter);
     }
 
     private void initSearch(){
@@ -222,21 +220,16 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu,menu);
-
         MenuItem item = menu.findItem(R.id.action_spinner);
         spinner = (Spinner) MenuItemCompat.getActionView(item);
-
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.regions, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
-        Log.d(LOGMESSAGE, "count: " + spinner.getCount());
         spinner.setOnItemSelectedListener(spinnerItemSelected());
-        // searchRequestListener.onSearch(newQuery);
         return super.onCreateOptionsMenu(menu);
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
@@ -246,36 +239,39 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         return super.onOptionsItemSelected(item);
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == LOGIN_REQUEST && resultCode == RESULT_OK){
-
             boolean loginedIn  = data.getBooleanExtra(LOGINED_IN,false);
-            if(loginedIn){
+            if(loginedIn && FirebaseAuth.getInstance().getCurrentUser() != null){
                 nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
                 nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
                 Loginlogout.setIcon(R.drawable.ic_settings_power_black_24dp);
                 Loginlogout.setTitle("Logout");
             }
-            else{
+            else  if(loginedIn && FirebaseAuth.getInstance().getCurrentUser() == null){
                 nav_username.setText("Username");
                 nav_email.setText("Email");
                 Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
                 Loginlogout.setTitle("Login");
+            }
+            else  if(!loginedIn && FirebaseAuth.getInstance().getCurrentUser() == null){
 
+                nav_username.setText("Username");
+                nav_email.setText("Email");
+                Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
+                Loginlogout.setTitle("Login");
             }
         }
     }
-
     public AdapterView.OnItemSelectedListener spinnerItemSelected(){
         final String [] regions = getResources().getStringArray(R.array.regions);
         return  new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                  regionRequestListener.onRegionSearch(regions[position].toLowerCase(),viewPager);
+                 // regionRequestListener.onRegionSearch(regions[position].toLowerCase(),viewPager);
 
             }
 
@@ -285,7 +281,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             }
         };
     }
-
     @Override
     public void onBackPressed() {
 
@@ -307,7 +302,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         }
     }
-
     @Override
     public boolean onNavigationItemSelected( MenuItem item) {
         int id = item.getItemId();
@@ -315,45 +309,26 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             case R.id.action_login_logout:
                 Loginlogout = item;
                 CharSequence action_text = item.getTitle();
+                if ( FirebaseAuth.getInstance().getCurrentUser() == null) {
+                    Loginlogout.setTitle("Login");
+                    Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
+                    nav_username.setText("Username");
+                    nav_email.setText("Email");
 
-//                if (FirebaseAuth.getInstance().getCurrentUser() != null){
-//
-//                }
-
-                if(action_text.toString().contains("Login")){
-
-                    if ( FirebaseAuth.getInstance().getCurrentUser() == null) {
-                         startActivityForResult(new Intent(this, LoginActivity.class),LOGIN_REQUEST);
-                        
-                    }
-
+                    HomeScreenActivity.this.startActivityForResult(new Intent(HomeScreenActivity.this, LoginActivity.class),LOGIN_REQUEST);
                 }
                 else
-                if(action_text.toString().contains("Logout")){
-                    if ( FirebaseAuth.getInstance().getCurrentUser() != null) {
+                if ( FirebaseAuth.getInstance().getCurrentUser() != null) {
                           FirebaseAuth.getInstance().signOut();
-
                           Loginlogout.setTitle("Login");
                           Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
                           nav_username.setText("Username");
                           nav_email.setText("Email");
-                          super.onResume();
-                    }
-                    else
-                    {
-                        nav_username.setText("Username");
-                        nav_email.setText("Email");
-                        Loginlogout.setTitle("Login");
-                        Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-                        super.onResume();
-                    }
                 }
-            return true;
-
+               return true;
         }
         return false;
     }
-
     @Override
     public boolean onClose() {
 
@@ -367,23 +342,29 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         return true;
     }
-
     @Override
     public void onClick(View v) {
         if(v.getId()== android.support.v7.appcompat.R.id.search_close_btn){
             searchEditText.setText("         ");
         }
     }
+    @Override
+    public void onUserProfileChange(String which, String value) {
+        if(APP_USER_EMAIL.contentEquals(which)){
+            nav_email.setText(value);
+        }
 
+        if(APP_USERNAME.contentEquals(which)){
+            nav_username.setText(value);
+        }
+
+    }
     public interface  SearchRequestListener{
         public ArrayList<Event> onSearch(String query);
     }
-
     public interface  SearchRegionRequestListener{
         public ArrayList<Event> onRegionSearch(String query, ViewPager  vp);
     }
-
-
     public boolean isInternetOn() {
 
         // get Connectivity Manager object to check connection
@@ -422,13 +403,5 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     }
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        tabAdapter  = new CMPagerAdapter(getSupportFragmentManager(), 3);
-        viewPager.setAdapter(tabAdapter);
     }
 }

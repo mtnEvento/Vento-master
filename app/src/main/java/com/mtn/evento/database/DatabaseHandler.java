@@ -76,7 +76,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         try
         {
-            SQLiteDatabase db = this.getWritableDatabase();
+            SQLiteDatabase db = getWritableDatabase();
             String json = "",display ="";
 
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
@@ -105,12 +105,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // [Getting All reserved Events]
     public ArrayList<ResultSet> getAllreservedEvents() {
         Log.d(LOGMESSAGE, "getAllreservedEvents: ");
+        SQLiteDatabase db = null ;
         try
         {
             ArrayList<Event> eventList = new ArrayList<Event>();
             ArrayList<ResultSet> resultSets = new ArrayList<>();
             String selectQuery = "SELECT  * FROM " + TABLE_RESERVED_EVENT;
-            SQLiteDatabase db = this.getWritableDatabase();
+            db = getReadableDatabase();
             Cursor cursor = db.rawQuery(selectQuery, null);
             // looping through all rows and adding to list
             if (cursor.moveToFirst()) {
@@ -169,6 +170,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     resultSets.add(new ResultSet(eventList,displayTickets));
                 } while (cursor.moveToNext());
 
+                db.close();
                 Log.d(LOGMESSAGE, "success : get db: " + resultSets);
             }
             // return event list
@@ -176,6 +178,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d(LOGMESSAGE, "ERROR : get db : " + e.getMessage());
+            db.close();
             return  null;
         }
 

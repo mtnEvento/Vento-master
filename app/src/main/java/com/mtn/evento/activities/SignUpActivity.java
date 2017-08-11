@@ -44,6 +44,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView signInIcon;
     private TextView signInText;
     private boolean signUpTracker;
+    ProgressDialog processSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +88,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         //showProgressDialog();
-        final  ProgressDialog processSignUp =  ProgressDialog.show(this,null,"Signing up and logging in....",true,false);
+        processSignUp =  ProgressDialog.show(this,null,"Signing up and logging in....",true,false);
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
 
@@ -106,7 +107,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             intent.putExtra( LoginActivity.EMAIL,mEmailField.getText().toString());
                             setResult(Activity.RESULT_OK,intent);
                             signUpTracker = true ;
-                            SignUpActivity.super.onBackPressed();
+                            finish();
                         }
                     }
                 })
@@ -209,12 +210,10 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             signUp();
         }
         else  if (i == R.id.signInIcon) {
-            SignUpActivity.super.onBackPressed();
-           // startActivity(new Intent(SignUpActivity.this, SignUpActivity.class));
+            finish();
         }
         else  if (i == R.id.loginText) {
-           // startActivity(new Intent(SignUpActivity.this, SignUpActivity.class));
-            SignUpActivity.super.onBackPressed();
+            finish();
         }
     }
 
@@ -235,7 +234,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             Intent intent = new Intent();
             intent.putExtra( LoginActivity.SIGNED_UP ,false);
             setResult(Activity.RESULT_OK,intent);
-            SignUpActivity.super.onBackPressed();
+            finish();
         }
 
 
