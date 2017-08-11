@@ -36,6 +36,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.mtn.evento.Evento;
 import com.mtn.evento.Payment;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.BarcodeActivity;
@@ -270,36 +271,39 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
     private void makePayment( final List<SinglePurchaseData> singlePurchaseData) {
 
-//        HashMap<String,String> contentValue = new HashMap<>();
-//        contentValue.put("CustomerName","Daniel");
-//        contentValue.put("CustomerMsisdn","233241361156");
-//        contentValue.put("CustomerEmail","user@gmail.com");
-//        contentValue.put("Channel","mtn-gh");
-//        contentValue.put("Amount","1");
-//        contentValue.put("Description","T Shirt");
-//
-//        String url = "http://10.13.56.107/payment.php";
-//        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
-//            @Override
-//            public void getResult(String result) {
-//                if(result == null || result.isEmpty()){return; }
-//                Log.d(LOGMESSAGE, "getResult: " + result);
-//                try {
-//                    JSONObject object = new JSONObject(result);
-//                    JSONObject data =  object.getJSONObject("data");
-//                    String transactionId = data.getString("TransactionId");
-//
-//                    DatabaseHandler db = new DatabaseHandler(getContext());
-//                    db.addEvent(mEvent);
-//
-//                    Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).connectToServer();
+        HashMap<String,String> contentValue = new HashMap<>();
+        contentValue.put("CustomerName","Daniel");
+        contentValue.put("CustomerMsisdn","233203779747");
+        contentValue.put("CustomerEmail","user@gmail.com");
+        contentValue.put("Channel","mtn-gh");
+        contentValue.put("Amount","1");
+        contentValue.put("Description","T Shirt");
 
-        DatabaseHandler handler = new DatabaseHandler(getActivity());
+        String url = "http://pay.codoxogh.com/payment.php";
+        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
+            @Override
+            public void getResult(String result) {
+                if(result == null || result.isEmpty()){return; }
+                Log.d(LOGMESSAGE, "getResult: " + result);
+                try {
+                    JSONObject object = new JSONObject(result);
+                    JSONObject data =  object.getJSONObject("data");
+                    String transactionId = data.getString("TransactionId");
+
+
+                    //processPayment(singlePurchaseData);
+
+                    Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).connectToServer();
+
+
+    }
+
+    private void processPayment(final List<SinglePurchaseData> singlePurchaseData){
         //TODO  add all purchased tickets to list of DisplayTicket object
         EncodeData.getInstance();
         List<DisplayTicket> displayTickets = new ArrayList<>();
@@ -328,12 +332,12 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
             }
 
         }
-        handler.addEvent(mEvent,displayTickets);
+
+        ((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent,displayTickets);
         Intent intent = new Intent(getActivity(), BarcodeActivity.class);
         intent.putExtra(Constants.TICKET, (Serializable) displayTickets);
         startActivity(intent);
     }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

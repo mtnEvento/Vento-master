@@ -15,7 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.TextView;
+
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.mtn.evento.Evento;
@@ -43,6 +44,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
     static ArrayList<ResultSet> reservedEvents;
     static AppCompatActivity appContext;
     static private FirebaseAuth mAuth;
+    private TextView errorHandler;
 
     public ReservedFragment() {
         Log.d(LOGMESSAGE, "ReservedFragment: instantiated ");
@@ -59,6 +61,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_reserved, container, false);
         reservedRecycler = (RecyclerView) v.findViewById(R.id.reservedRecycler);
+         errorHandler = (TextView) v.findViewById(R.id.no_seats);
         layoutManager = new LinearLayoutManager(appContext);
         reservedRecycler.setLayoutManager(layoutManager);
         reservedRecycler.setHasFixedSize(true);
@@ -76,10 +79,12 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
             if(mAuth != null && mAuth.getCurrentUser() != null){
 
 
-                if(reservedEventsAdapter != null && reservedRecycler != null) {
+                if(reservedEventsAdapter != null && reservedRecycler != null && appContext != null && appContext.getApplication() != null  && ((Evento) appContext.getApplication()).getDatabaseHandler() !=null ) {
 
                     reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
                     if(reservedEvents !=null ){
+                        reservedRecycler.setVisibility(View.VISIBLE);
+                        errorHandler.setVisibility(View.GONE);
                         reservedEventsAdapter.setReservedEvents(reservedEvents);
                         reservedRecycler.setAdapter(reservedEventsAdapter);
                         reservedRecycler.invalidate();
@@ -88,9 +93,13 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
             }
             else
             {
+
                 if( reservedRecycler != null ) {
+
                     reservedRecycler.removeAllViews();
                     reservedRecycler.invalidate();
+                    reservedRecycler.setVisibility(View.GONE);
+                    errorHandler.setText(R.string.not_logged_in);
                 }
 
             }
@@ -99,7 +108,9 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
         else
         {
             //TODO: Alert no network connection
-            Toast.makeText(appContext,"No network connection available. Please check your network and try again!",Toast.LENGTH_LONG).show();
+            reservedRecycler.setVisibility(View.GONE);
+            errorHandler.setText(R.string.no_connection);
+
         }
 
     }

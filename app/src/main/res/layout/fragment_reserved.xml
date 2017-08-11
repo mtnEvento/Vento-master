@@ -11,8 +11,18 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/reservedRecycler"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
     </ScrollView>
+    <TextView
+        android:id="@+id/no_seats"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/darkBlue"
+        android:textSize="@dimen/no_seat_size"
+        android:text="@string/no_seats_reservred"/>
 
 </FrameLayout>

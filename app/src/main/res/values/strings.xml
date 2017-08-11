@@ -25,4 +25,7 @@
     <string name="seatTypeCount">Cart : 1</string>
     <string name="print">Print</string>
     <string name="quauntity">quantity</string>
+    <string name="no_connection">No Internet!</string>
+    <string name="no_seats_reservred">No Seats Reserved</string>
+    <string name="not_logged_in">You are logged out</string>
 </resources>

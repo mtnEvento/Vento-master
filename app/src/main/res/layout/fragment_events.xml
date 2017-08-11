@@ -8,12 +8,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-   <android.support.v7.widget.RecyclerView
-       android:id="@+id/eventRecycler"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"/>
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/eventRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
     </ScrollView>
-
+    <TextView
+        android:id="@+id/no_network"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/darkBlue"
+        android:textSize="@dimen/standard_height"
+        android:text="@string/no_connection"/>
 
 </FrameLayout>

@@ -5,4 +5,5 @@
     <dimen name="card_size">60dp</dimen>
     <dimen name="elevation_standard">5dp</dimen>
     <dimen name="standard_height">35dp</dimen>
+    <dimen name="no_seat_size">10pt</dimen>
 </resources>

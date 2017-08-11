@@ -17,29 +17,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/customSearchIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:elevation="@dimen/button_radius"
-                android:cropToPadding="true"
-                android:layout_marginTop="9dp"
-                android:layout_marginLeft="32dp"
-                app:srcCompat="@drawable/ic_search_svg"
-                tools:ignore="VectorDrawableCompat" />
-            <android.support.v7.widget.SearchView
-                android:id="@+id/eventSearchView"
-                android:layout_width="match_parent"
-                android:layout_height="40sp"
-                android:background="@drawable/curved_white"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/margin_standard"
-                android:layout_marginRight="@dimen/margin_standard"/>
-        </FrameLayout>
+        <!--<FrameLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+            <!--<ImageView-->
+                <!--android:id="@+id/customSearchIcon"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:elevation="@dimen/button_radius"-->
+                <!--android:cropToPadding="true"-->
+                <!--android:layout_marginTop="9dp"-->
+                <!--android:layout_marginLeft="32dp" />-->
+                <!--&lt;!&ndash;app:srcCompat="@drawable/ic_search_svg"&ndash;&gt;-->
+                <!--&lt;!&ndash;tools:ignore="VectorDrawableCompat"&ndash;&gt;-->
+            <!--<android.support.v7.widget.SearchView-->
+                <!--android:id="@+id/eventSearchView"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="40sp"-->
+                <!--android:background="@drawable/curved_white"-->
+                <!--android:layout_centerHorizontal="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_marginLeft="@dimen/margin_standard"-->
+                <!--android:layout_marginRight="@dimen/margin_standard"/>-->
+        <!--</FrameLayout>-->
 
             />
         <android.support.design.widget.TabLayout

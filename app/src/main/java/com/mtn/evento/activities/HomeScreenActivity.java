@@ -101,7 +101,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         initUI();
         initSetting();
-        initSearch();
+       // initSearch();
     }
 
     public void initUI(){
@@ -142,8 +142,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
-
-        //eventsLoginLogoutListener = (LoginLogoutListener) ((EventsFragment)tabAdapter.getItem(0));
         reservedLoginLogoutListener = (LoginLogoutListener) ((ReservedFragment)tabAdapter.getItem(1));
         mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -154,87 +152,108 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     @Override
     protected void onStart() {
         super.onStart();
-
-            viewPager.setAdapter(tabAdapter);
-//        else
-   //     {
-//            AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreenActivity.this);
-//            builder.setTitle("NO NETWORK AVAILABLE");
-//            builder.setMessage("Sorry, no internet connection available. Please check your network connection and try again!");
-//            builder.setPositiveButton("RETRY", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    if(isNetworkAndInternetAvailable()){
-//                        viewPager.setAdapter(tabAdapter);
-//                    }
-//                    else
-//                    {
-//                        AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreenActivity.this);
-//                        builder.setTitle("NO NETWORK AVAILABLE");
-//                        builder.setMessage("Sorry, no internet connection available. Please check your network connection and try again!");
-//                        builder.setPositiveButton("RETRY", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                if(isNetworkAndInternetAvailable()){
-//                                    viewPager.setAdapter(tabAdapter);
-//                                }
-//                            }
-//                        });
-//                    }
-//                }
-//            });
-//            builder.show();
-      //  }
-        searchRequestListener = (SearchRequestListener) ((EventsFragment)tabAdapter.getItem(0));
-        regionRequestListener = (SearchRegionRequestListener) ((EventsFragment)tabAdapter.getItem(0));
+        viewPager.setAdapter(tabAdapter);
+        searchRequestListener = (SearchRequestListener) ((EventsFragment) tabAdapter.getItem(0));
+        regionRequestListener = (SearchRegionRequestListener) ((EventsFragment) tabAdapter.getItem(0));
 
     }
-
     private void initSearch(){
-        searchView = (SearchView) findViewById(R.id.eventSearchView);
-        searchEditText = (EditText)searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-        ImageView closeButtonImage = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
-        closeButtonImage.setVisibility(View.GONE);
-        closeButtonImage.removeOnLayoutChangeListener(null);
-        closeButtonImage.setOnFocusChangeListener(null);
+
+        searchView = (SearchView) findViewById(R.id.reserve_seat);
+        searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        View mSearchEditFrame = searchView.findViewById(android.support.v7.appcompat.R.id.search_edit_frame);
+        ImageView mCollapsedIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
+        ImageView mCloseButton = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        Drawable mSearchHintIcon = new Drawable() {
+            @Override
+            public void draw(Canvas canvas) {
+                canvas.setBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_search_svg));
+            }
+
+            @Override
+            public void setAlpha(int alpha) {
+
+            }
+
+            @Override
+            public void setColorFilter(ColorFilter colorFilter) {
+
+            }
+
+            @Override
+            public int getOpacity() {
+                return PixelFormat.OPAQUE;
+            }
+        };
+
+        View mSearchPlate = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);;
+        final View mSubmitArea  = searchView.findViewById(android.support.v7.appcompat.R.id.submit_area);
+        ImageView mSearchButton = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button);;
+        ImageView mGoButton =(ImageView)searchView.findViewById(android.support.v7.appcompat.R.id.search_go_btn); ;
+
+        mCloseButton.setVisibility(View.GONE);
+        mCloseButton.removeOnLayoutChangeListener(null);
+        mCloseButton.setOnFocusChangeListener(null);
+        mCollapsedIcon.setImageDrawable(mSearchHintIcon);
+
+        mCloseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(HomeScreenActivity.this,"close Btn clicked! and mSubmitArea with text : "+(searchEditText).getText().toString(),Toast.LENGTH_LONG).show();
+            }
+        });
+        mGoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(HomeScreenActivity.this,"Go Btn clicked!",Toast.LENGTH_LONG).show();
+            }
+        });
+//        mSearchButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(HomeScreenActivity.this,"Search Btn clicked! and mSubmitArea with text : "+(searchEditText).getText().toString(),Toast.LENGTH_LONG).show();
+//            }
+//        });
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            closeButtonImage.setRevealOnFocusHint(false);
+            mCloseButton.setRevealOnFocusHint(false);
         }
         searchEditText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         searchEditText.setHintTextColor(Color.LTGRAY);
         searchEditText.setHint("           Search Events by Titles...");
-        ImageView mSearchHintIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-                customSearchIcon.setVisibility(View.GONE);
-                searchEditText.setHint("       Search Events by Titles...");
-            }
-        });
 
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
-                    customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-                    customSearchIcon.setVisibility(View.GONE);
-                    searchEditText.setHint("       Search Events by Titles...");
-                }
-                else{
-                    customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-                    customSearchIcon.setVisibility(View.VISIBLE);
-                    searchEditText.setHint("           Search Events by Titles...");
-                }
-            }
-        });
-
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(HomeScreenActivity.this,""+ v.getId(),Toast.LENGTH_LONG).show();
-            }
-        });
+//        searchView.setOnSearchClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+//                customSearchIcon.setVisibility(View.GONE);
+//                searchEditText.setHint("       Search Events by Titles...");
+//            }
+//        });
+//
+//        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if(hasFocus){
+//                    customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+//                    customSearchIcon.setVisibility(View.GONE);
+//                    searchEditText.setHint("       Search Events by Titles...");
+//                }
+//                else{
+//                    customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+//                    customSearchIcon.setVisibility(View.VISIBLE);
+//                    searchEditText.setHint("           Search Events by Titles...");
+//                }
+//            }
+//        });
+//
+//        searchView.setOnSearchClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(HomeScreenActivity.this,""+ v.getId(),Toast.LENGTH_LONG).show();
+//            }
+//        });
 
 
         // searchView.
@@ -344,14 +363,14 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     @Override
     public void onBackPressed() {
 
-        if(searchEditText.getText().toString().isEmpty()){
-            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-            customSearchIcon.setVisibility(View.VISIBLE);
-        }
-        else {
-            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-            customSearchIcon.setVisibility(View.GONE);
-        }
+//        if(searchEditText.getText().toString().isEmpty()){
+//            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+//            customSearchIcon.setVisibility(View.VISIBLE);
+//        }
+//        else {
+//            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+//            customSearchIcon.setVisibility(View.GONE);
+//        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -415,21 +434,21 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     @Override
     public boolean onClose() {
 
-        if(searchEditText.getText().toString().isEmpty()){
-            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-            customSearchIcon.setVisibility(View.VISIBLE);
-        }
-        else {
-            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-            customSearchIcon.setVisibility(View.GONE);
-        }
+//        if(searchEditText.getText().toString().isEmpty()){
+//            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+//            customSearchIcon.setVisibility(View.VISIBLE);
+//        }
+//        else {
+//            customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
+//            customSearchIcon.setVisibility(View.GONE);
+//        }
         return true;
     }
     @Override
     public void onClick(View v) {
-        if(v.getId()== android.support.v7.appcompat.R.id.search_close_btn){
-            searchEditText.setText("         ");
-        }
+//        if(v.getId()== android.support.v7.appcompat.R.id.search_close_btn){
+//            searchEditText.setText("         ");
+//        }
     }
     @Override
     public void onUserProfileChange(String which, String value) {

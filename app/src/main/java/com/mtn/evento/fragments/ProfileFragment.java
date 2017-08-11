@@ -136,19 +136,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
     private void displayUserdetails(){
         if(isNetworkAndInternetAvailable()){
-            if( mAuth  != null && mAuth.getCurrentUser()!=null){
-                if (((Evento) appContext.getApplication()).getSettings().contains(APP_USER_EMAIL)) {
+            if( mAuth  != null && mAuth.getCurrentUser()!=null ){
+                if ( appContext != null && appContext.getApplication() !=null &&((Evento) appContext.getApplication()).getSettings().contains(APP_USER_EMAIL)) {
                     String str_email = ((Evento) appContext.getApplication()).getSettings().getString(APP_USER_EMAIL, "Email");
                     email.setText(str_email);
                     this.userProfile.onUserProfileChange(APP_USER_EMAIL,str_email);
                 }
 
-                if (((Evento) appContext.getApplication()).getSettings().contains(APP_USER_PHONE)) {
+                if (appContext != null && appContext.getApplication() !=null && ((Evento) appContext.getApplication()).getSettings().contains(APP_USER_PHONE)) {
                     String str_phone = ((Evento) appContext.getApplication()).getSettings().getString(APP_USER_PHONE, "Phone Number");
                     phone.setText(  (str_phone == null || str_phone .isEmpty() )? "No Phone number":str_phone );
                 }
 
-                if (((Evento) appContext.getApplication()).getSettings().contains(APP_USERNAME)) {
+                if (appContext != null && appContext.getApplication() !=null && ((Evento) appContext.getApplication()).getSettings().contains(APP_USERNAME)) {
                     String str_username = ((Evento) appContext.getApplication()).getSettings().getString(APP_USERNAME, "Username");
                     username.setText(str_username);
                     this.userProfile.onUserProfileChange(APP_USERNAME,str_username);
@@ -161,11 +161,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     this.userProfile.onUserProfileChange(APP_USERNAME,"Username");
                 }
             }
-        }
-        else
-        {
-            //TODO: Alert no network connection
-            Toast.makeText(appContext,"No network connection available. Please check your network and try again!",Toast.LENGTH_LONG).show();
         }
     }
     @Override

@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -50,6 +51,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     static private DatabaseReference eventsRef;
     static private AppCompatActivity appContext;
     static private EventValueListener eventValueListener;
+    private TextView no_networkView;
 
     public interface EventFilter{
         public void onFilterEvent(String filterTerm, ArrayList<Event> events);
@@ -72,6 +74,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_events, container, false);
         eventRecycler = (RecyclerView) view.findViewById(R.id.eventRecycler);
+        no_networkView = (TextView) view.findViewById(R.id.no_network);
         layoutManager = new LinearLayoutManager(appContext);
         eventRecycler.setLayoutManager(layoutManager);
         eventRecycler.setHasFixedSize(true);
@@ -106,7 +109,9 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         else
         {
             //TODO: Alert no network connection
-            Toast.makeText(appContext,"No network connection available. Please check your network and try again!",Toast.LENGTH_LONG).show();
+            eventRecycler.setVisibility(View.GONE);
+            no_networkView.setVisibility(View.VISIBLE);
+
         }
     }
      class EventValueListener implements ValueEventListener {
@@ -122,6 +127,9 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
             Log.d(LOGMESSAGE, "onDataChange: Events " + events);
             eventAdapter.setEvents(events, false);
             eventRecycler.setAdapter(eventAdapter);
+            no_networkView.setVisibility(View.GONE);
+            eventRecycler.setVisibility(View.VISIBLE);
+
 
         }
         @Override
