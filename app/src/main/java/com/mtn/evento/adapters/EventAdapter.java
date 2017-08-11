@@ -16,45 +16,80 @@ import com.mtn.evento.R;
 import com.mtn.evento.activities.EventDetailActivity;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
+import com.mtn.evento.fragments.EventsFragment;
 
 import java.util.ArrayList;
 
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder> {
+public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>  {
 
-    ArrayList<Event> events;
-    Context context;
+    private ArrayList<Event> events,filteredEvent;
+    private Context context;
+    private   boolean filter = false;
 
     public EventAdapter() {
 
     }
 
-    public void setEvents(ArrayList<Event> events) {
-        this.events = events;
+
+    public void setEvents(ArrayList<Event> events, boolean shouldFilter) {
+
+        if(shouldFilter){
+            filter = true ;
+            this.filteredEvent = events;
+
+        }
+        else
+        {
+            filter = false ;
+            this.events = events;
+        }
     }
 
     @Override
     public EventHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_event,parent,false);
         context = parent.getContext();
-        return new EventHolder(view).setEvents(this.events);
+        return new EventHolder(view).setEvents(this.events,filter);
     }
 
     @Override
     public void onBindViewHolder(EventHolder holder, int position) {
-        Glide.with(context)
-                .load(events.get(position).getBanner())
-                .asBitmap()
-                .into(holder.imageView) ;
-        holder.title.setText(events.get(position).getTitle());
-        holder.venue.setText(events.get(position).getVenue());
-        holder.layout.setTag(events.get(position));
+
+        if(filter){
+            Glide.with(context)
+                    .load(filteredEvent.get(position).getBanner())
+                    .asBitmap()
+                    .into(holder.imageView) ;
+            holder.title.setText(filteredEvent.get(position).getTitle());
+            holder.venue.setText(filteredEvent.get(position).getVenue());
+            holder.layout.setTag(filteredEvent.get(position));
+        }
+        else
+        {
+            Glide.with(context)
+                    .load(events.get(position).getBanner())
+                    .asBitmap()
+                    .into(holder.imageView) ;
+            holder.title.setText(events.get(position).getTitle());
+            holder.venue.setText(events.get(position).getVenue());
+            holder.layout.setTag(events.get(position));
+        }
+
     }
 
     @Override
     public int getItemCount() {
-        return events.size();
+        if(filter){
+            return filteredEvent.size();
+        }
+        else{
+            return events.size();
+        }
+
     }
+
+
 
     static class EventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -62,7 +97,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
         TextView title,venue;
         RelativeLayout layout;
         Context context;
-        ArrayList<Event> events;
+        ArrayList<Event> events, filteredEvent;
 
         public EventHolder(View itemView) {
             super(itemView);
@@ -74,8 +109,17 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
             layout.setOnClickListener(this);
         }
 
-        public   EventHolder  setEvents(ArrayList<Event> events) {
-            this.events = events;
+        public   EventHolder  setEvents(ArrayList<Event> events, boolean shouldFilter) {
+
+            if(shouldFilter){
+
+                this.filteredEvent = events;
+
+            }
+            else
+            {
+                this.events = events;
+            }
             return this;
         }
 

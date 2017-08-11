@@ -232,7 +232,9 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                             {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                                 builder.setTitle("NOT LOGGED IN");
-                                builder.setMessage("Sorry, You need to login first in order to reserve a seat! Goto the Side-Navigation and login if you are already registered.");
+                                builder.setMessage("Sorry, You need to login first in order to reserve a seat! " +
+                                        "Goto the User Navigation Drawer and click on login if you have already registered " +
+                                        "otherwise use the Register With Us link to do so.");
                                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {

@@ -157,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         intent.putExtra(LoginActivity.EMAIL,user.getEmail());
         intent.putExtra(LoginActivity.USERNAME,username);
         setResult(Activity.RESULT_OK,intent);
-        super.onBackPressed();
+        finish();
     }
 
     private String usernameFromEmail(String email) {
@@ -232,6 +232,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Intent intent = new Intent();
             intent.putExtra( HomeScreenActivity.LOGINED_IN ,false);
             setResult(Activity.RESULT_OK,intent);
+            finish();
         }
 
         super.onBackPressed();
@@ -248,14 +249,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 intent.putExtra(LoginActivity.EMAIL,data.getStringExtra(LoginActivity.EMAIL));
                 intent.putExtra(LoginActivity.USERNAME,data.getStringExtra(LoginActivity.USERNAME));
                 setResult(Activity.RESULT_OK,intent);
-                LoginActivity.this.onBackPressed();
+                finish();
             }
             else{
 
                 Intent intent = new Intent();
                 intent.putExtra( HomeScreenActivity.LOGINED_IN ,false);
                 setResult(Activity.RESULT_OK,intent);
-                LoginActivity.this.onBackPressed();
+                finish();
             }
         }
     }

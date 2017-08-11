@@ -42,23 +42,28 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
  */
 public class EventsFragment extends Fragment implements HomeScreenActivity.SearchRequestListener,HomeScreenActivity.SearchRegionRequestListener {
 
-    private ProgressDialog progressEvent;
-    static RecyclerView eventRecycler;
-    private RecyclerView.LayoutManager layoutManager;
-    static EventAdapter eventAdapter;
-    static ArrayList<Event> events;
-    private FirebaseDatabase firebaseDatabase ;
-    private DatabaseReference eventsRef;
-    private AppCompatActivity appContext;
-    private EventValueListener eventValueListener;
+     private RecyclerView eventRecycler;
+     private RecyclerView.LayoutManager layoutManager;
+     EventAdapter eventAdapter;
+     ArrayList<Event> events;
+     private FirebaseDatabase firebaseDatabase ;
+     private DatabaseReference eventsRef;
+     private AppCompatActivity appContext;
+     private EventValueListener eventValueListener;
 
-    public EventsFragment() {}
-    public void setAppContext(AppCompatActivity appContext){
-        this.appContext = appContext ;
+    public interface EventFilter{
+        public void onFilterEvent(String filterTerm, ArrayList<Event> events);
+
+    }
+    public EventsFragment() {
         events = new ArrayList<>();
         eventAdapter = new EventAdapter();
         firebaseDatabase = FirebaseDatabase.getInstance() ;
         eventsRef =  firebaseDatabase.getReference(Database.Tables.EVENTS);
+    }
+    public void setAppContext(AppCompatActivity appContext){
+        this.appContext = appContext ;
+
 
 
     }
@@ -70,20 +75,32 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         layoutManager = new LinearLayoutManager(appContext);
         eventRecycler.setLayoutManager(layoutManager);
         eventRecycler.setHasFixedSize(true);
-        attachValuelistener();
+
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        attachValuelistener();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        eventsRef.removeEventListener(eventValueListener);
+        if(eventValueListener != null){
+
+            if(eventsRef != null){
+                eventsRef.removeEventListener(eventValueListener);
+            }
+        }
+
     }
     private void attachValuelistener(){
         if(isNetworkAndInternetAvailable())
         {
-            progressEvent =  ProgressDialog.show(this.appContext,"","Loading Events....",true,true);
             eventValueListener = new EventValueListener();
+
             eventsRef.addValueEventListener(eventValueListener);
         }
         else
@@ -98,14 +115,14 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         public void onDataChange(DataSnapshot dataSnapshot)
         {
             for (DataSnapshot aDataSnapshot: dataSnapshot.getChildren()){
-                Event evt = aDataSnapshot.getValue(Event.class);
+                 Event evt = aDataSnapshot.getValue(Event.class);
                 events.add(evt);
             }
 
             Log.d(LOGMESSAGE, "onDataChange: Events " + events);
-            eventAdapter.setEvents(events);
+            eventAdapter.setEvents(events, false);
             eventRecycler.setAdapter(eventAdapter);
-            progressEvent.hide();
+
         }
         @Override
         public void onCancelled(DatabaseError databaseError) {
@@ -123,14 +140,14 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                         filteredEvents.add(e);
                     }
                 }
-                eventAdapter.setEvents(filteredEvents);
+                eventAdapter.setEvents(filteredEvents, true);
                 eventRecycler.setAdapter(eventAdapter);
         }
         else
         {
               if(events != null && !events.isEmpty() )
               {
-                    eventAdapter.setEvents(events);
+                    eventAdapter.setEvents(events,false);
                     eventRecycler.setAdapter(eventAdapter);
                     Log.d(LOGMESSAGE, "onSearch: Events " + events);
                     Log.d(LOGMESSAGE, "onSearch: Events Obj title" + events.get(0));
@@ -145,29 +162,32 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         if(!query.isEmpty()){
             if(query.contains("--region--")){
                 if(events != null && !events.isEmpty() ){
-                    eventAdapter.setEvents(events);
+                    eventAdapter.setEvents(events,false);
                     eventRecycler.setAdapter(eventAdapter);
+
                 }
                 else
                 {
                     ArrayList<Event> filteredEvents = new ArrayList<>();
-                    for (Event e: events ) {
-                        if(e != null  && e.getRegion() != null && e.getRegion().toLowerCase().contains(query)){
+                    for (Event e : events ) {
+                        if( e != null  && e.getRegion() != null && e.getRegion().toLowerCase().contains(query)){
                             filteredEvents.add(e);
                         }
                     }
-                    eventAdapter.setEvents(filteredEvents);
+                    eventAdapter.setEvents(filteredEvents,true);
                     eventRecycler.setAdapter(eventAdapter);
+
                 }
             }
-            else {
+            else
+            {
                 ArrayList<Event> filteredEvents = new ArrayList<>();
-                for (Event e: events ) {
-                    if(e != null  && e.getRegion() != null && e.getRegion().toLowerCase().contains(query)){
+                for (Event e : events ) {
+                    if( e != null  && e.getRegion() != null && e.getRegion().toLowerCase().contains(query)){
                         filteredEvents.add(e);
                     }
                 }
-                eventAdapter.setEvents(filteredEvents);
+                eventAdapter.setEvents(filteredEvents, true);
                 eventRecycler.setAdapter(eventAdapter);
             }
         }
@@ -177,7 +197,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
 
         // get Connectivity Manager object to check connection
         ConnectivityManager connec =
-                (ConnectivityManager) appContext. getSystemService(getActivity().getBaseContext().CONNECTIVITY_SERVICE);
+                (ConnectivityManager) getActivity(). getSystemService(getActivity().getBaseContext().CONNECTIVITY_SERVICE);
 
         // Check for network connections
         if (connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
@@ -198,7 +218,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         return false;
     }
     private boolean isNetworkOn(){
-        ConnectivityManager ConnectionManager=(ConnectivityManager)appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager ConnectionManager=(ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
         if(networkInfo != null && networkInfo.isConnected()==true )
         {

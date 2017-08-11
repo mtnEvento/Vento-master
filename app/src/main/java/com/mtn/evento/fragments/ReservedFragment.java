@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.mtn.evento.R;
+import com.mtn.evento.activities.HomeScreenActivity;
 import com.mtn.evento.adapters.EventAdapter;
 import com.mtn.evento.adapters.ReservedEventsAdapter;
 import com.mtn.evento.data.Event;
@@ -27,12 +28,14 @@ import com.mtn.evento.database.DatabaseHandler;
 
 import java.util.ArrayList;
 
+import static com.mtn.evento.data.Constants.APP_LOGIN;
+import static com.mtn.evento.data.Constants.APP_LOGOUT;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ReservedFragment extends Fragment {
+public class ReservedFragment extends Fragment implements HomeScreenActivity.LoginLogoutListener {
     RecyclerView reservedRecycler;
     RecyclerView.LayoutManager layoutManager;
     ReservedEventsAdapter reservedEventsAdapter;
@@ -42,10 +45,8 @@ public class ReservedFragment extends Fragment {
     private FirebaseAuth mAuth;
 
     public ReservedFragment() {
-
-        Log.d(LOGMESSAGE, "ReservedFragment: CALLED ");
+        Log.d(LOGMESSAGE, "ReservedFragment: instantiated ");
         reservedEventsAdapter = new ReservedEventsAdapter();
-
     }
 
     public void setAppContext(AppCompatActivity appContext){
@@ -61,14 +62,12 @@ public class ReservedFragment extends Fragment {
         layoutManager = new LinearLayoutManager(appContext);
         reservedRecycler.setLayoutManager(layoutManager);
         reservedRecycler.setHasFixedSize(true);
-
         return v;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
+    public void onStart() {
+        super.onStart();
         if(isNetworkAndInternetAvailable()){
 
             if(mAuth == null){
@@ -77,16 +76,26 @@ public class ReservedFragment extends Fragment {
             if(mAuth != null && mAuth.getCurrentUser() != null){
 
                 db = new DatabaseHandler(appContext);
-                reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
-                db.close();
-                reservedRecycler.setAdapter(reservedEventsAdapter);
-                reservedRecycler.invalidate();
+                if(reservedEventsAdapter != null && reservedRecycler != null) {
+
+                    if(db != null){
+                        reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
+                        db.close();
+                    }
+
+                    reservedRecycler.setAdapter(reservedEventsAdapter);
+                    reservedRecycler.invalidate();
+                }
             }
             else
             {
-                reservedRecycler.invalidate();
+                if( reservedRecycler != null ) {
+                    reservedRecycler.removeAllViews();
+                    reservedRecycler.invalidate();
+                }
+
             }
-           //TODO: User not logged in
+            //TODO: User not logged in
         }
         else
         {
@@ -135,6 +144,29 @@ public class ReservedFragment extends Fragment {
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
     }
+    @Override
+    public boolean onLoginLogout(String which) {
+        switch (which){
+            case APP_LOGIN:
+                if(db == null){
+                    db = new DatabaseHandler(appContext);
+                }
+                if(reservedEventsAdapter != null && reservedRecycler != null){
+                    reservedEventsAdapter.setReservedEvents(db.getAllreservedEvents());
+                    db.close();
+                    reservedRecycler.setAdapter(reservedEventsAdapter);
+                    reservedRecycler.invalidate();
+                }
 
+                break;
+            case APP_LOGOUT :
+                if(reservedEventsAdapter != null && reservedRecycler != null){
+                    reservedRecycler.removeAllViews();
+                    reservedRecycler.invalidate();
+                }
 
+                break;
+        }
+        return false;
+    }
 }

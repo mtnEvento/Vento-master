@@ -47,7 +47,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     public void setAppContext(AppCompatActivity appContext){
         this.appContext = (HomeScreenActivity)appContext ;
-        this.userProfile = (UserProfile) this.appContext;
+        if( this.appContext != null){
+            this.userProfile = (UserProfile) this.appContext;
+        }
+
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -124,8 +127,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
         else
         {
-            this.userProfile.onUserProfileChange(APP_USER_EMAIL,"Email");
-            this.userProfile.onUserProfileChange(APP_USERNAME,"Username");
+            if( this.userProfile != null){
+                this.userProfile.onUserProfileChange(APP_USER_EMAIL,"Email");
+                this.userProfile.onUserProfileChange(APP_USERNAME,"Username");
+            }
+
         }
     }
     private void displayUserdetails(){
@@ -150,8 +156,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
             else
             {
-                this.userProfile.onUserProfileChange(APP_USER_EMAIL,"Email");
-                this.userProfile.onUserProfileChange(APP_USERNAME,"Username");
+                if( this.userProfile != null){
+                    this.userProfile.onUserProfileChange(APP_USER_EMAIL,"Email");
+                    this.userProfile.onUserProfileChange(APP_USERNAME,"Username");
+                }
             }
         }
         else
@@ -169,8 +177,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
         else
         {
-            this.userProfile.onUserProfileChange(APP_USER_EMAIL,"Email");
-            this.userProfile.onUserProfileChange(APP_USERNAME,"Username");
+            if( this.userProfile != null){
+                this.userProfile.onUserProfileChange(APP_USER_EMAIL,"Email");
+                this.userProfile.onUserProfileChange(APP_USERNAME,"Username");
+            }
         }
     }
     public boolean isInternetOn() {
