@@ -273,7 +273,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
         HashMap<String,String> contentValue = new HashMap<>();
         contentValue.put("CustomerName","Daniel");
-        contentValue.put("CustomerMsisdn","233203779747");
+        contentValue.put("CustomerMsisdn","233541243508");
         contentValue.put("CustomerEmail","user@gmail.com");
         contentValue.put("Channel","mtn-gh");
         contentValue.put("Amount","1");
