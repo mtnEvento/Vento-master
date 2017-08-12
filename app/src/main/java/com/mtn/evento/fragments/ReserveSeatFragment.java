@@ -29,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.github.clans.fab.FloatingActionButton;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -71,6 +72,8 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     MenuItem cartView;
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
+    private de.hdodenhof.circleimageview.CircleImageView event_image;
+    PaymentListener mPaymentListener;
 
 
     public ReserveSeatFragment() {
@@ -89,11 +92,17 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
         View view = inflater.inflate(R.layout.fragment_reserve_seat, container, false);
         makePayment = (Button) view.findViewById(R.id.makePayment);
+        event_image = (de.hdodenhof.circleimageview.CircleImageView) view.findViewById(R.id.event_image);
+
         makePayment.setOnClickListener(this);
         Bundle bag = getArguments();
         mEvent = (Event) bag.getSerializable(Constants.EVENT);
         makePayment.setTag(mEvent);
         holder = new ReservationHolder(view,this,mEvent);
+        Glide.with(context)
+                .load(mEvent.getBanner())
+                .asBitmap()
+                .into(event_image) ;
 
         return view;
     }
@@ -273,37 +282,51 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
         HashMap<String,String> contentValue = new HashMap<>();
         contentValue.put("CustomerName","Daniel");
-        contentValue.put("CustomerMsisdn","233541243508");
+        contentValue.put("CustomerMsisdn","233541243508");//233541243508
         contentValue.put("CustomerEmail","user@gmail.com");
         contentValue.put("Channel","mtn-gh");
         contentValue.put("Amount","1");
         contentValue.put("Description","T Shirt");
 
-        String url = "http://pay.codoxogh.com/payment.php";
-        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
-            @Override
-            public void getResult(String result) {
-                if(result == null || result.isEmpty()){return; }
-                Log.d(LOGMESSAGE, "getResult: " + result);
-                try {
-                    JSONObject object = new JSONObject(result);
-                    JSONObject data =  object.getJSONObject("data");
-                    String transactionId = data.getString("TransactionId");
+//        String url = "http://pay.codoxogh.com/payment.php";
+//        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
+//            @Override
+//            public void getResult(String result) {
+//                if(result == null || result.isEmpty()){return; }
+//                Log.d(LOGMESSAGE, "getResult: " + result);
+//                try {
+//                    JSONObject object = new JSONObject(result);
+//                    JSONObject data =  object.getJSONObject("data");
+//                    String transactionId = data.getString("TransactionId");
+//
+//
+//
+//
+//                    Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).connectToServer();
 
+//        todo set payment listner
 
-                    //processPayment(singlePurchaseData);
+        List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
 
-                    Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        if (mPaymentListener != null ){
+            if (displayTickets != null && !displayTickets.isEmpty()){
+                mPaymentListener.payed("1234ddtryu99",true,displayTickets);
             }
-        }).connectToServer();
+            else {
+                mPaymentListener.payed("1234ddtryu99",false,displayTickets);
+            }
+
+        }
 
 
     }
 
-    private void processPayment(final List<SinglePurchaseData> singlePurchaseData){
+    private List<DisplayTicket> processPayment(final List<SinglePurchaseData> singlePurchaseData){
         //TODO  add all purchased tickets to list of DisplayTicket object
         EncodeData.getInstance();
         List<DisplayTicket> displayTickets = new ArrayList<>();
@@ -331,17 +354,21 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 Log.d(LOGMESSAGE," path:  "+mEvent.getEvent_id()+ "  "+FirebaseAuth.getInstance().getCurrentUser().getUid() +  "  "+secret);
             }
 
+
         }
 
-        ((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent,displayTickets);
-        Intent intent = new Intent(getActivity(), BarcodeActivity.class);
-        intent.putExtra(Constants.TICKET, (Serializable) displayTickets);
-        startActivity(intent);
+
+        return displayTickets;
+
     }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context ;
+    }
+
+    public void setCallback(PaymentListener paymentListener) {
+        mPaymentListener = paymentListener;
     }
 
     private static class ReservationHolder{
@@ -416,6 +443,10 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     }
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
+    }
+
+    public interface PaymentListener{
+        void payed(String transactionId, boolean status, List<DisplayTicket> displayTickets);
     }
 
 

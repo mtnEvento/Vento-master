@@ -1,5 +1,6 @@
 package com.mtn.evento.activities;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -9,9 +10,13 @@ import android.widget.FrameLayout;
 
 import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
+import com.mtn.evento.data.DisplayTicket;
+import com.mtn.evento.fragments.FinishFragment;
 import com.mtn.evento.fragments.ReserveSeatFragment;
 
-public class ReservationActivity extends AppCompatActivity {
+import java.util.List;
+
+public class ReservationActivity extends AppCompatActivity implements ReserveSeatFragment.PaymentListener{
 
     Toolbar toolbar;
     ReserveSeatFragment seatFragment ;
@@ -26,6 +31,7 @@ public class ReservationActivity extends AppCompatActivity {
         if(getSupportActionBar() != null)
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         seatFragment = new ReserveSeatFragment();
+        seatFragment.setCallback(this);
         seatFragment.setArguments(getIntent().getBundleExtra(Constants.BUNDLE));
         getSupportFragmentManager().beginTransaction().add(R.id.container,seatFragment).commit();
     }
@@ -45,5 +51,16 @@ public class ReservationActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void payed(String transactionId, boolean status, List<DisplayTicket> displayTickets) {
+
+        if(status){
+            FinishFragment finishFragment = new FinishFragment();
+            finishFragment.setValues(transactionId, displayTickets);
+            getSupportFragmentManager().beginTransaction().replace(R.id.container,finishFragment).commit();
+        }
+
     }
 }

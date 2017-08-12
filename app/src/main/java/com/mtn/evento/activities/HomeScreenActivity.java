@@ -377,7 +377,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             drawer.closeDrawer(GravityCompat.START);
         } else {
 
-            super.onBackPressed();
+            moveTaskToBack(true);
 
         }
     }

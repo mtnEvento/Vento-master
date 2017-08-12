@@ -26,7 +26,7 @@
                 >
 
                 <ImageView
-                    android:id="@+id/image"
+                    android:id="@+id/imageQr"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
@@ -45,7 +45,7 @@
                 android:layout_height="50dp">
 
                 <TextView
-                    android:id="@+id/name"
+                    android:id="@+id/type_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -66,7 +66,7 @@
                 android:layout_height="50dp">
 
                 <TextView
-                    android:id="@+id/transactionId"
+                    android:id="@+id/ptransactionId"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
     >
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -66,7 +67,7 @@
             android:gravity="center_horizontal"
             />
         <Button
-            android:id="@+id/plate"
+            android:id="@+id/transactionId"
             android:layout_width="150dp"
             android:layout_height="30dp"
             android:background="@drawable/rectangle_yellow"

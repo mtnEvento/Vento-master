@@ -75,6 +75,8 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         View view = inflater.inflate(R.layout.fragment_events, container, false);
         eventRecycler = (RecyclerView) view.findViewById(R.id.eventRecycler);
         no_networkView = (TextView) view.findViewById(R.id.no_network);
+        no_networkView.setText("Loading ...");
+      //  no_networkView.
         layoutManager = new LinearLayoutManager(appContext);
         eventRecycler.setLayoutManager(layoutManager);
         eventRecycler.setHasFixedSize(true);
@@ -119,9 +121,11 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         @Override
         public void onDataChange(DataSnapshot dataSnapshot)
         {
+            events.clear();
             for (DataSnapshot aDataSnapshot: dataSnapshot.getChildren()){
                  Event evt = aDataSnapshot.getValue(Event.class);
-                events.add(evt);
+
+                 events.add(evt);
             }
 
             Log.d(LOGMESSAGE, "onDataChange: Events " + events);

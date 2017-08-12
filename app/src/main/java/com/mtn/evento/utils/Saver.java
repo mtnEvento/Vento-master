@@ -3,6 +3,7 @@ package com.mtn.evento.utils;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -36,13 +37,13 @@ public class Saver {
 //        }
 //    }
 
-    private void saveBitmap(Bitmap bitmap, Activity a) {
-
+    public static String saveBitmap(Bitmap bitmap, Activity a) {
+        String absolutePath = null;
         try {
-            File mFolder = new File(a.getFilesDir() + "/nmc"); //give a name for the folder
-            File imagePath = new File(mFolder + "screenshot.png");
+            File mFolder = new File(a.getFilesDir() + "/event-barcode/"); //give a name for the folder
+            File imagePath = new File(mFolder +  String.valueOf(System.currentTimeMillis())+ "-ticket.png");
             if (!mFolder.exists()) {
-                mFolder.mkdir();
+                mFolder.mkdirs();
             }
             if (!imagePath.exists()) {
                 imagePath.createNewFile();
@@ -60,11 +61,14 @@ public class Saver {
             fos.close();
             MediaStore.Images.Media.insertImage(a.getContentResolver(), bitmap,"Screen", "screen");
 
+            absolutePath = imagePath.getAbsolutePath();
+
         } catch (FileNotFoundException e) {
             Log.e("no file", e.getMessage(), e);
         } catch (IOException e) {
             Log.e("io", e.getMessage(), e);
         }
 
+        return absolutePath;
     }
 }

@@ -28,4 +28,5 @@
     <string name="no_connection">No Internet!</string>
     <string name="no_seats_reservred">No Seats Reserved</string>
     <string name="not_logged_in">You are logged out</string>
+    <string name="save">Save to Gallery</string>
 </resources>
