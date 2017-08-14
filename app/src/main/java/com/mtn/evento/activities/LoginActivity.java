@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mtn.evento.Evento;
+import com.mtn.evento.Factory;
 import com.mtn.evento.R;
 import com.mtn.evento.data.User;
 
@@ -32,6 +33,7 @@ import static com.mtn.evento.data.Constants.APP_USERNAME;
 import static com.mtn.evento.data.Constants.APP_USER_EMAIL;
 import static com.mtn.evento.data.Constants.APP_USER_ID;
 import static com.mtn.evento.data.Constants.APP_USER_PHONE;
+import static com.mtn.evento.data.Constants.LOGINED_IN;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -48,6 +50,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private ImageView signUpIcon;
     private TextView signUpText;
     private final int REQUEST_SIGNUP = 77;
+    ProgressDialog processLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +59,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if(getSupportActionBar() != null)
+        if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
-        // Views
-       // mUsername = (EditText) findViewById(R.id.username);
+
         mEmailField = (EditText) findViewById(R.id.email);
         mPasswordField = (EditText) findViewById(R.id.password);
         mSignInButton = (Button) findViewById(R.id.loginBtn);
@@ -79,7 +83,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         switch (item.getItemId()){
             case android.R.id.home:
                 super.onBackPressed();
-                break;
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -90,8 +94,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
 
-       // showProgressDialog();
-       final  ProgressDialog processLogin =  ProgressDialog.show(this,"","Logging in ....",true,false);
+        if(processLogin == null){
+            processLogin =  ProgressDialog.show(LoginActivity.this,"","Logging In ....",true,false);
+        }
+
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
 
@@ -100,8 +106,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onComplete( Task<AuthResult> task) {
                         Log.d(LOGMESSAGE, "signIn:onComplete:" + task.isSuccessful());
-                       // hideProgressDialog();
-                        processLogin.hide();
+                        if(processLogin != null){
+                            processLogin.hide();
+                        }
                         if (task.isSuccessful()) {
                             onAuthSuccess(task.getResult().getUser());
                         }
@@ -120,44 +127,58 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
     private void onAuthSuccess(FirebaseUser user) {
-        String username = usernameFromEmail(user.getEmail());
 
-        // Write new user
-        writeNewUser(user.getUid(), username, user.getEmail());
+        if(user  != null){
 
-        if( !((Evento)getApplication()).getSettings().contains(APP_USER_ID) ){
-            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_ID,user.getUid()).commit();
-        }
-        else{
-            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_ID,user.getUid()).commit();
-        }
-
-        if( !((Evento)getApplication()).getSettings().contains(APP_USERNAME) ){
-            ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,username).commit();
-        }
-        else{
-            ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,username).commit();
-        }
+            String username = usernameFromEmail(user.getEmail());
+            String str_username = null ;
+            if( ((Evento)getApplication()).getSettings().contains(APP_USERNAME) ){
+                 str_username = ((Evento)getApplication()).getSettings().getString(APP_USERNAME,username);
+            }
+            else
+            {
+                str_username = username ;
+            }
 
 
-        if( !((Evento)getApplication()).getSettings().contains(APP_USER_EMAIL) ){
-            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_EMAIL,user.getEmail()).commit();
-        }
-        else
-        {
-            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_EMAIL,user.getEmail()).commit();
+            if( !((Evento)getApplication()).getSettings().contains(APP_USER_ID) ){
+                ((Evento)getApplication()).getSettings().edit().putString(APP_USER_ID,user.getUid()).commit();
+            }
+            else{
+                ((Evento)getApplication()).getSettings().edit().putString(APP_USER_ID,user.getUid()).commit();
+            }
+
+            if( !((Evento)getApplication()).getSettings().contains(APP_USERNAME) ){
+                ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,str_username).commit();
+            }
+            else
+            {
+                if(str_username != null && !str_username.equalsIgnoreCase(username)){
+                    ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,str_username).commit();
+                }
+                else
+                {
+                    ((Evento)getApplication()).getSettings().edit().putString(APP_USERNAME,str_username).commit();
+                }
+
+            }
+
+            if( !((Evento)getApplication()).getSettings().contains(APP_USER_EMAIL) ){
+                ((Evento)getApplication()).getSettings().edit().putString(APP_USER_EMAIL,user.getEmail()).commit();
+            }
+            else
+            {
+                ((Evento)getApplication()).getSettings().edit().putString(APP_USER_EMAIL,user.getEmail()).commit();
+            }
+
+            Intent intent = new Intent();
+            intent.putExtra( LOGINED_IN ,true);
+            intent.putExtra(LoginActivity.EMAIL,user.getEmail());
+            intent.putExtra(LoginActivity.USERNAME,str_username);
+            setResult(Activity.RESULT_OK,intent);
+            finish();
         }
 
-        if( !((Evento)getApplication()).getSettings().contains(APP_USER_PHONE) ){
-            ((Evento)getApplication()).getSettings().edit().putString(APP_USER_PHONE,"###-###-####").commit();
-        }
-
-        Intent intent = new Intent();
-        intent.putExtra( HomeScreenActivity.LOGINED_IN ,true);
-        intent.putExtra(LoginActivity.EMAIL,user.getEmail());
-        intent.putExtra(LoginActivity.USERNAME,username);
-        setResult(Activity.RESULT_OK,intent);
-        finish();
     }
 
     private String usernameFromEmail(String email) {
@@ -174,6 +195,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mEmailField.setError("Required");
             result = false;
         } else {
+            mEmailField.setError(null);
+        }
+
+        if(! mEmailField.getText().toString().contains("@")){
+            mEmailField.setError("Must contain '@' sign");
+            result = false;
+        }
+        else
+        {
             mEmailField.setError(null);
         }
 
@@ -230,7 +260,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }else
         {
             Intent intent = new Intent();
-            intent.putExtra( HomeScreenActivity.LOGINED_IN ,false);
+            intent.putExtra( LOGINED_IN ,false);
             setResult(Activity.RESULT_OK,intent);
             finish();
         }
@@ -245,7 +275,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             boolean loginedIn  = data.getBooleanExtra(SIGNED_UP,false);
             if(loginedIn){
                 Intent intent = new Intent();
-                intent.putExtra( HomeScreenActivity.LOGINED_IN ,true);
+                intent.putExtra( LOGINED_IN ,true);
                 intent.putExtra(LoginActivity.EMAIL,data.getStringExtra(LoginActivity.EMAIL));
                 intent.putExtra(LoginActivity.USERNAME,data.getStringExtra(LoginActivity.USERNAME));
                 setResult(Activity.RESULT_OK,intent);
@@ -254,7 +284,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             else{
 
                 Intent intent = new Intent();
-                intent.putExtra( HomeScreenActivity.LOGINED_IN ,false);
+                intent.putExtra( LOGINED_IN ,false);
                 setResult(Activity.RESULT_OK,intent);
                 finish();
             }

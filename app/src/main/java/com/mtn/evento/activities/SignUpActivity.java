@@ -46,6 +46,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private boolean signUpTracker;
     ProgressDialog processSignUp;
 
+    public SignUpActivity() {
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +59,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         setSupportActionBar(toolbar);
         if(getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
         // Views
         mUsername = (EditText) findViewById(R.id.username);
         mEmailField = (EditText) findViewById(R.id.email);
@@ -87,45 +90,59 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             return;
         }
 
-        //showProgressDialog();
         processSignUp =  ProgressDialog.show(this,null,"Signing up and logging in....",true,false);
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete( Task<AuthResult> task) {
-                        Log.d(LOGMESSAGE, "createUser:onComplete:" + task.isSuccessful());
-                        processSignUp.hide();
-                        if (task.isSuccessful()) {
+        if( mAuth != null ) {
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete( Task<AuthResult> task) {
+                            Log.d(LOGMESSAGE, "createUser:onComplete:" + task.isSuccessful());
 
-                            onAuthSuccess(task.getResult().getUser());
-                            Intent intent = new Intent();
-                            intent.putExtra( LoginActivity.SIGNED_UP ,true);
-                            intent.putExtra( LoginActivity.USERNAME,mUsername.getText().toString());
-                            intent.putExtra( LoginActivity.EMAIL,mEmailField.getText().toString());
-                            setResult(Activity.RESULT_OK,intent);
-                            signUpTracker = true ;
-                            finish();
+                            if(  processSignUp != null)
+                            {
+                                processSignUp.hide();
+                            }
+                            if (task.isSuccessful()) {
+
+                                onAuthSuccess(task.getResult().getUser());
+                                Intent intent = new Intent();
+                                intent.putExtra( LoginActivity.SIGNED_UP ,true);
+                                intent.putExtra( LoginActivity.USERNAME,mUsername.getText().toString());
+                                intent.putExtra( LoginActivity.EMAIL,mEmailField.getText().toString());
+                                setResult(Activity.RESULT_OK,intent);
+                                signUpTracker = true ;
+                                finish();
+                            }
                         }
-                    }
-                })
-                .addOnFailureListener(SignUpActivity.this, new OnFailureListener() {
-                     @Override
-                     public void onFailure( Exception e) {
+                    })
+                    .addOnFailureListener(SignUpActivity.this, new OnFailureListener() {
+                        @Override
+                        public void onFailure( Exception e) {
 
-                         signUpTracker = false ;
-                         Toast.makeText(SignUpActivity.this,e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
-                     }
-                });
+                            signUpTracker = false ;
+                            Toast.makeText(SignUpActivity.this,e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
+                        }
+                    });
+        }
+        else
+        {
+            if(  processSignUp != null)
+            {
+                processSignUp.hide();
+            }
+        }
     }
 
     private void onAuthSuccess(FirebaseUser user) {
-       // String username = usernameFromEmail(user.getEmail());
         String username =  mUsername.getText().toString();
         // Write new user
-        writeNewUser(user.getUid(), username, user.getEmail());
+        if(user != null)
+        {
+            writeNewUser(user.getUid(), username, user.getEmail());
+        }
     }
 
     private String usernameFromEmail(String email) {
@@ -152,10 +169,21 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             mEmailField.setError(null);
         }
 
+        if(! mEmailField.getText().toString().contains("@")){
+            mEmailField.setError("Must contain '@' sign");
+            result = false;
+        }
+        else
+        {
+            mEmailField.setError(null);
+        }
+
         if (TextUtils.isEmpty(mPasswordField.getText().toString())) {
             mPasswordField.setError("Required");
             result = false;
-        } else {
+        }
+        else
+        {
             mPasswordField.setError(null);
         }
 
@@ -165,7 +193,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     // [START basic_write]
     private void writeNewUser(String userId, String name, String email) {
         User user = new User();
-
         user.setUsername(name);
         user.setEmail(email);
         user.setPhone("###-###-####");
@@ -218,16 +245,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        // Check auth on Activity start
-        if (mAuth.getCurrentUser() != null) {
-            onAuthSuccess(mAuth.getCurrentUser());
-        }
-    }
-
-    @Override
     public void onBackPressed() {
 
         if(!signUpTracker){
@@ -236,7 +253,5 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             setResult(Activity.RESULT_OK,intent);
             finish();
         }
-
-
     }
 }

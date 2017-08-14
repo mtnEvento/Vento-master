@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mtn.evento.EventoMainPage;
+import com.mtn.evento.Factory;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.HomeScreenActivity;
 import com.mtn.evento.adapters.EventAdapter;
@@ -41,141 +42,210 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EventsFragment extends Fragment implements HomeScreenActivity.SearchRequestListener,HomeScreenActivity.SearchRegionRequestListener {
+public class EventsFragment extends Fragment implements HomeScreenActivity.SearchRequestListener,HomeScreenActivity.SearchRegionRequestListener,Factory.EventsDataAvailableListener ,Factory.InternetDataListenter {
 
-    static private RecyclerView eventRecycler;
-    static private RecyclerView.LayoutManager layoutManager;
+    private static RecyclerView eventRecycler;
+    private static RecyclerView.LayoutManager layoutManager;
     static EventAdapter eventAdapter;
-    static ArrayList<Event> events;
-    static private FirebaseDatabase firebaseDatabase ;
-    static private DatabaseReference eventsRef;
-    static private AppCompatActivity appContext;
-    static private EventValueListener eventValueListener;
-    private TextView no_networkView;
+    private static ArrayList<Event> events ,cacheEvent;
+    private static HomeScreenActivity appContext;
+    private static TextView no_networkView;
+    private static int dataCount ;
+
+    public EventsFragment() {
+
+        Log.d(LOGMESSAGE,"EventsFragment called") ;
+    }
+    public void setAppContext(HomeScreenActivity appContext){
+        if( this.appContext == null){
+            this.appContext = appContext ;
+
+            if(eventAdapter == null){
+                eventAdapter = new EventAdapter();
+            }
+
+            if(events == null){
+                events = new ArrayList<>();
+            }
+            if(cacheEvent == null){
+                cacheEvent = new ArrayList<>();
+            }
+
+            dataCount = 0;
+
+
+        }
+    }
+    //On the event data is ready
+    @Override
+    public void onEventsDataAvailable(int count, ArrayList<Event> reservedResultSets) {
+        // events.isEmpty();
+
+        cacheEvent = reservedResultSets ;
+        Log.d(LOGMESSAGE,"onEventsDataAvailable called  count :"+ count) ;
+        if( dataCount <= count ){
+
+            if(dataCount == count){
+
+            }
+            else if (dataCount < count){
+                events = reservedResultSets ;
+                eventAdapter.setEvents(events, false);
+                eventRecycler.setAdapter(eventAdapter);
+                no_networkView.setVisibility(View.GONE);
+                eventRecycler.setVisibility(View.VISIBLE);
+                dataCount =  count ;
+            }
+
+        }
+
+
+    }
+
+    @Override
+    public void onInternetConnected() {
+
+
+        if(eventAdapter != null && eventRecycler != null && events != null &&  events.size() > 0){
+            eventAdapter.setEvents(events, false);
+            eventRecycler.setAdapter(eventAdapter);
+            no_networkView.setVisibility(View.GONE);
+            eventRecycler.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            if(eventAdapter != null && eventRecycler != null){
+                eventRecycler.setVisibility(View.GONE);
+                no_networkView.setText( "Loading Event ....");
+                no_networkView.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public void onInternetDisconnected() {
+        if(eventAdapter != null && eventRecycler != null && events != null && events.size()>0 ){
+
+            eventAdapter.setEvents(events, false);
+            eventRecycler.setAdapter(eventAdapter);
+            no_networkView.setVisibility(View.GONE);
+            eventRecycler.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            if(eventAdapter != null && eventRecycler != null ){
+                eventRecycler.setVisibility(View.GONE);
+                no_networkView.setText( getString(R.string.no_connection));
+                no_networkView.setVisibility(View.VISIBLE);
+            }
+        }
+
+    }
 
     public interface EventFilter{
         public void onFilterEvent(String filterTerm, ArrayList<Event> events);
-
     }
-    public EventsFragment() {
-        events = new ArrayList<>();
-        eventAdapter = new EventAdapter();
-        firebaseDatabase = FirebaseDatabase.getInstance() ;
-        eventsRef =  firebaseDatabase.getReference(Database.Tables.EVENTS);
-    }
-    public void setAppContext(AppCompatActivity appContext){
-        this.appContext = appContext ;
 
-
-
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_events, container, false);
         eventRecycler = (RecyclerView) view.findViewById(R.id.eventRecycler);
         no_networkView = (TextView) view.findViewById(R.id.no_network);
-        no_networkView.setText("Loading ...");
-      //  no_networkView.
         layoutManager = new LinearLayoutManager(appContext);
         eventRecycler.setLayoutManager(layoutManager);
         eventRecycler.setHasFixedSize(true);
-
+        no_networkView.setText("Loading Events...");
         return view;
     }
-
     @Override
     public void onStart() {
         super.onStart();
-        attachValuelistener();
-    }
+        if(Factory.isNetworkAndInternetAvailableNow()){
+            if (eventRecycler != null && no_networkView != null ){
+                if(cacheEvent != null && cacheEvent.size()> 0){
+                    eventAdapter.setEvents(cacheEvent, false);
+                    eventRecycler.setAdapter(eventAdapter);
+                    no_networkView.setVisibility(View.GONE);
+                    eventRecycler.setVisibility(View.VISIBLE);
+                }
+                else{
+                    eventRecycler.setVisibility(View.GONE);
+                    no_networkView.setText("Loading Events...");
+                    no_networkView.setVisibility(View.VISIBLE);
+                }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if(eventValueListener != null){
 
-            if(eventsRef != null){
-                eventsRef.removeEventListener(eventValueListener);
             }
-        }
 
-    }
-    private void attachValuelistener(){
-        if(isNetworkAndInternetAvailable())
-        {
-            eventValueListener = new EventValueListener();
-
-            eventsRef.addValueEventListener(eventValueListener);
         }
         else
         {
-            //TODO: Alert no network connection
-            eventRecycler.setVisibility(View.GONE);
-            no_networkView.setVisibility(View.VISIBLE);
-
+            if (eventRecycler != null && no_networkView != null && cacheEvent != null && cacheEvent.size()> 0){
+                eventAdapter.setEvents(cacheEvent, false);
+                eventRecycler.setAdapter(eventAdapter);
+                no_networkView.setVisibility(View.GONE);
+                eventRecycler.setVisibility(View.VISIBLE);
+            }
+            else{
+                eventRecycler.setVisibility(View.GONE);
+                no_networkView.setText( getString(R.string.no_connection));
+                no_networkView.setVisibility(View.VISIBLE);
+            }
         }
     }
-     class EventValueListener implements ValueEventListener {
 
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot)
-        {
-            events.clear();
-            for (DataSnapshot aDataSnapshot: dataSnapshot.getChildren()){
-                 Event evt = aDataSnapshot.getValue(Event.class);
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(Factory.isNetworkAndInternetAvailableNow()){
+            if (eventRecycler != null && no_networkView != null){
+                if(cacheEvent != null){
+                    eventAdapter.setEvents(cacheEvent, false);
+                    eventRecycler.setAdapter(eventAdapter);
+                    no_networkView.setVisibility(View.GONE);
+                    eventRecycler.setVisibility(View.VISIBLE);
+                }
+                else{
+                    eventRecycler.setVisibility(View.GONE);
+                    no_networkView.setText("Loading Events...");
+                    no_networkView.setVisibility(View.VISIBLE);
+                }
 
-                 events.add(evt);
+
             }
 
-            Log.d(LOGMESSAGE, "onDataChange: Events " + events);
-            eventAdapter.setEvents(events, false);
-            eventRecycler.setAdapter(eventAdapter);
-            no_networkView.setVisibility(View.GONE);
-            eventRecycler.setVisibility(View.VISIBLE);
-
-
         }
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
+        else
+        {
+            if (eventRecycler != null && no_networkView != null && cacheEvent != null && cacheEvent.size()> 0){
+                eventAdapter.setEvents(cacheEvent, false);
+                eventRecycler.setAdapter(eventAdapter);
+                no_networkView.setVisibility(View.GONE);
+                eventRecycler.setVisibility(View.VISIBLE);
+            }
+            else{
 
+                eventRecycler.setVisibility(View.GONE);
+                no_networkView.setText( getString(R.string.no_connection));
+                no_networkView.setVisibility(View.VISIBLE);
+            }
         }
     }
+
     @Override
     public ArrayList<Event> onSearch(String query) {
-
-        if(!query.isEmpty()){
-
-                ArrayList<Event> filteredEvents = new ArrayList<>();
-                for (Event e: events ) {
-                    if(e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
-                        filteredEvents.add(e);
-                    }
-                }
-                eventAdapter.setEvents(filteredEvents, true);
-                eventRecycler.setAdapter(eventAdapter);
-        }
-        else
-        {
-              if(events != null && !events.isEmpty() )
-              {
-                    eventAdapter.setEvents(events,false);
-                    eventRecycler.setAdapter(eventAdapter);
-                    Log.d(LOGMESSAGE, "onSearch: Events " + events);
-                    Log.d(LOGMESSAGE, "onSearch: Events Obj title" + events.get(0));
-              }
-        }
-
-
         return null;
     }
     @Override
     public ArrayList<Event> onRegionSearch(String query, ViewPager vp) {
         if(!query.isEmpty()){
             if(query.contains("--region--")){
-                if(events != null && !events.isEmpty() ){
+                if(events != null && !events.isEmpty() &&   eventAdapter != null && eventRecycler != null){
                     eventAdapter.setEvents(events,false);
                     eventRecycler.setAdapter(eventAdapter);
+                    eventRecycler.setVisibility(View.VISIBLE);
+                    no_networkView.setVisibility(View.GONE);
 
                 }
                 else
@@ -186,8 +256,15 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                             filteredEvents.add(e);
                         }
                     }
-                    eventAdapter.setEvents(filteredEvents,true);
-                    eventRecycler.setAdapter(eventAdapter);
+                    if(eventAdapter != null){
+                        eventAdapter.setEvents(filteredEvents,true);
+                        if( eventRecycler != null){
+                            eventRecycler.setAdapter(eventAdapter);
+                            eventRecycler.setVisibility(View.VISIBLE);
+                            no_networkView.setVisibility(View.GONE);
+                        }
+                    }
+
 
                 }
             }
@@ -199,49 +276,16 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                         filteredEvents.add(e);
                     }
                 }
-                eventAdapter.setEvents(filteredEvents, true);
-                eventRecycler.setAdapter(eventAdapter);
+                if(eventAdapter != null){
+                    eventAdapter.setEvents(filteredEvents,true);
+                    if( eventRecycler != null){
+                        eventRecycler.setAdapter(eventAdapter);
+                        eventRecycler.setVisibility(View.VISIBLE);
+                        no_networkView.setVisibility(View.GONE);
+                    }
+                }
             }
         }
         return null;
-    }
-    public boolean isInternetOn() {
-
-        // get Connectivity Manager object to check connection
-        ConnectivityManager connec =
-                (ConnectivityManager) getActivity(). getSystemService(getActivity().getBaseContext().CONNECTIVITY_SERVICE);
-
-        // Check for network connections
-        if (connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
-                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
-
-
-            return true;
-
-        } else if (
-                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
-                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED)
-        {
-
-            return false;
-        }
-        return false;
-    }
-    private boolean isNetworkOn(){
-        ConnectivityManager ConnectionManager=(ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
-        if(networkInfo != null && networkInfo.isConnected()==true )
-        {
-            return true;
-        }
-        else
-        {
-            return  false;
-        }
-    }
-    private boolean isNetworkAndInternetAvailable(){
-        return  isNetworkOn()&& isInternetOn() ;
     }
 }

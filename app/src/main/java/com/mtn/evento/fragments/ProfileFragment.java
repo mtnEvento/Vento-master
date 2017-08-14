@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.mtn.evento.Evento;
+import com.mtn.evento.Factory;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.EditorActivity;
 import com.mtn.evento.activities.HomeScreenActivity;
@@ -31,7 +32,7 @@ import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProfileFragment extends Fragment implements View.OnClickListener {
+public class ProfileFragment extends Fragment implements View.OnClickListener,Factory.InternetDataListenter {
     AppCompatActivity mContext;
     TextView email, phone, username ;
     private final int EMAIL_EDIT_REQUEST = 120;
@@ -40,17 +41,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private FirebaseAuth mAuth;
     private HomeScreenActivity appContext;
     UserProfile userProfile;
+    private volatile boolean hasInternet= false;
 
     public ProfileFragment() {
         mAuth = FirebaseAuth.getInstance();
     }
 
-    public void setAppContext(AppCompatActivity appContext){
-        this.appContext = (HomeScreenActivity)appContext ;
-        if( this.appContext != null){
-            this.userProfile = (UserProfile) this.appContext;
-        }
+    public void setAppContext(HomeScreenActivity appContext){
 
+        if( this.appContext == null){
+            this.appContext = appContext ;
+            if( this.appContext != null){
+                this.userProfile = this.appContext;
+            }
+        }
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,7 +74,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         Intent editIntent = null;
-        if(isNetworkAndInternetAvailable()){
+        if(hasInternet){
             if(mAuth != null && mAuth.getCurrentUser() != null){
                 switch (v.getId()){
                     case R.id.usernameCardView:
@@ -135,8 +139,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
     private void displayUserdetails(){
-        if(isNetworkAndInternetAvailable()){
-            if( mAuth  != null && mAuth.getCurrentUser()!=null ){
+            if( mAuth  != null && mAuth.getCurrentUser() != null ){
                 if ( appContext != null && appContext.getApplication() !=null &&((Evento) appContext.getApplication()).getSettings().contains(APP_USER_EMAIL)) {
                     String str_email = ((Evento) appContext.getApplication()).getSettings().getString(APP_USER_EMAIL, "Email");
                     email.setText(str_email);
@@ -145,7 +148,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                 if (appContext != null && appContext.getApplication() !=null && ((Evento) appContext.getApplication()).getSettings().contains(APP_USER_PHONE)) {
                     String str_phone = ((Evento) appContext.getApplication()).getSettings().getString(APP_USER_PHONE, "Phone Number");
-                    phone.setText(  (str_phone == null || str_phone .isEmpty() )? "No Phone number":str_phone );
+                    phone.setText(  (str_phone == null || str_phone .isEmpty() )? "No Phone number" : str_phone );
                 }
 
                 if (appContext != null && appContext.getApplication() !=null && ((Evento) appContext.getApplication()).getSettings().contains(APP_USERNAME)) {
@@ -161,7 +164,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     this.userProfile.onUserProfileChange(APP_USERNAME,"Username");
                 }
             }
-        }
     }
     @Override
     public void onResume() {
@@ -178,42 +180,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         }
     }
-    public boolean isInternetOn() {
-        // get Connectivity Manager object to check connection
-        ConnectivityManager connec =
-                (ConnectivityManager) getActivity(). getSystemService(getActivity().getBaseContext().CONNECTIVITY_SERVICE);
 
-        // Check for network connections
-        if (connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
-                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
-
-
-            return true;
-
-        } else if ( connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
-                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED)
-        {
-
-            return false;
-        }
-        return false;
+    @Override
+    public void onInternetConnected() {
+        hasInternet = true ;
     }
-    private boolean isNetworkOn(){
-        ConnectivityManager ConnectionManager=(ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
-        if(networkInfo != null && networkInfo.isConnected()==true )
-        {
-            return true;
-        }
-        else
-        {
-            return  false;
-        }
-    }
-    private boolean isNetworkAndInternetAvailable(){
-        return  isNetworkOn()&& isInternetOn() ;
+
+    @Override
+    public void onInternetDisconnected() {
+        hasInternet = false ;
     }
 
     public interface UserProfile{

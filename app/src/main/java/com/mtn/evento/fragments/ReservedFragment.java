@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.mtn.evento.Evento;
+import com.mtn.evento.Factory;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.HomeScreenActivity;
 import com.mtn.evento.adapters.EventAdapter;
@@ -37,122 +38,87 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ReservedFragment extends Fragment implements HomeScreenActivity.LoginLogoutListener {
-    static RecyclerView reservedRecycler;
-    static RecyclerView.LayoutManager layoutManager;
-    static ReservedEventsAdapter reservedEventsAdapter;
-    static ArrayList<ResultSet> reservedEvents;
-    static AppCompatActivity appContext;
-    static private FirebaseAuth mAuth;
-    private TextView errorHandler;
+public class ReservedFragment extends Fragment implements HomeScreenActivity.LoginLogoutListener ,Factory.InternetDataListenter, Factory.ReservedSeatsDataAvailableListener {
+     RecyclerView reservedRecycler;
+     RecyclerView.LayoutManager layoutManager;
+     ReservedEventsAdapter reservedEventsAdapter;
+     ArrayList<ResultSet> reservedEvents;
+     HomeScreenActivity appContext;
+     private FirebaseAuth mAuth;
+     private TextView errorHandler;
+     private int innerCount ;
 
     public ReservedFragment() {
         Log.d(LOGMESSAGE, "ReservedFragment: instantiated ");
         reservedEventsAdapter = new ReservedEventsAdapter();
     }
-
-    public void setAppContext(AppCompatActivity appContext){
-        this.appContext = appContext ;
+    public void setAppContext(HomeScreenActivity appContext){
+        if(this.appContext == null ){
+            this.appContext = appContext ;
+        }
     }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_reserved, container, false);
         reservedRecycler = (RecyclerView) v.findViewById(R.id.reservedRecycler);
-         errorHandler = (TextView) v.findViewById(R.id.no_seats);
+        errorHandler = (TextView) v.findViewById(R.id.no_seats);
         layoutManager = new LinearLayoutManager(appContext);
         reservedRecycler.setLayoutManager(layoutManager);
         reservedRecycler.setHasFixedSize(true);
         return v;
     }
-
     @Override
     public void onStart() {
         super.onStart();
-        if(isNetworkAndInternetAvailable()){
-
-            if(mAuth == null){
-                mAuth = FirebaseAuth.getInstance();
-            }
-            if(mAuth != null && mAuth.getCurrentUser() != null){
-
-
-                if(reservedEventsAdapter != null && reservedRecycler != null && appContext != null && appContext.getApplication() != null  && ((Evento) appContext.getApplication()).getDatabaseHandler() !=null ) {
-
-                    reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
-                    if(reservedEvents !=null ){
-                        reservedRecycler.setVisibility(View.VISIBLE);
-                        errorHandler.setVisibility(View.GONE);
-                        reservedEventsAdapter.setReservedEvents(reservedEvents);
-                        reservedRecycler.setAdapter(reservedEventsAdapter);
-                        reservedRecycler.invalidate();
-                    }
-                }
-            }
-            else
+        checkReservedSeats();
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        checkReservedSeats();
+    }
+    private void checkReservedSeats(){
+        if(mAuth == null){
+            mAuth = FirebaseAuth.getInstance();
+        }
+        if(mAuth != null && mAuth.getCurrentUser() != null){
+            if(reservedEventsAdapter != null && reservedRecycler != null && appContext != null && appContext.getApplication() != null  && ((Evento) appContext.getApplication()).getDatabaseHandler() !=null )
             {
-
-                if( reservedRecycler != null ) {
-
-                    reservedRecycler.removeAllViews();
+                reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
+                if(reservedEvents != null && reservedEvents.size() > 0 )
+                {
+                    errorHandler.setVisibility(View.GONE);
+                    reservedEventsAdapter.setReservedEvents(reservedEvents);
+                    reservedRecycler.setAdapter(reservedEventsAdapter);
                     reservedRecycler.invalidate();
-                    reservedRecycler.setVisibility(View.GONE);
-                    errorHandler.setText(R.string.not_logged_in);
+                    reservedRecycler.setVisibility(View.VISIBLE);
                 }
-
+                else  if(reservedEvents != null && reservedEvents.size() == 0 )
+                {
+                    reservedRecycler.setVisibility(View.GONE);
+                    reservedRecycler.invalidate();
+                    errorHandler.setText(R.string.no_seats_reservred);
+                    errorHandler.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    reservedRecycler.setVisibility(View.GONE);
+                    reservedRecycler.invalidate();
+                    errorHandler.setText(R.string.no_seats_reservred);
+                    errorHandler.setVisibility(View.VISIBLE);
+                }
             }
-            //TODO: User not logged in
         }
         else
         {
-            //TODO: Alert no network connection
-            reservedRecycler.setVisibility(View.GONE);
-            errorHandler.setText(R.string.no_connection);
-
+            if( reservedRecycler != null ) {
+                reservedRecycler.removeAllViews();
+                reservedRecycler.invalidate();
+                reservedRecycler.setVisibility(View.GONE);
+                errorHandler.setText(R.string.not_logged_in);
+                errorHandler.setVisibility(View.VISIBLE);
+            }
         }
-
-    }
-
-    public boolean isInternetOn() {
-
-        // get Connectivity Manager object to check connection
-        ConnectivityManager connec =
-                (ConnectivityManager) getActivity(). getSystemService(getActivity().getBaseContext().CONNECTIVITY_SERVICE);
-
-        // Check for network connections
-        if (connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
-                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
-
-
-            return true;
-
-        } else if (
-                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
-                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED)
-        {
-
-            return false;
-        }
-        return false;
-    }
-    private boolean isNetworkOn(){
-        ConnectivityManager ConnectionManager=(ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
-        if(networkInfo != null && networkInfo.isConnected()==true )
-        {
-            return true;
-        }
-        else
-        {
-            return  false;
-        }
-    }
-    private boolean isNetworkAndInternetAvailable(){
-        return  isNetworkOn()&& isInternetOn() ;
     }
     @Override
     public boolean onLoginLogout(String which) {
@@ -181,5 +147,40 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                 break;
         }
         return false;
+    }
+    @Override
+    public void onInternetConnected() {
+
+      /*/
+      reservedRecycler.setVisibility(View.GONE);
+      errorHandler.setText(R.string.no_connection);
+      errorHandler.setVisibility(View.VISIBLE);
+     /*/
+    }
+    @Override
+    public void onInternetDisconnected() {
+        /*/
+        reservedRecycler.setVisibility(View.GONE);
+        errorHandler.setText(R.string.no_connection);
+        errorHandler.setVisibility(View.VISIBLE);
+       /*/
+    }
+    @Override
+    public void onReservedSeatsDataAvailable(int count, ArrayList<ResultSet> reservedResultSets) {
+       if(innerCount <= count) {
+           if(innerCount == count)
+           {
+               //do nothing
+           }
+           else  if(innerCount < count)
+           {
+               errorHandler.setVisibility(View.GONE);
+               reservedEventsAdapter.setReservedEvents(reservedResultSets);
+               reservedRecycler.setAdapter(reservedEventsAdapter);
+               reservedRecycler.invalidate();
+               reservedRecycler.setVisibility(View.VISIBLE);
+               innerCount = count ;
+           }
+       }
     }
 }

@@ -72,7 +72,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     // [Adding new event]
-    public void addEvent(Event event,  List<DisplayTicket> displayTickets) {
+    public synchronized void addEvent(Event event,  List<DisplayTicket> displayTickets) {
 
         try
         {
@@ -103,7 +103,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // [Adding new event]
 
     // [Getting All reserved Events]
-    public ArrayList<ResultSet> getAllreservedEvents() {
+    public synchronized ArrayList<ResultSet> getAllreservedEvents() {
         Log.d(LOGMESSAGE, "getAllreservedEvents: ");
         SQLiteDatabase db = null ;
         try
@@ -186,7 +186,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // [Getting All reserved Events]
 
     // [Getting events Count]
-    public int getEventsCount() {
+    public synchronized int getEventsCount() {
         String countQuery = "SELECT  * FROM " + TABLE_RESERVED_EVENT;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
@@ -197,7 +197,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // [Getting events Count]
 
     // [Updating single event]
-    public int updateEvent(Event event, List<DisplayTicket> displayTickets) {
+    public synchronized int updateEvent(Event event, List<DisplayTicket> displayTickets) {
         // updating row
         try
         {
@@ -231,7 +231,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // [Updating single event]
 
     // [Deleting single event]
-    public void deleteEvent(Event event){
+    public synchronized void deleteEvent(Event event){
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_RESERVED_EVENT, KEY_EVENT_ID + " = ?",
                 new String[] { String.valueOf(event.getEvent_id()) });

@@ -46,44 +46,5 @@ public class SmartGet {
         return format.format(date);
     }
 
-    public static String printToFile(Activity activity, Bitmap bitmap){
 
-            String path = Saver.saveBitmap(bitmap,activity);
-            if(path != null) {
-                File file = new File(path);
-
-                try {
-
-                    // Share Intent
-                    Intent share = new Intent(Intent.ACTION_SEND);
-
-                    // Type of file to share
-                    share.setType("image/jpeg");
-
-                    FileOutputStream output = new FileOutputStream(file);
-
-                    // Compress into png format image from 0% - 100%
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
-                    output.flush();
-                    output.close();
-
-                    // Locate the image to Share
-                    Uri uri = Uri.fromFile(file);
-
-                    // Pass the image into an Intnet
-                    share.putExtra(Intent.EXTRA_STREAM, uri);
-
-                    // Show the social share chooser list
-                    activity.startActivity(Intent.createChooser(share, "Share Image Tutorial"));
-                    return file.getAbsolutePath();
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-
-                }
-
-            }
-
-        return  null;
-    }
 }

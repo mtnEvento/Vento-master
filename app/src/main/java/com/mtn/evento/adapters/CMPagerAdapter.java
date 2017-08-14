@@ -13,6 +13,8 @@ import com.mtn.evento.fragments.EventsFragment;
 import com.mtn.evento.fragments.ProfileFragment;
 import com.mtn.evento.fragments.ReservedFragment;
 
+import java.util.ArrayList;
+
 /**
  * Created by DANNY-KAY on 8/4/2017.
  */
@@ -21,12 +23,13 @@ public class CMPagerAdapter extends FragmentStatePagerAdapter {
 
     int mNumOfTabs;
     AppCompatActivity context;
+    ArrayList<Fragment> mTabs;
 
+    public CMPagerAdapter( FragmentManager fm, ArrayList<Fragment> mTabs, int NumOfTabs) {
 
-    public CMPagerAdapter(AppCompatActivity context, FragmentManager fm, int NumOfTabs) {
         super(fm);
+        this.mTabs = mTabs ;
         this.mNumOfTabs = NumOfTabs;
-        this.context = context;
     }
 
     @Override
@@ -34,17 +37,13 @@ public class CMPagerAdapter extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-                EventsFragment tab1 = new EventsFragment();
-                tab1.setAppContext(this.context);
-                return tab1;
+
+                return this.mTabs.get(position);
             case 1:
-                ReservedFragment tab2 = new ReservedFragment();
-                tab2.setAppContext(this.context);
-                return tab2;
+
+               return this.mTabs.get(position);
             case 2:
-                ProfileFragment tab3 = new ProfileFragment();
-                tab3.setAppContext(this.context);
-                return tab3;
+                return this.mTabs.get(position);
             default:
                 return null;
         }

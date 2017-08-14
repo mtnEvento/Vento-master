@@ -65,7 +65,7 @@ public class FinishFragment extends Fragment implements View.OnClickListener {
         Button finish = (Button) view.findViewById(R.id.next);
         Button transactionId = (Button) view.findViewById(R.id.transactionId);
 
-        transactionId.setText((mTransactionId.length() > 10)? mTransactionId.substring(0,7) + "..." : mTransactionId);
+        transactionId.setText(( mTransactionId != null  && mTransactionId.length() > 10)? mTransactionId.substring(0,7) + "..." : mTransactionId);
 
         transactionId.setOnHoverListener(new View.OnHoverListener() {
             @Override

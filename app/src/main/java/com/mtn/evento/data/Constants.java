@@ -18,4 +18,5 @@ public class Constants {
     public static final String RESERVED_SEAT ="com.mtn.evento.data.RESERVED_SEAT" ;
     public static final String APP_LOGIN ="com.mtn.evento.data.APP_LOGIN" ;
     public static final String APP_LOGOUT ="com.mtn.evento.data.APP_LOGOUT" ;
+    public static final String LOGINED_IN = "LOGINED_IN";
 }

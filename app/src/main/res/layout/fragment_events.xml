@@ -23,6 +23,6 @@
         android:textStyle="bold"
         android:textColor="@color/darkBlue"
         android:textSize="@dimen/standard_height"
-        android:text="@string/no_connection"/>
+        />
 
 </FrameLayout>
