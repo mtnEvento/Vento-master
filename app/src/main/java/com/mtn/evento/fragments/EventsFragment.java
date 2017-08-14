@@ -134,9 +134,15 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         else
         {
             if(eventAdapter != null && eventRecycler != null ){
-                eventRecycler.setVisibility(View.GONE);
-                no_networkView.setText( getString(R.string.no_connection));
-                no_networkView.setVisibility(View.VISIBLE);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        eventRecycler.setVisibility(View.GONE);
+                        no_networkView.setText( getString(R.string.no_connection));
+                        no_networkView.setVisibility(View.VISIBLE);
+                    }
+                });
+
             }
         }
 

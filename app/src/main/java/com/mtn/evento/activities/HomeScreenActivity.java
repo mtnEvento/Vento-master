@@ -566,10 +566,14 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         Log.d(LOGMESSAGE,"HomeScreenActivity onInternetDisconnected called") ;
         if(mFactory != null)
         {
-            mFactory.runReservedSeatsTasksOnInternetAvailable();
-            this. eventInternetDataListenter.onInternetDisconnected();
-            this.reservedSeatInternetDataListenter.onInternetDisconnected();
-            this.profileInternetDataListenter.onInternetDisconnected();
+            if(mFactory != null){
+                mFactory.runReservedSeatsTasksOnInternetAvailable();
+                if(this.eventInternetDataListenter != null && this.reservedSeatInternetDataListenter != null && this.profileInternetDataListenter != null){
+                    this.eventInternetDataListenter.onInternetDisconnected();
+                    this.reservedSeatInternetDataListenter.onInternetDisconnected();
+                    this.profileInternetDataListenter.onInternetDisconnected();
+                }
+            }
         }else
         {
             mFactory = new Factory(HomeScreenActivity.this) ;
