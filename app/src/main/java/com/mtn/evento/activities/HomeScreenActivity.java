@@ -69,13 +69,14 @@ import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 import static com.mtn.evento.data.Constants.LOGINED_IN;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
-public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,Factory.UserLogInOrOutListenter,ProfileFragment.UserProfile, Factory.InternetDataListenter, Factory.EventsDataAvailableListener, Factory.ReservedSeatsDataAvailableListener {
+public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Factory.UserLogInOrOutListenter, ProfileFragment.UserProfile, Factory.InternetDataListenter, Factory.ReservedSeatsDataAvailableListener {
     private static final int LOGIN_REQUEST = 47;
     private static final int SIGNUP_REQUEST = 49;
+    public static ArrayList<Event> events, cacheEvent;
     private Factory mFactory;
     private SearchRequestListener searchRequestListener;
     private SearchRegionRequestListener regionRequestListener;
-    private MenuItem Loginlogout;
+    private MenuItem Login, logout;
     private TextView nav_username, nav_email;
     private DrawerLayout mDrawerLayout;
     private de.hdodenhof.circleimageview.CircleImageView  imageView;
@@ -93,7 +94,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     private ProfileFragment tab3 ;
     private LoginLogoutListener reservedLoginLogoutListener;
     private Factory.InternetDataListenter eventInternetDataListenter;
-    private Factory.EventsDataAvailableListener eventsDataAvailableListener;
     private Factory.InternetDataListenter reservedSeatInternetDataListenter;
     private Factory.ReservedSeatsDataAvailableListener reservedSeatsDataAvailableListener;
     private Factory.InternetDataListenter  profileInternetDataListenter;
@@ -105,16 +105,337 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if(getSupportActionBar() != null){
-
             // getSupportActionBar().setIcon(R.mipmap.ic_launcher_round);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-
         }
-        mFactory = new Factory(HomeScreenActivity.this);
         initTabs();
         initUI(mTabs);
         initSetting();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        MenuItem item = menu.findItem(R.id.action_spinner);
+        spinner = (Spinner) MenuItemCompat.getActionView(item);
+
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.regions, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(spinnerItemSelected());
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(Gravity.START);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SIGNUP_REQUEST && resultCode == RESULT_OK) {
+            boolean signupAndLogined = data.getBooleanExtra(LoginActivity.SIGNED_UP, false);
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+
+                if (Login != null && logout != null && signupAndLogined) {
+                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
+                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
+                    Login.setVisible(false);
+                    logout.setVisible(true);
+                    reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
+                }
+                reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
+            } else if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+
+                if (Login != null && logout != null) {
+                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
+                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
+                    Login.setVisible(true);
+                    logout.setVisible(false);
+                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
+                }
+            }
+        } else if (requestCode == LOGIN_REQUEST && resultCode == RESULT_OK) {
+            boolean loginedIn = data.getBooleanExtra(LOGINED_IN, false);
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+
+                if (Login != null && logout != null && loginedIn) {
+                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
+                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
+                    Login.setVisible(false);
+                    logout.setVisible(true);
+                    reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
+                }
+                reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
+            } else if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+
+                if (Login != null && logout != null) {
+                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
+                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
+                    Login.setVisible(true);
+                    logout.setVisible(false);
+                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
+                }
+                reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
+            }
+
+        }
+    }
+
+    public AdapterView.OnItemSelectedListener spinnerItemSelected() {
+        final String[] regions = getResources().getStringArray(R.array.regions);
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                regionRequestListener.onRegionSearch(regions[position].toLowerCase(), viewPager);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        };
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(LOGMESSAGE, "HomeScreenActivity onStart called ");
+        mFactory = new Factory(HomeScreenActivity.this);
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(LOGMESSAGE, "HomeScreenActivity onResume called");
+        super.onResume();
+        if (mFactory != null) {
+            Log.d(LOGMESSAGE, "HomeScreenActivity onResume called mFactory != null");
+            mFactory.runReservedSeatsTasksOnInternetAvailable();
+            mFactory.runNetworkTask();
+            mFactory.runLoginLogoutTask();
+        } else {
+            Log.d(LOGMESSAGE, "HomeScreenActivity onResume called mFactory == null");
+            mFactory = new Factory(HomeScreenActivity.this);
+            if (mFactory != null) {
+                mFactory.runReservedSeatsTasksOnInternetAvailable();
+                mFactory.runNetworkTask();
+                mFactory.runLoginLogoutTask();
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mFactory != null) {
+
+            mFactory.stopNetworkTask();
+            mFactory.stopLoginLogoutTask();
+            mFactory.cancelReservedSeatsTasksOnInternetUnAvailable();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        if (mFactory != null) {
+            mFactory = null;
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mFactory != null) {
+            mFactory = null;
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            moveTaskToBack(true);
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+
+            case R.id.register:
+                HomeScreenActivity.this.startActivityForResult(new Intent(HomeScreenActivity.this, SignUpActivity.class), SIGNUP_REQUEST);
+                return true;
+            case R.id.action_logout:
+                logout = item;
+                if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                    nav_username.setText("Username");
+                    nav_email.setText("Email");
+                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
+                } else {
+                    if (isNetworkAndInternetAvailable()) {
+                        FirebaseAuth.getInstance().signOut();
+                    } else {
+                        FirebaseAuth.getInstance().signOut();
+                    }
+                    nav_username.setText("Username");
+                    nav_email.setText("Email");
+                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
+                }
+
+                return true;
+            case R.id.action_login:
+                Login = item;
+                nav_username.setText("Username");
+                nav_email.setText("Email");
+                if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+
+                    if (isNetworkAndInternetAvailable()) {
+                        HomeScreenActivity.this.startActivityForResult(new Intent(HomeScreenActivity.this, LoginActivity.class), LOGIN_REQUEST);
+                    } else {
+                        Toast.makeText(HomeScreenActivity.this, "No internet available to perform this task", Toast.LENGTH_LONG).show();
+                    }
+                }
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onUserProfileChange(final String which, final String value) {
+        Log.d(LOGMESSAGE, "HomeScreenActivity onUserProfileChange called");
+        nav_email.post(new Runnable() {
+            @Override
+            public void run() {
+                if (APP_USER_EMAIL.contentEquals(which)) {
+                    nav_email.setText(value);
+                }
+            }
+        });
+
+        nav_username.post(new Runnable() {
+            @Override
+            public void run() {
+                if (APP_USERNAME.contentEquals(which)) {
+                    nav_username.setText(value);
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void onInternetConnected() {
+        Log.d(LOGMESSAGE, "HomeScreenActivity onInternetConnected called");
+
+        if (mFactory != null) {
+            if (HomeScreenActivity.this.eventInternetDataListenter != null) {
+                HomeScreenActivity.this.eventInternetDataListenter.onInternetConnected();
+            }
+            if (HomeScreenActivity.this.reservedSeatInternetDataListenter != null) {
+                HomeScreenActivity.this.reservedSeatInternetDataListenter.onInternetConnected();
+            }
+            if (HomeScreenActivity.this.profileInternetDataListenter != null) {
+                HomeScreenActivity.this.profileInternetDataListenter.onInternetConnected();
+            }
+        }
+    }
+
+    @Override
+    public void onInternetDisconnected() {
+        Log.d(LOGMESSAGE, "HomeScreenActivity onInternetDisconnected called");
+        if (mFactory != null) {
+            if (HomeScreenActivity.this.eventInternetDataListenter != null) {
+                HomeScreenActivity.this.eventInternetDataListenter.onInternetDisconnected();
+            }
+            if (HomeScreenActivity.this.reservedSeatInternetDataListenter != null) {
+
+                HomeScreenActivity.this.reservedSeatInternetDataListenter.onInternetDisconnected();
+
+            }
+            if (HomeScreenActivity.this.profileInternetDataListenter != null) {
+                HomeScreenActivity.this.profileInternetDataListenter.onInternetDisconnected();
+            }
+        }
+    }
+
+    @Override
+    public void onReservedSeatsDataAvailable(int count, ArrayList<ResultSet> reservedResultSets) {
+
+        Log.d(LOGMESSAGE, "HomeScreenActivity onReservedSeatsDataAvailable called");
+        if (HomeScreenActivity.this.reservedSeatsDataAvailableListener != null) {
+            HomeScreenActivity.this.reservedSeatsDataAvailableListener.onReservedSeatsDataAvailable(count, reservedResultSets);
+        }
+    }
+
+    @Override
+    public void onUserSignedIn() {
+        Log.d(LOGMESSAGE, "HomeScreenActivity onUserSignedIn called");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (FirebaseAuth.getInstance().getCurrentUser() != null && logout != null && Login != null && nav_username != null && nav_email != null) {
+
+                    if (logout != null && Login != null) {
+
+                        String email = "Email";
+                        String username = "Username";
+                        if (((Evento) getApplication()).getSettings().contains(APP_USER_EMAIL)) {
+                            email = ((Evento) getApplication()).getSettings().getString(APP_USER_EMAIL, email);
+                        }
+
+                        if (((Evento) getApplication()).getSettings().contains(APP_USERNAME)) {
+                            username = ((Evento) getApplication()).getSettings().getString(APP_USERNAME, username);
+                        }
+                        nav_username.setText(username);
+                        nav_email.setText(email);
+                        logout.setVisible(true);
+                        Login.setVisible(false);
+                        reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
+                    }
+
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void onUserSignedOut() {
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (FirebaseAuth.getInstance().getCurrentUser() == null && logout != null && Login != null && nav_username != null && nav_email != null) {
+
+                    if (logout != null && Login != null) {
+
+                        nav_username.setText("Username");
+                        nav_email.setText("Email");
+                        logout.setVisible(false);
+                        Login.setVisible(true);
+                        reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
+                    }
+                }
+            }
+        });
+
     }
     public void initUI(ArrayList<Fragment> mTabs){
 
@@ -126,6 +447,11 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         imageView =  (de.hdodenhof.circleimageview.CircleImageView) headerView. findViewById(R.id.nav_user);
         nav_username = (TextView) headerView. findViewById(R.id.nav_username);
         nav_email = (TextView) headerView. findViewById(R.id.nav_email);
+
+        final Menu menu = navigationView.getMenu();
+        Login = menu.findItem(R.id.action_login);
+        logout = menu.findItem(R.id.action_logout);
+
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Events"));
@@ -164,12 +490,18 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
     }
     public void initTabs(){
+
+        if (events == null) {
+            events = new ArrayList<>();
+        }
+        if (cacheEvent == null) {
+            cacheEvent = new ArrayList<>();
+        }
+
         mTabs = new ArrayList<>();
         tab1 = new EventsFragment();
         tab1.setAppContext(HomeScreenActivity.this);
         this.eventInternetDataListenter = tab1;
-        this.eventsDataAvailableListener = tab1;
-
         mTabs.add(tab1);
 
         tab2 = new ReservedFragment();
@@ -182,12 +514,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         tab3.setAppContext(HomeScreenActivity.this);
         this.profileInternetDataListenter = tab3 ;
         mTabs.add(tab3);
-
-    }
-    @Override
-    protected void onStart() {
-        super.onStart();
-
 
     }
     private void initSearch(){
@@ -309,380 +635,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
 
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu,menu);
-        MenuItem item = menu.findItem(R.id.action_spinner);
-        spinner = (Spinner) MenuItemCompat.getActionView(item);
 
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.regions, android.R.layout.simple_spinner_item);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerAdapter);
-        spinner.setOnItemSelectedListener(spinnerItemSelected());
-        return super.onCreateOptionsMenu(menu);
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:
-                mDrawerLayout.openDrawer(Gravity.START);
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if( requestCode == SIGNUP_REQUEST && resultCode == RESULT_OK )
-        {
-            boolean signupAndLogined  = data.getBooleanExtra(LoginActivity.SIGNED_UP,false);
-            if( FirebaseAuth.getInstance().getCurrentUser() != null){
-
-                if(Loginlogout.getTitle().toString().equals("Logout") && Loginlogout.getIcon().equals(R.drawable.ic_settings_power_black_24dp) ) {
-                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
-                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
-                    Loginlogout.setIcon(R.drawable.ic_settings_power_black_24dp);
-                    Loginlogout.setTitle("Logout");
-                    reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
-                }
-                else
-                {
-                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
-                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
-                    Loginlogout.setIcon(R.drawable.ic_settings_power_black_24dp);
-                    Loginlogout.setTitle("Logout");
-                    reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
-                }
-
-            }
-            else  if( FirebaseAuth.getInstance().getCurrentUser() == null){
-
-
-                if(Loginlogout.getTitle().toString().equals("Login") && Loginlogout.getIcon().equals(R.drawable.ic_lock_open_black_24dp) ){
-                    nav_username.setText("Username");
-                    nav_email.setText("Email");
-                    Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
-                }
-                else
-                {
-
-                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
-                    nav_username.setText("Username");
-                    nav_email.setText("Email");
-                    Loginlogout.setTitle("Login");
-                    Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-
-                }
-            }
-        }
-        else
-        if(requestCode == LOGIN_REQUEST && resultCode == RESULT_OK){
-            boolean loginedIn  = data.getBooleanExtra(LOGINED_IN,false);
-            if( FirebaseAuth.getInstance().getCurrentUser() != null){
-
-                if(Loginlogout.getTitle().toString().equals("Logout") && Loginlogout.getIcon().equals(R.drawable.ic_settings_power_black_24dp) ) {
-                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
-                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
-                    Loginlogout.setIcon(R.drawable.ic_settings_power_black_24dp);
-                    Loginlogout.setTitle("Logout");
-                    reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
-                }
-                else
-                {
-                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
-                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
-                    Loginlogout.setIcon(R.drawable.ic_settings_power_black_24dp);
-                    Loginlogout.setTitle("Logout");
-                    reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
-                }
-                
-            }
-            else  if( FirebaseAuth.getInstance().getCurrentUser() == null){
-
-
-                if(Loginlogout.getTitle().toString().equals("Login") && Loginlogout.getIcon().equals(R.drawable.ic_lock_open_black_24dp) ){
-                    nav_username.setText("Username");
-                    nav_email.setText("Email");
-                    Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
-
-                }
-                else
-                {
-                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
-                    nav_username.setText("Username");
-                    nav_email.setText("Email");
-                    Loginlogout.setTitle("Login");
-                    Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-                }
-            }
-
-        }
-    }
-    public AdapterView.OnItemSelectedListener spinnerItemSelected(){
-        final String [] regions = getResources().getStringArray(R.array.regions);
-        return  new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                 regionRequestListener.onRegionSearch(regions[position].toLowerCase(),viewPager);
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        };
-    }
-    @Override
-    public void onBackPressed() {
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else
-        {
-            moveTaskToBack(true);
-        }
-    }
-    @Override
-    public boolean onNavigationItemSelected( MenuItem item) {
-        int id = item.getItemId();
-        switch (id){
-
-            case R.id.register:
-                HomeScreenActivity.this.startActivityForResult(new Intent(HomeScreenActivity.this, SignUpActivity.class),SIGNUP_REQUEST);
-                return  true;
-            case R.id.action_login_logout:
-                Loginlogout = item;
-
-                if ( FirebaseAuth.getInstance().getCurrentUser() == null && Loginlogout != null ) {
-
-                    if(Loginlogout != null && Loginlogout.getTitle().toString().equals("Login") && Loginlogout.getIcon().equals(R.drawable.ic_lock_open_black_24dp) ){
-                        nav_username.setText("Username");
-                        nav_email.setText("Email");
-                    }
-                    else
-                    {
-                        nav_username.setText("Username");
-                        nav_email.setText("Email");
-                        Loginlogout.setTitle("Login");
-                        Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-                    }
-                    if(isNetworkAndInternetAvailable()){
-                        HomeScreenActivity.this.startActivityForResult(new Intent(HomeScreenActivity.this, LoginActivity.class),LOGIN_REQUEST);
-                    }
-                    else
-                    {
-                        nav_username.setText("Username");
-                        nav_email.setText("Email");
-                        Loginlogout.setTitle("Login");
-                        Toast.makeText(HomeScreenActivity.this,"No internet available to perform this task", Toast.LENGTH_LONG).show();
-
-                    }
-
-                }
-                else
-                if ( FirebaseAuth.getInstance().getCurrentUser() != null) {
-
-                    if(Loginlogout != null && Loginlogout.getTitle().toString().equals("Logout") && Loginlogout.getIcon().equals(R.drawable.ic_settings_power_black_24dp) ) {
-
-                        if(isNetworkAndInternetAvailable()){
-                            FirebaseAuth.getInstance().signOut();
-                        }
-                        else
-                        {
-                            FirebaseAuth.getInstance().signOut();
-                        }
-                        Loginlogout.setTitle("login");
-                        Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-                        nav_username.setText("Username");
-                        nav_email.setText("Email");
-                        reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
-                    }
-                    else
-                    {
-                        if(isNetworkAndInternetAvailable()){
-                            FirebaseAuth.getInstance().signOut();
-                        }
-                        else
-                        {
-                            FirebaseAuth.getInstance().signOut();
-                        }
-                        Loginlogout.setTitle("login");
-                        Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-                        nav_username.setText("Username");
-                        nav_email.setText("Email");
-                    }
-                }
-               return true;
-        }
-        return false;
-    }
-    @Override
-    public void onUserProfileChange(String which, String value) {
-        if(APP_USER_EMAIL.contentEquals(which)){
-            nav_email.setText(value);
-        }
-
-        if(APP_USERNAME.contentEquals(which)){
-            nav_username.setText(value);
-        }
-
-    }
-
-    @Override
-    public void onInternetConnected() {
-
-        Log.d(LOGMESSAGE,"HomeScreenActivity onInternetConnected called") ;
-        if(mFactory != null){
-            mFactory.initFirebase();
-            mFactory.startFirebaseEventTask(eventsDataAvailableListener);
-            mFactory.runReservedSeatsTasksOnInternetAvailable();
-            mFactory.runEventValueTaskOnInternetAvailable(this.eventsDataAvailableListener);
-            this.eventInternetDataListenter.onInternetConnected();
-            this.reservedSeatInternetDataListenter.onInternetConnected();
-            this.profileInternetDataListenter.onInternetConnected();
-        }
-        else{
-            mFactory = new Factory(HomeScreenActivity.this) ;
-            mFactory.initFirebase();
-            mFactory.startFirebaseEventTask(eventsDataAvailableListener);
-            mFactory.runReservedSeatsTasksOnInternetAvailable();
-            mFactory.runEventValueTaskOnInternetAvailable(this.eventsDataAvailableListener);
-            this.eventInternetDataListenter.onInternetConnected();
-            this.reservedSeatInternetDataListenter.onInternetConnected();
-            this.profileInternetDataListenter.onInternetConnected();
-        }
-
-    }
-
-    @Override
-    public void onInternetDisconnected() {
-        Log.d(LOGMESSAGE,"HomeScreenActivity onInternetDisconnected called") ;
-        if(mFactory != null)
-        {
-            if(mFactory != null){
-                mFactory.runReservedSeatsTasksOnInternetAvailable();
-                if(this.eventInternetDataListenter != null && this.reservedSeatInternetDataListenter != null && this.profileInternetDataListenter != null){
-                    this.eventInternetDataListenter.onInternetDisconnected();
-                    this.reservedSeatInternetDataListenter.onInternetDisconnected();
-                    this.profileInternetDataListenter.onInternetDisconnected();
-                }
-            }
-        }else
-        {
-            mFactory = new Factory(HomeScreenActivity.this) ;
-            mFactory.runReservedSeatsTasksOnInternetAvailable();
-            this. eventInternetDataListenter.onInternetDisconnected();
-            this.reservedSeatInternetDataListenter.onInternetDisconnected();
-            this.profileInternetDataListenter.onInternetDisconnected();
-        }
-
-    }
-
-    @Override
-    public void onEventsDataAvailable(int count, ArrayList<Event> reservedResultSets) {
-        Log.d(LOGMESSAGE,"HomeScreenActivity onEventsDataAvailable called") ;
-       this. eventsDataAvailableListener.onEventsDataAvailable(count,reservedResultSets);
-        Toast.makeText(HomeScreenActivity.this,"eventsDataAvailableListener called", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onReservedSeatsDataAvailable(int count, ArrayList<ResultSet> reservedResultSets) {
-
-        Log.d(LOGMESSAGE,"HomeScreenActivity onReservedSeatsDataAvailable called") ;
-        this.reservedSeatsDataAvailableListener.onReservedSeatsDataAvailable(count,reservedResultSets);
-    }
-
-    @Override
-    public void onUserSignedIn() {
-
-       runOnUiThread(new Runnable() {
-           @Override
-           public void run() {
-
-               if( FirebaseAuth.getInstance().getCurrentUser() != null && Loginlogout != null && nav_username != null &&  nav_email != null){
-
-                   if( Loginlogout != null && Loginlogout.getTitle().toString().equals("Logout") && Loginlogout.getIcon().equals(R.drawable.ic_settings_power_black_24dp) ) {
-
-                       String email = "Email";String username= "Username";
-                       if( ((Evento)getApplication()).getSettings().contains(APP_USER_EMAIL) ){
-                           email = ((Evento)getApplication()).getSettings().getString(APP_USER_EMAIL,email);
-                       }
-
-                       if( ((Evento)getApplication()).getSettings().contains(APP_USERNAME) ){
-                           username   = ((Evento)getApplication()).getSettings().getString(APP_USERNAME,username);
-                       }
-                       nav_username.setText(username);
-                       nav_email.setText(email);
-                       Loginlogout.setIcon(R.drawable.ic_settings_power_black_24dp);
-                       Loginlogout.setTitle("Logout");
-                   }
-                   else
-                   {
-                       String email = "Email";String username= "Username";
-                       if( ((Evento)getApplication()).getSettings().contains(APP_USER_EMAIL) ){
-                           email = ((Evento)getApplication()).getSettings().getString(APP_USER_EMAIL,email);
-                       }
-
-                       if( ((Evento)getApplication()).getSettings().contains(APP_USERNAME) ){
-                           username   = ((Evento)getApplication()).getSettings().getString(APP_USERNAME,username);
-                       }
-                       nav_username.setText(username);
-                       nav_email.setText(email);
-                       Loginlogout.setIcon(R.drawable.ic_settings_power_black_24dp);
-                       Loginlogout.setTitle("Logout");
-                   }
-                   reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
-               }
-           }
-       });
-
-    }
-
-    @Override
-    public void onUserSignedOut() {
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if ( FirebaseAuth.getInstance().getCurrentUser() == null && Loginlogout != null && nav_username != null &&  nav_email != null) {
-
-                    if(Loginlogout.getTitle().toString().equals("Login") && Loginlogout.getIcon().equals(R.drawable.ic_lock_open_black_24dp) ){
-                        if(Loginlogout.getActionView() != null){}
-                        nav_username.setText("Username");
-                        nav_email.setText("Email");
-                        Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);;
-                    }
-                    else
-                    {
-                        if(Loginlogout.getActionView() != null){}
-                        nav_username.setText("Username");
-                        nav_email.setText("Email");
-                        Loginlogout.setTitle("Login");
-                        Loginlogout.setIcon(R.drawable.ic_lock_open_black_24dp);
-                    }
-                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
-                }
-            }
-        });
-
-    }
-
-    public interface  SearchRequestListener{
-        public ArrayList<Event> onSearch(String query);
-    }
-    public interface  SearchRegionRequestListener{
-        public ArrayList<Event> onRegionSearch(String query, ViewPager  vp);
-    }
-    public interface  LoginLogoutListener{
-        public boolean onLoginLogout(String which);
-    }
     public boolean isInternetOn() {
 
         // get Connectivity Manager object to check connection
@@ -707,6 +660,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         return false;
     }
+
     private boolean isNetworkOn(){
         ConnectivityManager ConnectionManager=(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
@@ -719,7 +673,21 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             return  false;
         }
     }
+
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
     }
+
+    public interface SearchRequestListener {
+        public ArrayList<Event> onSearch(String query);
+    }
+
+    public interface SearchRegionRequestListener {
+        public ArrayList<Event> onRegionSearch(String query, ViewPager vp);
+    }
+
+    public interface LoginLogoutListener {
+        public boolean onLoginLogout(String which);
+    }
+
 }

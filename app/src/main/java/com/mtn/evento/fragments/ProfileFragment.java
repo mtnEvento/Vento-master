@@ -33,14 +33,14 @@ import static com.mtn.evento.data.Constants.APP_USER_PHONE;
  * A simple {@link Fragment} subclass.
  */
 public class ProfileFragment extends Fragment implements View.OnClickListener,Factory.InternetDataListenter {
-    AppCompatActivity mContext;
-    TextView email, phone, username ;
     private final int EMAIL_EDIT_REQUEST = 120;
     private final int PHONE_EDIT_REQUEST = 121;
     private final int USERNAME_EDIT_REQUEST = 122;
+    AppCompatActivity mContext;
+    TextView email, phone, username;
+    UserProfile userProfile;
     private FirebaseAuth mAuth;
     private HomeScreenActivity appContext;
-    UserProfile userProfile;
     private volatile boolean hasInternet= false;
 
     public ProfileFragment() {
@@ -91,7 +91,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,Fa
             }
             else
             {
-                Toast.makeText(appContext,"Please login start in order to edit your profile",Toast.LENGTH_LONG).show();
+                Toast.makeText(appContext, "Please login first in order to edit your profile", Toast.LENGTH_LONG).show();
             }
         }
         else

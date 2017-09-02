@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
-        <item android:title="Login"
-            android:id="@+id/action_login_logout"
+        <item
+            android:id="@+id/action_login"
             android:icon="@drawable/ic_lock_open_black_24dp"
+            android:title="Login"
             />
-        <item android:title="Register"
+
+        <item
+            android:id="@+id/action_logout"
+            android:icon="@drawable/ic_settings_power_black_24dp"
+            android:title="Logout"
+            android:visible="false" />
+        <item
             android:id="@+id/register"
             android:icon="@drawable/user"
+            android:title="Register"
             />
     </group>
 </menu>

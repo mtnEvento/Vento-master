@@ -26,113 +26,77 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 public class Factory {
 
-    private FirebaseDatabase firebaseDatabase;
+    private static volatile boolean internet = false;
+    private static volatile boolean isIn = false;
     private HomeScreenActivity manager;
     private InternetDataListenter internetDataListenter ;
     private LoginLogoutTaskListener loginLogoutTaskListener ;
     private UserLogInOrOutListenter userLogInOrOutListenter;
     private ReservedSeatsDataAvailableListener reservedSeatsDataAvailableListener ;
     private ReservedSeatsTask reservedSeatsTask;
-    private DatabaseReference eventsRef;
-    private EventsDataAvailableListener eventsDataAvailableListener ;
-    private FirebaseEventTask firebaseEventTask;
     private NetworkTask internetTask;
-    private static volatile boolean internet = false;
-    private static volatile boolean isIn = false;
 
     public Factory(HomeScreenActivity homeScreenActivity) {
         if(this.manager == null){
             this.manager = homeScreenActivity ;
             this.internetDataListenter = (InternetDataListenter) this.manager ;
-            this.eventsDataAvailableListener = (EventsDataAvailableListener )this.manager ;
             this.reservedSeatsDataAvailableListener = (ReservedSeatsDataAvailableListener )this.manager;
-            this.internetTask= new NetworkTask(this.manager,this.internetDataListenter);
-            this.internetTask.execute();
             this.userLogInOrOutListenter = (UserLogInOrOutListenter) this.manager ;
-            this.loginLogoutTaskListener = new LoginLogoutTaskListener(this.manager,this.userLogInOrOutListenter) ;
-            this.loginLogoutTaskListener.execute();
         }
 
     }
-    public void initFirebase(){
 
-        if(firebaseDatabase == null ){
-            firebaseDatabase = FirebaseDatabase.getInstance() ;
-        }
-        if(eventsRef == null){
-           eventsRef =  firebaseDatabase.getReference(Database.Tables.EVENTS);
-        }
+    public static synchronized boolean isNetworkAndInternetAvailableNow() {
+        return internet;
     }
 
+    public void runLoginLogoutTask() {
+        this.loginLogoutTaskListener = new LoginLogoutTaskListener(this.manager, this.userLogInOrOutListenter);
+        this.loginLogoutTaskListener.execute();
+    }
 
-    public void startFirebaseEventTask(EventsDataAvailableListener eventsDataAvailableListener){
-        if(firebaseEventTask == null){
-            firebaseEventTask = new FirebaseEventTask( eventsDataAvailableListener );
-            firebaseEventTask.listenForFirebasedata();
+    public void runNetworkTask() {
+        this.internetTask = new NetworkTask(this.manager, this.internetDataListenter);
+        this.internetTask.execute();
+    }
+
+    public void stopNetworkTask() {
+        if (this.internetTask != null) {
+            this.internetTask.stopNetworkTask();
         }
-        else
-        {
-            firebaseEventTask.listenForFirebasedata();
+
+    }
+
+    public void stopLoginLogoutTask() {
+        if (this.loginLogoutTaskListener != null) {
+            this.loginLogoutTaskListener.stopLoginLogoutTask();
         }
     }
-    public interface EventsDataAvailableListener{
-        public void onEventsDataAvailable(int count,ArrayList<Event> reservedResultSets);
-    }
-    public interface ReservedSeatsDataAvailableListener{
-        public void onReservedSeatsDataAvailable(int count, ArrayList<ResultSet> reservedResultSets);
-    }
-    public interface InternetDataListenter{
-        public void onInternetConnected();
-        public void onInternetDisconnected();
-    }
-    public interface UserLogInOrOutListenter{
-        public void onUserSignedIn();
-        public void onUserSignedOut();
-    }
-    public static synchronized  boolean  isNetworkAndInternetAvailableNow (){
-       return  internet ;
-    }
+
     public void runReservedSeatsTasksOnInternetAvailable(){
-        if(reservedSeatsTask != null && reservedSeatsTask.isCancelled()){
-            reservedSeatsTask.execute();
-        }
-        else
-        {
+        if (reservedSeatsTask == null) {
+
             reservedSeatsTask = new ReservedSeatsTask();
             reservedSeatsTask.execute();
         }
-
-
     }
+
     public void cancelReservedSeatsTasksOnInternetUnAvailable(){
-        if (reservedSeatsTask != null && !reservedSeatsTask.isCancelled() ){
+        if (reservedSeatsTask != null) {
             reservedSeatsTask.cancel(true);
+            reservedSeatsTask = null;
         }
-    }
-
-    public void runEventValueTaskOnInternetAvailable(EventsDataAvailableListener eventsDataAvailableListener){
-        if( this.firebaseEventTask  != null){
-            this.firebaseEventTask.listenForFirebasedata();
-        }
-        else
-        {
-            this.firebaseEventTask = new FirebaseEventTask(eventsDataAvailableListener);
-            this.firebaseEventTask.listenForFirebasedata();
-        }
-
-
-    }
-    public void cancelEventValueTaskOnInternetUnAvailable(){
-        if(this.firebaseEventTask != null){
-            this.firebaseEventTask.stopEventValueLister();
-        }
-
     }
 
     public HomeScreenActivity getManager() {
         return manager;
 
     }
+
+    public void setManager(HomeScreenActivity manager) {
+        this.manager = manager;
+    }
+
     private  boolean isNetworkOn(){
         ConnectivityManager ConnectionManager=(ConnectivityManager) manager.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
@@ -145,6 +109,7 @@ public class Factory {
             return  false;
         }
     }
+
     private  boolean isNetworkAndInternetAvailable(){
 
          internet = isNetworkOn()&& isInternetOn() ;
@@ -175,18 +140,41 @@ public class Factory {
         }
         return false;
     }
-    public void setManager(HomeScreenActivity manager) {
-        this.manager = manager;
+
+    public interface EventsDataAvailableListener {
+        public void onEventsDataAvailable(int count, ArrayList<Event> reservedResultSets);
     }
+
+    public interface ReservedSeatsDataAvailableListener {
+        public void onReservedSeatsDataAvailable(int count, ArrayList<ResultSet> reservedResultSets);
+    }
+
+    public interface InternetDataListenter {
+        public void onInternetConnected();
+
+        public void onInternetDisconnected();
+    }
+
+    public interface UserLogInOrOutListenter {
+        public void onUserSignedIn();
+
+        public void onUserSignedOut();
+    }
+
     class NetworkTask extends AsyncTask<Void,Void,Void>{
-        private InternetDataListenter internetDataListenter;
         volatile boolean hasInternet= false ;
         HomeScreenActivity manager;
+        volatile boolean stop = false;
+        private InternetDataListenter internetDataListenter;
 
         public NetworkTask(HomeScreenActivity manager, InternetDataListenter internetDataListenter) {
             this.manager = manager ;
             this.internetDataListenter = internetDataListenter;
             Log.d(LOGMESSAGE,"NetworkTask called :   ") ;
+        }
+
+        public void stopNetworkTask() {
+            stop = true;
         }
 
         private void operate(){
@@ -215,7 +203,11 @@ public class Factory {
                              while (true)
                              {
                                 operate();
-                                Thread.sleep(500);
+                                 Thread.sleep(1000);
+
+                                 if (stop) {
+                                     break;
+                                 }
                              }
 
 
@@ -228,14 +220,24 @@ public class Factory {
                                 try
                                 {
                                     operate();
-                                    Thread.sleep(500);
+                                    Thread.sleep(1000);
+                                    if (stop) {
+                                        break;
+                                    }
                                 } catch (InterruptedException e1) {
                                     e1.printStackTrace();
                                 }
                                 finally { }
+                                if (stop) {
+                                    break;
+                                }
                             }
                         }
                         finally { }
+
+                        if (stop) {
+                            break;
+                        }
 
                     }
                 }
@@ -249,6 +251,10 @@ public class Factory {
     class ReservedSeatsTask extends AsyncTask<Void,Void,Void> {
         volatile int prevDataCount = 0 ;
         ReservedSeatsTask reservedSeatsTask;
+
+        public ReservedSeatsTask() {
+            Log.d(LOGMESSAGE, "ReservedSeatsTask called :  ");
+        }
         @Override
         protected Void doInBackground(Void... params) {
             Runnable runnable = new Runnable() {
@@ -276,7 +282,7 @@ public class Factory {
                                 }
 
                             }
-                            Thread.sleep(500);
+                            Thread.sleep(1000);
                         }
 
                     }catch (Exception e)
@@ -294,85 +300,12 @@ public class Factory {
         }
 
     }
-    class FirebaseEventTask {
-        EventValueListener eventValueListener = null;
-        EventsDataAvailableListener eventsDataAvailableListener = null;
-        volatile int prevDataCount = 0 ;
-        volatile boolean shouldStopValueLister = false ;
-        public FirebaseEventTask(EventsDataAvailableListener eventsDataAvailableListener) {
-            this.eventsDataAvailableListener = eventsDataAvailableListener ;
-        }
-
-        public void stopEventValueLister(){
-            shouldStopValueLister = true ;
-        }
-        public void listenForFirebasedata(){
-            Log.d(LOGMESSAGE,"listenForFirebasedata  called") ;
-            while(!shouldStopValueLister)
-            {
-                if(eventValueListener == null){
-                    eventValueListener = new EventValueListener(this.eventsDataAvailableListener );
-                    Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            try
-                            {
-                                eventsRef.addValueEventListener(eventValueListener);
-                                Log.d(LOGMESSAGE,"listenForFirebasedata  added") ;
-                                eventsRef.keepSynced(true);
-                            }catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.d(LOGMESSAGE,"listenForFirebasedata Error :  "+e.fillInStackTrace(),e.getCause()) ;
-                            }
-                        }
-                    };
-
-                    Thread  reservedSeatsThreadCount = new Thread(runnable);
-                    reservedSeatsThreadCount.start();
-                }
-
-            }
-        }
-        class EventValueListener implements ValueEventListener {
-            EventsDataAvailableListener eventsDataAvailableListener;
-            ArrayList<Event> events ;
-            volatile int preDataCount ;
-
-            public EventValueListener( EventsDataAvailableListener eventsDataAvailableListener) {
-                this.eventsDataAvailableListener = eventsDataAvailableListener;
-                events = new ArrayList<>();
-                preDataCount =  events.size() ;
-            }
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                events.clear();
-                for (DataSnapshot aDataSnapshot: dataSnapshot.getChildren()){
-                    Event evt = aDataSnapshot.getValue(Event.class);
-                    events.add(evt);
-                }
-                if(prevDataCount <= events.size() ){
-
-                    if( prevDataCount == events.size() ){}
-                    else  if(prevDataCount < events.size() )
-                    {
-                        Factory.this.eventsDataAvailableListener.onEventsDataAvailable(events.size(),events);
-                        prevDataCount = events.size() ;
-                    }
-                }
-                Log.d(LOGMESSAGE, "onDataChange: Events " + events);
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        }
-    }
     class LoginLogoutTaskListener extends AsyncTask<Void,Void,Void>{
-        private InternetDataListenter internetDataListenter;
         volatile boolean hasInternet= false ;
+        volatile boolean stop = false;
         HomeScreenActivity manager;
         UserLogInOrOutListenter userLogInOrOutListenter ;
+        private InternetDataListenter internetDataListenter;
 
         public LoginLogoutTaskListener(HomeScreenActivity manager, UserLogInOrOutListenter userLogInOrOutListenter) {
             this.manager = manager ;
@@ -380,6 +313,9 @@ public class Factory {
             Log.d(LOGMESSAGE,"LoginLogoutTaskListener called :   ") ;
         }
 
+        public void stopLoginLogoutTask() {
+            this.stop = true;
+        }
         private void operateUserLoginORLogout(){
 
             Log.d(LOGMESSAGE,"userLogInOrOutListenter runnable started :   ") ;
@@ -410,6 +346,9 @@ public class Factory {
                         {
                             while (true)
                             {
+                                if (stop) {
+                                    break;
+                                }
                                 operateUserLoginORLogout();
                                 Thread.sleep(500);
                             }
@@ -423,16 +362,24 @@ public class Factory {
 
                                 try
                                 {
+                                    if (stop) {
+                                        break;
+                                    }
                                     operateUserLoginORLogout();
                                     Thread.sleep(500);
                                 } catch (InterruptedException e1) {
                                     e1.printStackTrace();
                                 }
                                 finally { }
+                                if (stop) {
+                                    break;
+                                }
                             }
                         }
                         finally { }
-
+                        if (stop) {
+                            break;
+                        }
                     }
                 }
             };
@@ -442,5 +389,4 @@ public class Factory {
             return null;
         }
     }
-
 }

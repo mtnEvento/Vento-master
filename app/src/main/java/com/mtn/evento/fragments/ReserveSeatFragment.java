@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -66,14 +67,14 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
  */
 public class ReserveSeatFragment extends Fragment implements View.OnClickListener {
     Context context;
+    MenuItem cartView;
+    PaymentListener mPaymentListener;
     private ReservationHolder holder;
     private Event mEvent;
     private Button makePayment;
-    MenuItem cartView;
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private de.hdodenhof.circleimageview.CircleImageView event_image;
-    PaymentListener mPaymentListener;
 
 
     public ReserveSeatFragment() {
@@ -122,7 +123,12 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                         Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
                     }
                 });
+                CardView view = (CardView) mView;
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0, 0, 0, 32);
+                view.setLayoutParams(params);
                 holder.seats_group.addView(mView);
+
                 if( cartView != null &&  cartView.getTitle()!= null){
 
                     if(!cartView.getTitle().toString().isEmpty()){
@@ -167,12 +173,12 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                  LinearLayout layout = (LinearLayout) crd.getChildAt(0);
 
                                  MaterialSpinner spiner = (MaterialSpinner) layout.getChildAt(0);
-                                 String typeName =  holder.ticketCategories[spiner.getSelectedIndex()];
+                               String typeName = holder.ticketCategories[spiner.getSelectedIndex()].toUpperCase();
                                  ArrayList<Ticket>   tickets  =  mEvent.getTicket_type();
                                  ArrayList<String>   strTickets  = new ArrayList<>();
                                  for (Ticket  ticket : tickets  )
                                  {
-                                      if(typeName.contentEquals(ticket.getName())){
+                                     if (typeName.contentEquals(ticket.getName().toUpperCase())) {
                                           amount =   ticket.getAmount().trim();
                                           dubleAmount = Double.parseDouble(amount);
                                           singlePurchaseData.setType(typeName);
@@ -312,6 +318,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 //        todo set payment listner
 
         List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
+        ((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
 
         if (mPaymentListener != null ){
             if (displayTickets != null && !displayTickets.isEmpty()){
@@ -352,6 +359,8 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 ticket.setSecrets(timestamp);
                 mDatabase.child("bookings").child(mEvent.getEvent_id()).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(secret).setValue(ticket);
                 Log.d(LOGMESSAGE," path:  "+mEvent.getEvent_id()+ "  "+FirebaseAuth.getInstance().getCurrentUser().getUid() +  "  "+secret);
+                //TODO : update available seat
+                // mDatabase.child(mEvent.getEvent_id())
             }
 
 
@@ -369,40 +378,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
     public void setCallback(PaymentListener paymentListener) {
         mPaymentListener = paymentListener;
-    }
-
-    private static class ReservationHolder{
-        String[]  ticketCategories;
-       private FloatingActionButton menu_add ,menu_remove;
-       private LinearLayout seats_group;
-        public ReservationHolder(View holder, View.OnClickListener onClickListener, Event event){
-
-            ArrayList<Ticket>   tickets  =  event.getTicket_type();
-            ArrayList<String>   strTickets  = new ArrayList<>();
-            for (Ticket  ticket : tickets  ) {
-                strTickets.add(ticket.getName()) ;
-            }
-            String[] types = new String[strTickets.size()];
-            for (int i = 0; i < strTickets.size(); i++) {
-                types[i] = strTickets.get(i);
-            }
-
-            ticketCategories =  types;
-            seats_group = (LinearLayout) holder.findViewById(R.id.seats_group);
-            menu_add = (FloatingActionButton) holder.findViewById(R.id.menu_add);
-            menu_add.setOnClickListener(onClickListener);
-            menu_remove = (FloatingActionButton) holder.findViewById(R.id.menu_remove);
-            menu_remove.setOnClickListener(onClickListener);
-            MaterialSpinner spinner = (MaterialSpinner) holder.findViewById(R.id.spinner);
-            spinner.setItems(ticketCategories);
-            spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
-
-                @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                    Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
-                }
-            });
-        }
-
     }
 
     public boolean isInternetOn() {
@@ -429,6 +404,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         }
         return false;
     }
+
     private boolean isNetworkOn(){
         ConnectivityManager ConnectionManager=(ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
@@ -441,12 +417,48 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
             return  false;
         }
     }
+
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
     }
-
     public interface PaymentListener{
         void payed(String transactionId, boolean status, List<DisplayTicket> displayTickets);
+    }
+
+    private static class ReservationHolder {
+        String[] ticketCategories;
+        private FloatingActionButton menu_add, menu_remove;
+        private LinearLayout seats_group;
+
+        public ReservationHolder(View holder, View.OnClickListener onClickListener, Event event) {
+
+            ArrayList<Ticket> tickets = event.getTicket_type();
+            ArrayList<String> strTickets = new ArrayList<>();
+            for (Ticket ticket : tickets) {
+                strTickets.add(ticket.getName());
+            }
+            String[] types = new String[strTickets.size()];
+            for (int i = 0; i < strTickets.size(); i++) {
+                types[i] = strTickets.get(i).toUpperCase();
+            }
+
+            ticketCategories = types;
+            seats_group = (LinearLayout) holder.findViewById(R.id.seats_group);
+            menu_add = (FloatingActionButton) holder.findViewById(R.id.menu_add);
+            menu_add.setOnClickListener(onClickListener);
+            menu_remove = (FloatingActionButton) holder.findViewById(R.id.menu_remove);
+            menu_remove.setOnClickListener(onClickListener);
+            MaterialSpinner spinner = (MaterialSpinner) holder.findViewById(R.id.spinner);
+            spinner.setItems(ticketCategories);
+            spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+                @Override
+                public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                    Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+                }
+            });
+        }
+
     }
 
 

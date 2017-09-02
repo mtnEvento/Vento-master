@@ -3,8 +3,6 @@ package com.mtn.evento.data;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import org.jetbrains.annotations.Contract;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -32,7 +30,6 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
         this.web_url = web_url;
     }
 
-    @Contract("_ -> !null")
     public static ServerConnector newInstance(String web_url) {
         return new ServerConnector(web_url);
     }

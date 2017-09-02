@@ -2,9 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/page"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/page"
+    android:background="@color/colorBackground"
     tools:context="com.mtn.evento.activities.BarcodeActivity">
 
     <ScrollView
@@ -15,11 +16,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <LinearLayout
-                    android:orientation="vertical"
                     android:id="@+id/print_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/toolbar">
+                    android:layout_below="@+id/toolbar"
+                    android:orientation="vertical">
 
 
                 <android.support.v7.widget.CardView
@@ -79,10 +80,10 @@
                     android:id="@+id/shareBtn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/print_view"
                     android:layout_marginLeft="@dimen/margin_standard"
                     android:layout_marginRight="@dimen/margin_standard"
                     android:layout_marginTop="5dp"
-                    android:layout_below="@+id/print_view"
                     android:background="@drawable/yellow_btn"
                     android:padding="@dimen/margin_standard"
                     android:text="@string/share"
@@ -92,9 +93,10 @@
                     android:id="@+id/printBtn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/shareBtn"
                     android:layout_marginLeft="@dimen/margin_standard"
                     android:layout_marginRight="@dimen/margin_standard"
-                    android:layout_below="@+id/shareBtn"
+                    android:layout_marginTop="6dp"
                     android:background="@drawable/curved_white"
                     android:padding="@dimen/margin_standard"
                     android:text="@string/save" />

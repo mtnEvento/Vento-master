@@ -3,24 +3,74 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     buildToolsVersion '25.0.3'
-    defaultConfig {
+
+    defaultConfig
+            {
         applicationId "com.mtn.evento"
-        minSdkVersion 15
+                minSdkVersion 14
         targetSdkVersion 25
+
         versionCode 1
         versionName "1.0"
+
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+                multiDexEnabled true
     }
     buildTypes {
-        release {
-            minifyEnabled false
+        release
+                {
+                    minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug
+                {
+                    minifyEnabled true
+                    proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                }
     }
+
+    dexOptions {
+        preDexLibraries = false
+        javaMaxHeapSize "4g"
+    }
+
+//    splits {
+//
+//        // Configures multiple APKs based on ABI.
+//        abi {
+//
+//            // Enables building multiple APKs per ABI.
+//            enable false
+//
+//            // By default all ABIs are included, so use reset() and include to specify that we only
+//            // want APKs for x86, armeabi-v7a, and mips.
+//
+//            // Resets the list of ABIs that Gradle should create APKs for to none.
+//            reset()
+//
+//            // Specifies a list of ABIs that Gradle should create APKs for.
+//            include "x86", "armeabi-v7a", "mips"
+//
+//            // Specifies that we do not want to also generate a universal APK that includes all ABIs.
+//            universalApk true
+//        }
+//    }
+////    afterEvaluate {
+////        tasks.matching {
+////            it.name.startsWith('dex')
+////        }.each { dx ->
+////            if (dx.additionalParameters == null) {
+////                dx.additionalParameters = ['--multi-dex']
+////            } else {
+////                dx.additionalParameters += '--multi-dex'
+////            }
+////        }
+////    }
 }
 
-dependencies {
+dependencies
+        {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -41,12 +91,13 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.jaredrummler:material-spinner:1.1.0'
     compile 'com.github.florent37:viewanimator:1.0.5'
-    compile 'com.github.renaudcerrato:FloatingSearchView:1.0.1'
+            //compile 'com.github.renaudcerrato:FloatingSearchView:1.0.1'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.github.bumptech.glide:glide:3.8.0'
-    compile 'org.jetbrains:annotations-java5:15.0'
+            //compile 'org.jetbrains:annotations-java5:15.0'
     compile 'jp.wasabeef:glide-transformations:2.0.2'
     compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
+            compile 'com.android.support:multidex:1.0.1'
     testCompile 'junit:junit:4.12'
 }
 apply plugin: 'com.google.gms.google-services'

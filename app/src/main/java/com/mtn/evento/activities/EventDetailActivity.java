@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -60,15 +61,23 @@ public class EventDetailActivity extends AppCompatActivity {
         ( (TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
         ( (TextView)findViewById(R.id.evt_date)).setText(event.getEvent_date());
         // TODO: 8/10/2017  set available seats
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.layout_seat_available);
+        LinearLayout seatLinearLayout = (LinearLayout) findViewById(R.id.layout_seat_available);
+        LinearLayout pricesLinearLayout = (LinearLayout) findViewById(R.id.layout_seat_prices);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, 10, 0, 10);
+
+
         for(Ticket ticket : event.getTicket_type()){
             TextView view = (TextView) getLayoutInflater().inflate(R.layout.seats_available,null);
-            view.setText(ticket.getName() + " : " + ticket.getAvailable_seats());
-            linearLayout.addView(view);
+            TextView view2 = (TextView) getLayoutInflater().inflate(R.layout.seats_available, null);
+            view.setText(ticket.getName().toUpperCase() + " :  " + ticket.getAvailable_seats());
+            view2.setText(ticket.getName().toUpperCase() + " :  GHS " + ticket.getAmount());
+            seatLinearLayout.addView(view, params);
+            pricesLinearLayout.addView(view2, params);
         }
         ( (TextView)findViewById(R.id.evt_venue)).setText((event.getVenue() == null || event.getVenue().isEmpty()) ? "Venue not specified " : event.getVenue());
         ( (TextView)findViewById(R.id.evt_region)).setText((event.getRegion() == null || event.getRegion().isEmpty()) ? "Region not specified " : event.getRegion());
-        ( (TextView)findViewById(R.id.evt_description)).setText((event.getDescription() == null || event.getDescription().isEmpty()) ? "No Description " : event.getDescription());
+        ((TextView) findViewById(R.id.evt_description)).setText((event.getDescription() == null || event.getDescription().contains("null") || event.getDescription().isEmpty()) ? "No Description " : event.getDescription());
     }
 
     @Override

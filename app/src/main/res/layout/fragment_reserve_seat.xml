@@ -1,6 +1,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
@@ -19,23 +19,24 @@
             android:layout_below="@+id/toolbar"
             android:layout_centerHorizontal="true"
             android:layout_margin="@dimen/margin_standard"
-            app:civ_border_width="2dp"
-            app:civ_border_color="@color/colorPrimary"
             android:src="@drawable/banner"
+            app:civ_border_color="@color/colorPrimary"
+            app:civ_border_width="2dp"
             />
          <android.support.v4.widget.NestedScrollView
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+             android:layout_above="@+id/makePayment"
              android:layout_below="@+id/event_image"
              android:layout_marginLeft="@dimen/margin_standard"
              android:layout_marginRight="@dimen/margin_standard"
-             android:padding="@dimen/margin_standard"
-             android:layout_above="@+id/makePayment">
+             android:background="@color/colorBackground"
+             android:padding="@dimen/margin_standard">
              <LinearLayout
-                 android:orientation="vertical"
                  android:id="@+id/seats_group"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
+                 android:orientation="vertical"
 
                  >
                  <android.support.v7.widget.CardView
@@ -44,40 +45,37 @@
                      android:layout_marginBottom="16dp">
 
                      <LinearLayout
-                         android:weightSum="1"
-                         android:orientation="horizontal"
                          android:layout_width="match_parent"
                          android:layout_height="wrap_content"
+                         android:orientation="horizontal"
                          android:padding="5dp"
+                         android:weightSum="1"
                          >
                          <com.jaredrummler.materialspinner.MaterialSpinner
                              android:id="@+id/spinner"
                              android:layout_width="0dp"
+                             android:layout_height="wrap_content"
+                             android:layout_marginRight="12dp"
+                             android:layout_marginTop="3dp"
                              android:layout_weight=".5"
+                             android:background="@drawable/yellow_btn"
+                             app:ms_arrow_tint="@color/white"
                              app:ms_background_color="@color/colorAccent"
                              app:ms_hide_arrow="false"
-                             app:ms_arrow_tint="@color/white"
-                             app:ms_text_color="@color/white"
-                             android:layout_marginTop="3dp"
-                             android:background="@drawable/yellow_btn"
-                             android:layout_marginRight="12dp"
-                             android:layout_height="wrap_content"/>
+                             app:ms_text_color="@color/white" />
                          <EditText
-                             android:layout_marginBottom="2dp"
-                             android:background="@drawable/seat_background"
                              android:layout_width="0dp"
-                             android:hint="@string/quauntity"
-                             android:layout_gravity="bottom"
                              android:layout_height="wrap_content"
-                             android:padding="@dimen/margin_standard"
+                             android:layout_gravity="bottom"
+                             android:layout_marginBottom="2dp"
+                             android:layout_weight="0.5"
+                             android:background="@drawable/seat_background"
+                             android:hint="@string/quauntity"
                              android:inputType="numberDecimal"
-                             android:layout_weight="0.5"/>
+                             android:padding="@dimen/margin_standard" />
 
                      </LinearLayout>
-
-
                  </android.support.v7.widget.CardView>
-
              </LinearLayout>
          </android.support.v4.widget.NestedScrollView>
 
@@ -86,61 +84,61 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:padding="@dimen/margin_standard"
             android:layout_centerHorizontal="true"
-            android:text="@string/make_payment"
-            android:background="@drawable/yellow_btn"
-            android:textColor="@color/white"
             android:layout_marginBottom="@dimen/margin_standard"
+            android:background="@drawable/yellow_btn"
+            android:padding="@dimen/margin_standard"
+            android:text="@string/make_payment"
+            android:textColor="@color/white"
             android:textStyle="bold"
             />
 
     </RelativeLayout>
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/menu"
-        android:layout_gravity="bottom|right|end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="10dp"
+        android:layout_gravity="bottom|right|end"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        app:menu_animationDelayPerItem="50"
+        app:menu_backgroundColor="@android:color/transparent"
+        app:menu_buttonSpacing="0dp"
+        app:menu_colorNormal="#da7836"
+        app:menu_colorPressed="#ec6f09"
+        app:menu_colorRipple="#99FFFFFF"
+        app:menu_fab_hide_animation="@anim/hide_to_bottom"
+        app:menu_fab_label="Close"
+        app:menu_fab_show_animation="@anim/show_from_bottom"
         app:menu_fab_size="normal"
-        app:menu_showShadow="true"
+        app:menu_icon="@drawable/ic_menu"
+        app:menu_labels_colorNormal="#333333"
+        app:menu_labels_colorPressed="#444444"
+        app:menu_labels_colorRipple="#66FFFFFF"
+        app:menu_labels_cornerRadius="3dp"
+        app:menu_labels_ellipsize="none"
+        app:menu_labels_hideAnimation="@anim/fab_slide_out_to_right"
+        app:menu_labels_margin="0dp"
+        app:menu_labels_maxLines="-1"
+        app:menu_labels_padding="8dp"
+        app:menu_labels_paddingBottom="4dp"
+        app:menu_labels_paddingLeft="8dp"
+        app:menu_labels_paddingRight="8dp"
+        app:menu_labels_paddingTop="4dp"
+        app:menu_labels_position="left"
+        app:menu_labels_showAnimation="@anim/fab_slide_in_from_right"
+        app:menu_labels_showShadow="true"
+        app:menu_labels_singleLine="false"
+        app:menu_labels_style="@style/MenuLabelsStyle"
+        app:menu_labels_textColor="#FFFFFF"
+        app:menu_labels_textSize="14sp"
+        app:menu_openDirection="up"
         app:menu_shadowColor="#66000000"
         app:menu_shadowRadius="4dp"
         app:menu_shadowXOffset="1dp"
         app:menu_shadowYOffset="3dp"
-        app:menu_colorNormal="#da7836"
-        app:menu_colorPressed="#ec6f09"
-        app:menu_colorRipple="#99FFFFFF"
-        app:menu_animationDelayPerItem="50"
-        app:menu_icon="@drawable/ic_menu"
-        app:menu_buttonSpacing="0dp"
-        app:menu_labels_margin="0dp"
-        app:menu_labels_showAnimation="@anim/fab_slide_in_from_right"
-        app:menu_labels_hideAnimation="@anim/fab_slide_out_to_right"
-        app:menu_labels_paddingTop="4dp"
-        app:menu_labels_paddingRight="8dp"
-        app:menu_labels_paddingBottom="4dp"
-        app:menu_labels_paddingLeft="8dp"
-        app:menu_labels_padding="8dp"
-        app:menu_labels_textColor="#FFFFFF"
-        app:menu_labels_textSize="14sp"
-        app:menu_labels_cornerRadius="3dp"
-        app:menu_labels_colorNormal="#333333"
-        app:menu_labels_colorPressed="#444444"
-        app:menu_labels_colorRipple="#66FFFFFF"
-        app:menu_labels_showShadow="true"
-        app:menu_labels_singleLine="false"
-        app:menu_labels_ellipsize="none"
-        app:menu_labels_maxLines="-1"
-        app:menu_labels_style="@style/MenuLabelsStyle"
-        app:menu_labels_position="left"
-        app:menu_openDirection="up"
-        app:menu_backgroundColor="@android:color/transparent"
-        app:menu_fab_label="Close"
-        app:menu_fab_show_animation="@anim/show_from_bottom"
-        app:menu_fab_hide_animation="@anim/hide_to_bottom">
+        app:menu_showShadow="true">
 
 
         <com.github.clans.fab.FloatingActionButton
@@ -148,19 +146,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_delete_forever"
-            app:fab_label="@string/remove_ticket"
-            app:fab_size="mini"
             android:tint="@color/white"
             app:fab_colorNormal="@color/white"
+            app:fab_label="@string/remove_ticket"
+            app:fab_size="mini"
             tools:src="@drawable/ic_delete_forever" />
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/menu_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add_ticket"
+            app:fab_colorNormal="@color/white"
             app:fab_label="@string/add_ticket"
             app:fab_size="mini"
-            app:fab_colorNormal="@color/white"
             tools:src="@drawable/ic_add_ticket" />
 
     </com.github.clans.fab.FloatingActionMenu>

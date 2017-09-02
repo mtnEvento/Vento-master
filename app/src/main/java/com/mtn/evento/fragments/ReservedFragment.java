@@ -39,14 +39,14 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
  * A simple {@link Fragment} subclass.
  */
 public class ReservedFragment extends Fragment implements HomeScreenActivity.LoginLogoutListener ,Factory.InternetDataListenter, Factory.ReservedSeatsDataAvailableListener {
-     RecyclerView reservedRecycler;
-     RecyclerView.LayoutManager layoutManager;
-     ReservedEventsAdapter reservedEventsAdapter;
+    static RecyclerView reservedRecycler;
+    static RecyclerView.LayoutManager layoutManager;
+    static ReservedEventsAdapter reservedEventsAdapter;
+    static HomeScreenActivity appContext;
+    static private FirebaseAuth mAuth;
+    static private TextView errorHandler;
+    static private int innerCount;
      ArrayList<ResultSet> reservedEvents;
-     HomeScreenActivity appContext;
-     private FirebaseAuth mAuth;
-     private TextView errorHandler;
-     private int innerCount ;
 
     public ReservedFragment() {
         Log.d(LOGMESSAGE, "ReservedFragment: instantiated ");
@@ -133,18 +133,23 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                         reservedEventsAdapter.setReservedEvents(reservedEvents);
                         reservedRecycler.setAdapter(reservedEventsAdapter);
                         reservedRecycler.invalidate();
+                        reservedRecycler.setVisibility(View.VISIBLE);
+                        errorHandler.setVisibility(View.GONE);
                     }
 
                 }
 
-                break;
+                return true;
             case APP_LOGOUT :
                 if(reservedEventsAdapter != null && reservedRecycler != null){
                     reservedRecycler.removeAllViews();
                     reservedRecycler.invalidate();
+                    reservedRecycler.setVisibility(View.GONE);
+                    errorHandler.setText(R.string.not_logged_in);
+                    errorHandler.setVisibility(View.VISIBLE);
                 }
 
-                break;
+                return true;
         }
         return false;
     }
