@@ -28,16 +28,16 @@ public class Payment extends AppCompatActivity {
     public void makePayment(View v){
 
         HashMap<String,String> contentValue = new HashMap<>();
-        contentValue.put("CustomerName","Daniel");
-        contentValue.put("CustomerMsisdn","233241361156");
-        contentValue.put("CustomerEmail","user@gmail.com");
-        contentValue.put("Channel","mtn-gh");
+        contentValue.put("CustomerName", "Prince Foli");
+        contentValue.put("CustomerMsisdn", "0274320517");
+        contentValue.put("CustomerEmail", "prncfoli@gmail.com");
+        contentValue.put("Channel", "tigo-gh");//mtn-gh
         contentValue.put("Amount","1");
-        contentValue.put("Description","T Shirt");
+        contentValue.put("Description", "Ticket for event.");
 
         Log.d(LOGMESSAGE, "button clicked: ");
 
-        ServerConnector.newInstance("http://10.13.56.107/payment.php").setParameters(contentValue).attachListener(new ServerConnector.Callback() {
+        ServerConnector.newInstance("https://www.crust-media.com/callback/index2.php").setParameters(contentValue).attachListener(new ServerConnector.Callback() {
             @Override
             public void getResult(String result) {
                 if(result == null || result.isEmpty()){return; }

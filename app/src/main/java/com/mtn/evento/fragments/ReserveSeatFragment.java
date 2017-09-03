@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -288,47 +289,64 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
         HashMap<String,String> contentValue = new HashMap<>();
         contentValue.put("CustomerName","Daniel");
-        contentValue.put("CustomerMsisdn","233541243508");//233541243508
-        contentValue.put("CustomerEmail","user@gmail.com");
-        contentValue.put("Channel","mtn-gh");
+        contentValue.put("CustomerMsisdn", "0274320517");//233541243508//233541243508
+        contentValue.put("CustomerEmail", "prncfoli@gmail.com");
+        contentValue.put("Channel", "tigo-gh");
         contentValue.put("Amount","1");
-        contentValue.put("Description","T Shirt");
+        contentValue.put("Description", "Ticket");
+        contentValue.put("PrimaryCallbackUrl", "https://www.crust-media.com/callback/index.php");
 
-//        String url = "http://pay.codoxogh.com/payment.php";
-//        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
-//            @Override
-//            public void getResult(String result) {
-//                if(result == null || result.isEmpty()){return; }
-//                Log.d(LOGMESSAGE, "getResult: " + result);
-//                try {
-//                    JSONObject object = new JSONObject(result);
-//                    JSONObject data =  object.getJSONObject("data");
-//                    String transactionId = data.getString("TransactionId");
-//
-//
-//
-//
-//                    Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).connectToServer();
+        String url = "https://www.crust-media.com/callback/index2.php";
+        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
+            @Override
+            public void getResult(String result) {
+                Log.d(LOGMESSAGE, "result: " + result);
+                if (result == null || result.isEmpty()) {
+                    return;
+                }
+                Log.d(LOGMESSAGE, "getResult: " + result);
+                try {
+                    JSONObject object = new JSONObject(result);
+                    JSONObject data = object.getJSONObject("data");
+                    String transactionId = data.getString("TransactionId");
+
+                    if (transactionId != null && !transactionId.isEmpty()) {
+
+                        HashMap<String, String> contentValue = new HashMap<>();
+                        contentValue.put("TransactionId", transactionId);
+                        String url = "https://www.crust-media.com/callback/index.php";
+                        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
+                            @Override
+                            public void getResult(String result) {
+                                Log.d(LOGMESSAGE, "Result 2: " + result);
+                            }
+                        });
+                    }
+
+                    // List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
+                    //((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
+
+                    Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.d(LOGMESSAGE, "TransactionError : " + e);
+                }
+            }
+        }).connectToServer();
+
 
 //        todo set payment listner
 
-        List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
-        ((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
 
-        if (mPaymentListener != null ){
-            if (displayTickets != null && !displayTickets.isEmpty()){
-                mPaymentListener.payed("1234ddtryu99",true,displayTickets);
-            }
-            else {
-                mPaymentListener.payed("1234ddtryu99",false,displayTickets);
-            }
-
-        }
+//        if (mPaymentListener != null ){
+//            if (displayTickets != null && !displayTickets.isEmpty()){
+//                mPaymentListener.payed("1234ddtryu99",true,displayTickets);
+//            }
+//            else {
+//                mPaymentListener.payed("1234ddtryu99",false,displayTickets);
+//            }
+//
+//        }
 
 
     }
@@ -379,7 +397,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     public void setCallback(PaymentListener paymentListener) {
         mPaymentListener = paymentListener;
     }
-
     public boolean isInternetOn() {
 
         // get Connectivity Manager object to check connection
@@ -404,7 +421,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         }
         return false;
     }
-
     private boolean isNetworkOn(){
         ConnectivityManager ConnectionManager=(ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
@@ -417,14 +433,12 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
             return  false;
         }
     }
-
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
     }
     public interface PaymentListener{
         void payed(String transactionId, boolean status, List<DisplayTicket> displayTickets);
     }
-
     private static class ReservationHolder {
         String[] ticketCategories;
         private FloatingActionButton menu_add, menu_remove;
