@@ -112,14 +112,19 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
         }
+
+        //handleIntent(getIntent());
+
+        Log.d(LOGMESSAGE, "onCreate: isSearching : " + isSearching);
         initTabs();
         initUI(mTabs);
         initSetting();
 
+
+
         mFactory = new Factory(HomeScreenActivity.this);
         Log.d(LOGMESSAGE, "onCreate: is called");
 
-        handleIntent(getIntent());
     }
 
     @Override
@@ -135,9 +140,24 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         spinner.setOnItemSelectedListener(spinnerItemSelected());
 
         // Associate searchable configuration with the SearchView
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(searchRequestListener != null){
+                    searchRequestListener.onSearch(newText.toLowerCase());
+                }
+               // Toast.makeText(HomeScreenActivity.this, newText, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -159,8 +179,9 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             isSearching = true;
-            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
-            searchRequestListener.onSearch(query.toLowerCase());
+            Log.d(LOGMESSAGE, "handleIntent: issearching : " + isSearching);
+
+
             //use the query to search your data somehow
         }
     }
@@ -224,8 +245,10 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(regionRequestListener != null){
+                    regionRequestListener.onRegionSearch(regions[position].toLowerCase(), viewPager);
+                }
 
-                regionRequestListener.onRegionSearch(regions[position].toLowerCase(), viewPager);
 
             }
 

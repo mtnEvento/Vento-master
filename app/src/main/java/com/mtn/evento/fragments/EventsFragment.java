@@ -47,6 +47,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     private DatabaseReference eventsRef;
     private FirebaseDatabase firebaseDatabase;
     private EventValueListener eventValueListener;
+    private String mQuery;
 
     public EventsFragment() {
         Log.d(LOGMESSAGE,"EventsFragment called") ;
@@ -110,36 +111,36 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     @Override
     public void onStart() {
         super.onStart();
-        initFirebase();
-        if(Factory.isNetworkAndInternetAvailableNow()){
-            if (eventRecycler != null && no_networkView != null ){
-                if(cacheEvent != null && cacheEvent.size()> 0){
+        Log.d(LOGMESSAGE, "onStart: isSearching is " + HomeScreenActivity.isSearching);
+
+            initFirebase();
+            if (Factory.isNetworkAndInternetAvailableNow()) {
+                if (eventRecycler != null && no_networkView != null) {
+                    if (cacheEvent != null && cacheEvent.size() > 0) {
+                        eventAdapter.setEvents(cacheEvent, false);
+                        eventRecycler.setAdapter(eventAdapter);
+                        no_networkView.setVisibility(View.GONE);
+                        eventRecycler.setVisibility(View.VISIBLE);
+                    } else {
+                        eventRecycler.setVisibility(View.GONE);
+                        no_networkView.setText("Loading Events...");
+                        no_networkView.setVisibility(View.VISIBLE);
+                    }
+                }
+            } else {
+                if (eventRecycler != null && no_networkView != null && cacheEvent != null && cacheEvent.size() > 0) {
                     eventAdapter.setEvents(cacheEvent, false);
                     eventRecycler.setAdapter(eventAdapter);
                     no_networkView.setVisibility(View.GONE);
                     eventRecycler.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
                     eventRecycler.setVisibility(View.GONE);
-                    no_networkView.setText("Loading Events...");
+                    no_networkView.setText(getString(R.string.no_connection));
                     no_networkView.setVisibility(View.VISIBLE);
                 }
             }
-        }
-        else
-        {
-            if (eventRecycler != null && no_networkView != null && cacheEvent != null && cacheEvent.size()> 0){
-                eventAdapter.setEvents(cacheEvent, false);
-                eventRecycler.setAdapter(eventAdapter);
-                no_networkView.setVisibility(View.GONE);
-                eventRecycler.setVisibility(View.VISIBLE);
-            }
-            else{
-                eventRecycler.setVisibility(View.GONE);
-                no_networkView.setText( getString(R.string.no_connection));
-                no_networkView.setVisibility(View.VISIBLE);
-            }
-        }
+
+
     }
     @Override
     public void onResume() {
@@ -181,6 +182,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
 
     @Override
     public ArrayList<Event> onSearch(String query) {
+        mQuery = query;
         Log.d(LOGMESSAGE, "onSearch: is called " + query);
         ArrayList<Event> filteredEvents = new ArrayList<>();
         for (Event e : cacheEvent) {
@@ -195,7 +197,6 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
             Log.d(LOGMESSAGE, "filteredEvents.size() : " + filteredEvents.size());
 
             if (filteredEvents.size() > 0) {
-
                 if (eventRecycler != null) {
                     eventAdapter.setEvents(filteredEvents, true);
                     eventRecycler.setAdapter(eventAdapter);
@@ -207,6 +208,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                 no_networkView.setText("NO EVENTS MATCH THE SEARCH");
                 no_networkView.setVisibility(View.VISIBLE);
             }
+
         }
 
         return null;
