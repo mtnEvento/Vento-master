@@ -170,7 +170,7 @@ public class Factory {
         public NetworkTask(HomeScreenActivity manager, InternetDataListenter internetDataListenter) {
             this.manager = manager ;
             this.internetDataListenter = internetDataListenter;
-            Log.d(LOGMESSAGE,"NetworkTask called :   ") ;
+           // Log.d(LOGMESSAGE,"NetworkTask called :   ") ;
         }
 
         public void stopNetworkTask() {
@@ -179,7 +179,7 @@ public class Factory {
 
         private void operate(){
 
-            Log.d(LOGMESSAGE,"NetworkTask runnable started :   ") ;
+          //  Log.d(LOGMESSAGE,"NetworkTask runnable started :   ") ;
             hasInternet = isNetworkAndInternetAvailable();
             if(hasInternet){
                 internetDataListenter.onInternetConnected();
@@ -253,7 +253,7 @@ public class Factory {
         ReservedSeatsTask reservedSeatsTask;
 
         public ReservedSeatsTask() {
-            Log.d(LOGMESSAGE, "ReservedSeatsTask called :  ");
+         //   Log.d(LOGMESSAGE, "ReservedSeatsTask called :  ");
         }
         @Override
         protected Void doInBackground(Void... params) {
@@ -288,7 +288,7 @@ public class Factory {
                     }catch (Exception e)
                     {
                        e.printStackTrace();
-                        Log.d(LOGMESSAGE,"ReservedSeatsTask Error :  "+e.fillInStackTrace(),e.getCause()) ;
+                      //  Log.d(LOGMESSAGE,"ReservedSeatsTask Error :  "+e.fillInStackTrace(),e.getCause()) ;
                     }
                 }
             };
@@ -310,7 +310,7 @@ public class Factory {
         public LoginLogoutTaskListener(HomeScreenActivity manager, UserLogInOrOutListenter userLogInOrOutListenter) {
             this.manager = manager ;
             this.userLogInOrOutListenter = userLogInOrOutListenter ;
-            Log.d(LOGMESSAGE,"LoginLogoutTaskListener called :   ") ;
+           // Log.d(LOGMESSAGE,"LoginLogoutTaskListener called :   ") ;
         }
 
         public void stopLoginLogoutTask() {
@@ -318,7 +318,7 @@ public class Factory {
         }
         private void operateUserLoginORLogout(){
 
-            Log.d(LOGMESSAGE,"userLogInOrOutListenter runnable started :   ") ;
+          //  Log.d(LOGMESSAGE,"userLogInOrOutListenter runnable started :   ") ;
 //             FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
 //                @Override
 //                public void onAuthStateChanged(FirebaseAuth firebaseAuth) {
@@ -356,7 +356,7 @@ public class Factory {
 
                         } catch (Exception e)
                         {
-                            Log.d(LOGMESSAGE, "userLogInOrOutListenter :   " + e.fillInStackTrace(), e.getCause());
+                          //  Log.d(LOGMESSAGE, "userLogInOrOutListenter :   " + e.fillInStackTrace(), e.getCause());
                             while (true)
                             {
 

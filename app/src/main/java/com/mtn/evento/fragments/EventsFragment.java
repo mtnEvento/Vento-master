@@ -178,8 +178,37 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         }
 
     }
+
     @Override
     public ArrayList<Event> onSearch(String query) {
+        Log.d(LOGMESSAGE, "onSearch: is called " + query);
+        ArrayList<Event> filteredEvents = new ArrayList<>();
+        for (Event e : cacheEvent) {
+            if( e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
+                filteredEvents.add(e);
+                Log.d(LOGMESSAGE, "filtered event added");
+            }
+        }
+
+        if (eventAdapter != null) {
+
+            Log.d(LOGMESSAGE, "filteredEvents.size() : " + filteredEvents.size());
+
+            if (filteredEvents.size() > 0) {
+
+                if (eventRecycler != null) {
+                    eventAdapter.setEvents(filteredEvents, true);
+                    eventRecycler.setAdapter(eventAdapter);
+                    eventRecycler.setVisibility(View.VISIBLE);
+                    no_networkView.setVisibility(View.GONE);
+                }
+            } else {
+                eventRecycler.setVisibility(View.GONE);
+                no_networkView.setText("NO EVENTS MATCH THE SEARCH");
+                no_networkView.setVisibility(View.VISIBLE);
+            }
+        }
+
         return null;
     }
     @Override
