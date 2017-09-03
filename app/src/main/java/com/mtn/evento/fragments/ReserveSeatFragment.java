@@ -310,7 +310,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                     JSONObject data = object.getJSONObject("data");
                     String transactionId = data.getString("TransactionId");
 
-                    if (transactionId != null && !transactionId.isEmpty()) {
+                    if (transactionId != null && !transactionId.isEmpty()) { //cvbfcvbv
 
                         HashMap<String, String> contentValue = new HashMap<>();
                         contentValue.put("TransactionId", transactionId);
