@@ -322,7 +322,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                             }
                         });
                     }
-
+    //
                     // List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
                     //((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
 
