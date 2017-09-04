@@ -73,6 +73,7 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
  * A simple {@link Fragment} subclass.
  */
 public class ReserveSeatFragment extends Fragment implements View.OnClickListener {
+    static String transactionId;
     Context context;
     MenuItem cartView;
     PaymentListener mPaymentListener;
@@ -82,7 +83,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private de.hdodenhof.circleimageview.CircleImageView event_image;
-    static String transactionId ;
 
 
     public ReserveSeatFragment() {
@@ -299,13 +299,33 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
     private void makePayment( final List<SinglePurchaseData> singlePurchaseData, String[] networkPossibleName) {
 
-       final ProgressDialog loading = ProgressDialog.show(context, "", "Processing payment ...", false, false, new DialogInterface.OnCancelListener() {
+        final ProgressDialog loading = ProgressDialog.show(context, "", "Please wait...\nProcessing payment ", false, false);
+        Runnable runnable = new Runnable() {
            @Override
-           public void onCancel(DialogInterface dialog) {
+           public void run() {
+               try {
+                   Log.d(LOGMESSAGE, "Payment stopper started");
+                   Thread.sleep(30 * 1000);
+                   ((AppCompatActivity) context).runOnUiThread(new Runnable() {
+                       @Override
+                       public void run() {
+                           if (loading != null) {
+                               loading.setCancelable(true);
+                               loading.hide();
+                           }
+                       }
+                   });
 
-               dialog.dismiss();
+                   Log.d(LOGMESSAGE, "Payment stopper ended");
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+                   Log.d(LOGMESSAGE, "InterruptedException : " + e);
+               }
            }
-       });
+        };
+        final Thread thread = new Thread(runnable);
+        //thread.setDaemon(true);
+
         HashMap<String,String> contentValue = new HashMap<>();
         contentValue.put("CustomerName","Daniel");
         contentValue.put("CustomerEmail", "prncfoli@gmail.com");
@@ -347,11 +367,13 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
                     JSONObject data = object.getJSONObject("data");
                     transactionId = data.getString("TransactionId");
+
                     Log.d(LOGMESSAGE, "result index2 TransactionId : " + transactionId);
 
                     if (transactionId != null && !transactionId.isEmpty()) { //cvbfcvbv
 
                         final Timer  t = new Timer();
+                        thread.start();
                         TimerTask task = new TimerTask() {
                             @Override
                             public void run() {
@@ -373,7 +395,10 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
                                             if (isReady)
                                             {
-                                                loading.dismiss();
+                                                if (loading != null) {
+                                                    loading.hide();
+                                                }
+
                                                if (object.getString("StatusCode").contentEquals("0000")){
                                                    Log.d(LOGMESSAGE, "Result 2: transaction is successful ");
                                                    List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
@@ -395,7 +420,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                             e.printStackTrace();
                                             Log.d(LOGMESSAGE, "Result 2:Error:  " + e);
                                             t.purge();t.cancel();
-                                            loading.dismiss();
+                                            loading.hide();
                                         }
 
                                     }
@@ -416,7 +441,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.d(LOGMESSAGE, "TransactionError : " + e);
-                    loading.dismiss();
+                    loading.hide();
                 }
             }
         }).connectToServer();
@@ -521,44 +546,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
     }
-    public interface PaymentListener{
-        void payed(String transactionId, boolean status, List<DisplayTicket> displayTickets);
-    }
-    private static class ReservationHolder {
-        String[] ticketCategories;
-        private FloatingActionButton menu_add, menu_remove;
-        private LinearLayout seats_group;
 
-        public ReservationHolder(View holder, View.OnClickListener onClickListener, Event event) {
-
-            ArrayList<Ticket> tickets = event.getTicket_type();
-            ArrayList<String> strTickets = new ArrayList<>();
-            for (Ticket ticket : tickets) {
-                strTickets.add(ticket.getName());
-            }
-            String[] types = new String[strTickets.size()];
-            for (int i = 0; i < strTickets.size(); i++) {
-                types[i] = strTickets.get(i).toUpperCase();
-            }
-
-            ticketCategories = types;
-            seats_group = (LinearLayout) holder.findViewById(R.id.seats_group);
-            menu_add = (FloatingActionButton) holder.findViewById(R.id.menu_add);
-            menu_add.setOnClickListener(onClickListener);
-            menu_remove = (FloatingActionButton) holder.findViewById(R.id.menu_remove);
-            menu_remove.setOnClickListener(onClickListener);
-            MaterialSpinner spinner = (MaterialSpinner) holder.findViewById(R.id.spinner);
-            spinner.setItems(ticketCategories);
-            spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
-
-                @Override
-                public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                    Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
-                }
-            });
-        }
-
-    }
     public  void alertPaymentMethod(final AppCompatActivity app,final ArrayList<SinglePurchaseData>singlePurchaseDataArrayList ){
 
         android.app.AlertDialog.Builder builder = null;
@@ -615,6 +603,46 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                     }
                 })
                 .show();
+    }
+
+    public interface PaymentListener {
+        void payed(String transactionId, boolean status, List<DisplayTicket> displayTickets);
+    }
+
+    private static class ReservationHolder {
+        String[] ticketCategories;
+        private FloatingActionButton menu_add, menu_remove;
+        private LinearLayout seats_group;
+
+        public ReservationHolder(View holder, View.OnClickListener onClickListener, Event event) {
+
+            ArrayList<Ticket> tickets = event.getTicket_type();
+            ArrayList<String> strTickets = new ArrayList<>();
+            for (Ticket ticket : tickets) {
+                strTickets.add(ticket.getName());
+            }
+            String[] types = new String[strTickets.size()];
+            for (int i = 0; i < strTickets.size(); i++) {
+                types[i] = strTickets.get(i).toUpperCase();
+            }
+
+            ticketCategories = types;
+            seats_group = (LinearLayout) holder.findViewById(R.id.seats_group);
+            menu_add = (FloatingActionButton) holder.findViewById(R.id.menu_add);
+            menu_add.setOnClickListener(onClickListener);
+            menu_remove = (FloatingActionButton) holder.findViewById(R.id.menu_remove);
+            menu_remove.setOnClickListener(onClickListener);
+            MaterialSpinner spinner = (MaterialSpinner) holder.findViewById(R.id.spinner);
+            spinner.setItems(ticketCategories);
+            spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+                @Override
+                public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                    Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+                }
+            });
+        }
+
     }
 
 
