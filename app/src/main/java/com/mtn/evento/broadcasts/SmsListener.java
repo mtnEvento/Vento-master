@@ -10,12 +10,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.support.v4.app.ActivityCompat;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
 import android.telephony.SmsManager;
 import android.telephony.gsm.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.mtn.evento.TelephonyInfo;
+
+import java.util.List;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.mtn.evento.TelephonyInfo.getOutput;
@@ -26,6 +30,26 @@ import static com.mtn.evento.TelephonyInfo.getOutput;
  */
 
 public class SmsListener extends BroadcastReceiver {
+
+    private final static String simSlotName[] = {
+            "extra_asus_dial_use_dualsim",
+            "com.android.phone.extra.slot",
+            "slot",
+            "simslot",
+            "sim_slot",
+            "subscription",
+            "Subscription",
+            "phone",
+            "com.android.phone.DialingMode",
+            "simSlot",
+            "slot_id",
+            "simId",
+            "simnum",
+            "phone_type",
+            "slotId",
+            "slotIdx",
+            "com.mediatek.common.telephony.IOnlyOwnerSimSupport"
+    };
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -59,32 +83,143 @@ public class SmsListener extends BroadcastReceiver {
                                 return;
                             }
 
+
+
                             TelephonyInfo info = TelephonyInfo.getInstance(context);
                             if(info.isDualSIM()){
+                                TelephonyInfo telephonyInfo = TelephonyInfo.getInstance(context);
+                                TelecomManager telecomManager = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+                                List<PhoneAccountHandle> phoneAccountHandleList = null;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                                        return;
+                                    }
+                                    phoneAccountHandleList = telecomManager.getCallCapablePhoneAccounts();
+                                }
+                                ussdIntent.putExtra("com.android.phone.force.slot", true);
+                                ussdIntent.putExtra("Cdma_Supp", true);
 
-//                                if (getOutput(context, "SimOperatorName", 1).toLowerCase() .contains(simOperatorPossibleNames[0].toLowerCase())
-//                                        || getOutput
-//                                        (context, "SimOperatorName", 1) .toLowerCase().contains(simOperatorPossibleNames[1].toLowerCase())
-//                                        || getOutput
-//                                        (context, "SimOperatorName", 1).toLowerCase() .contains(simOperatorPossibleNames[2].toLowerCase()))
-//                                {
-//                                    //SIM1 : 1
-//
-//
-//                                    Toast.makeText(context,"NUMBER PORTING REQUEST SENT!",Toast.LENGTH_LONG).show();
-//                                }
-//                                else if(getOutput(context, "SimOperatorName", 2).toLowerCase() .contains
-//                                        (simOperatorPossibleNames[0].toLowerCase())
-//                                        || getOutput
-//                                        (context, "SimOperatorName", 2).toLowerCase() .contains(simOperatorPossibleNames[1].toLowerCase())
-//                                        || getOutput
-//                                        (context, "SimOperatorName", 2).toLowerCase() .contains(simOperatorPossibleNames[2].toLowerCase()))
-//                                {
-//                                    // SIM2 : 2
-//
-//
-//                                    Toast.makeText(context,"NUMBER PORTING REQUEST SENT!",Toast.LENGTH_LONG).show();
-//                                }
+                                if (getOutput(context, "SimOperatorName", 1).toLowerCase() .contains("mtn"))
+
+                                {
+                                    //SIM1 : 1
+                                    for (String s : simSlotName) {
+                                        ussdIntent.putExtra(s, 0);
+                                    }
+                                    if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                        {
+                                            ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(0));
+                                        }
+                                    }
+                                    context.startActivity(ussdIntent);
+                                }
+                                else if(getOutput(context, "SimOperatorName", 2).toLowerCase() .contains("mtn".toLowerCase()))
+                                {
+                                    // SIM2 : 2
+                                    for (String s : simSlotName) {
+                                        ussdIntent.putExtra(s, 1);
+                                    }
+                                    if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                        {
+                                            ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(1));
+                                        }
+                                    }
+                                    context.startActivity(ussdIntent);
+                                }
+
+
+                                if (getOutput(context, "SimOperatorName", 1).toLowerCase() .contains("tigo"))
+
+                                {
+                                    //SIM1 : 1
+                                    for (String s : simSlotName) {
+                                        ussdIntent.putExtra(s, 0);
+                                    }
+                                    if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                        {
+                                            ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(0));
+                                        }
+                                    }
+                                    context.startActivity(ussdIntent);
+
+                                }
+                                else if(getOutput(context, "SimOperatorName", 2).toLowerCase() .contains("tigo".toLowerCase()))
+                                {
+                                    // SIM2 : 2
+                                    for (String s : simSlotName) {
+                                        ussdIntent.putExtra(s, 1);
+                                    }
+                                    if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                        {
+                                            ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(1));
+                                        }
+                                    }
+                                    context.startActivity(ussdIntent);
+                                }
+
+                                if (getOutput(context, "SimOperatorName", 1).toLowerCase() .contains("airtel"))
+
+                                {
+                                    //SIM1 : 1
+                                    for (String s : simSlotName) {
+                                        ussdIntent.putExtra(s, 0);
+                                    }
+                                    if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                        {
+                                            ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(0));
+                                        }
+                                    }
+                                    context.startActivity(ussdIntent);
+
+
+                                }
+                                else if(getOutput(context, "SimOperatorName", 2).toLowerCase() .contains("airtel".toLowerCase()))
+                                {
+                                    // SIM2 : 2
+                                    for (String s : simSlotName) {
+                                        ussdIntent.putExtra(s, 1);
+                                    }
+                                    if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                        {
+                                            ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(1));
+                                        }
+                                    }
+
+                                }
+
+                                if (getOutput(context, "SimOperatorName", 1).toLowerCase() .contains("vodafone"))
+
+                                {
+                                    for (String s : simSlotName) {
+                                        ussdIntent.putExtra(s, 0);
+                                    }
+                                    if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                        {
+                                            ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(0));
+                                        }
+                                    }
+                                    context.startActivity(ussdIntent);
+
+                                }
+                                else if(getOutput(context, "SimOperatorName", 2).toLowerCase() .contains("vodafone".toLowerCase()))
+                                {
+                                    for (String s : simSlotName) {
+                                        ussdIntent.putExtra(s, 1);
+                                    }
+                                    if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                        {
+                                            ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(1));
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
@@ -128,7 +263,149 @@ public class SmsListener extends BroadcastReceiver {
                                         // for ActivityCompat#requestPermissions for more details.
                                         return;
                                     }
-                                    context.startActivity(ussdIntent);
+                                    TelephonyInfo telephonyInfo = TelephonyInfo.getInstance(context);
+                                    TelecomManager telecomManager = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+                                    List<PhoneAccountHandle> phoneAccountHandleList = null;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                                            return;
+                                        }
+                                        phoneAccountHandleList = telecomManager.getCallCapablePhoneAccounts();
+                                    }
+
+
+                                    TelephonyInfo info = TelephonyInfo.getInstance(context);
+                                    if(info.isDualSIM()){
+                                        ussdIntent.putExtra("com.android.phone.force.slot", true);
+                                        ussdIntent.putExtra("Cdma_Supp", true);
+
+                                        if (getOutput(context, "SimOperatorName", 1).toLowerCase() .contains("mtn"))
+
+                                        {
+                                            //SIM1 : 1
+                                            for (String s : simSlotName) {
+                                                ussdIntent.putExtra(s, 0);
+                                            }
+                                            if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                                {
+                                                    ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(0));
+                                                }
+                                            }
+                                            context.startActivity(ussdIntent);
+                                        }
+                                        else if(getOutput(context, "SimOperatorName", 2).toLowerCase() .contains("mtn".toLowerCase()))
+                                        {
+                                            // SIM2 : 2
+                                            for (String s : simSlotName) {
+                                                ussdIntent.putExtra(s, 1);
+                                            }
+                                            if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                                {
+                                                    ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(1));
+                                                }
+                                            }
+                                            context.startActivity(ussdIntent);
+                                        }
+
+
+                                        if (getOutput(context, "SimOperatorName", 1).toLowerCase() .contains("tigo"))
+
+                                        {
+                                            //SIM1 : 1
+                                            for (String s : simSlotName) {
+                                                ussdIntent.putExtra(s, 0);
+                                            }
+                                            if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                                {
+                                                    ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(0));
+                                                }
+                                            }
+                                            context.startActivity(ussdIntent);
+
+                                        }
+                                        else if(getOutput(context, "SimOperatorName", 2).toLowerCase() .contains("tigo".toLowerCase()))
+                                        {
+                                            // SIM2 : 2
+                                            for (String s : simSlotName) {
+                                                ussdIntent.putExtra(s, 1);
+                                            }
+                                            if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                                {
+                                                    ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(1));
+                                                }
+                                            }
+                                            context.startActivity(ussdIntent);
+                                        }
+
+                                        if (getOutput(context, "SimOperatorName", 1).toLowerCase() .contains("airtel"))
+
+                                        {
+                                            //SIM1 : 1
+                                            for (String s : simSlotName) {
+                                                ussdIntent.putExtra(s, 0);
+                                            }
+                                            if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                                {
+                                                    ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(0));
+                                                }
+                                            }
+                                            context.startActivity(ussdIntent);
+
+
+                                        }
+                                        else if(getOutput(context, "SimOperatorName", 2).toLowerCase() .contains("airtel".toLowerCase()))
+                                        {
+                                            // SIM2 : 2
+                                            for (String s : simSlotName) {
+                                                ussdIntent.putExtra(s, 1);
+                                            }
+                                            if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                                {
+                                                    ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(1));
+                                                }
+                                            }
+
+                                        }
+
+                                        if (getOutput(context, "SimOperatorName", 1).toLowerCase() .contains("vodafone"))
+
+                                        {
+                                            for (String s : simSlotName) {
+                                                ussdIntent.putExtra(s, 0);
+                                            }
+                                            if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                                {
+                                                    ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(0));
+                                                }
+                                            }
+                                            context.startActivity(ussdIntent);
+
+                                        }
+                                        else if(getOutput(context, "SimOperatorName", 2).toLowerCase() .contains("vodafone".toLowerCase()))
+                                        {
+                                            for (String s : simSlotName) {
+                                                ussdIntent.putExtra(s, 1);
+                                            }
+                                            if (phoneAccountHandleList != null && phoneAccountHandleList.size() > 0){
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                                                {
+                                                    ussdIntent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", phoneAccountHandleList.get(1));
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        context.startActivity(ussdIntent);
+                                    }
+
                                 }
                             }
                         }
