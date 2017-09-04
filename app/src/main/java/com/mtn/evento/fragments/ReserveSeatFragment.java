@@ -12,6 +12,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -83,6 +84,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private de.hdodenhof.circleimageview.CircleImageView event_image;
+    ProgressDialog loading;
 
 
     public ReserveSeatFragment() {
@@ -296,35 +298,43 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         };
     }
 
-
     private void makePayment( final List<SinglePurchaseData> singlePurchaseData, String[] networkPossibleName) {
-
-        final ProgressDialog loading = ProgressDialog.show(context, "", "Please wait...\nProcessing payment ", false, false);
+        final Handler h2 = new Handler();
+        loading = ProgressDialog.show(context, "", "Please wait...\n\nTrying to Contact Network Operator. This may take about 15secs ...", false, false);
         Runnable runnable = new Runnable() {
-           @Override
-           public void run() {
-               try {
-                   Log.d(LOGMESSAGE, "Payment stopper started");
-                   Thread.sleep(30 * 1000);
-                   ((AppCompatActivity) context).runOnUiThread(new Runnable() {
-                       @Override
-                       public void run() {
-                           if (loading != null) {
-                               loading.setCancelable(true);
-                               loading.hide();
-                           }
-                       }
-                   });
+            @Override
+            public void run() {
+                Log.d(LOGMESSAGE, "Payment 1 stopper started");
+                ((AppCompatActivity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (loading != null) {
 
-                   Log.d(LOGMESSAGE, "Payment stopper ended");
-               } catch (InterruptedException e) {
-                   e.printStackTrace();
-                   Log.d(LOGMESSAGE, "InterruptedException : " + e);
-               }
-           }
+                            loading.setCancelable(true);
+                            loading.setMessage("Failure in network...");
+                            Log.d(LOGMESSAGE, "Payment 1 setCancelable true");
+                            Runnable r2 = new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(loading != null){
+                                        loading.hide();
+                                    }
+                                }
+                            };
+                            h2.postDelayed(r2,50000);
+                        }
+                    }
+                });
+
+                Log.d(LOGMESSAGE, "Payment 1 stopper ended");
+            }
         };
-        final Thread thread = new Thread(runnable);
-        //thread.setDaemon(true);
+
+
+        final Handler handler = new Handler();
+        handler.postDelayed(runnable,30000);
+
+        final Handler h = new Handler();
 
         HashMap<String,String> contentValue = new HashMap<>();
         contentValue.put("CustomerName","Daniel");
@@ -373,10 +383,40 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                     if (transactionId != null && !transactionId.isEmpty()) { //cvbfcvbv
 
                         final Timer  t = new Timer();
-                        thread.start();
+                        Runnable runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.d(LOGMESSAGE, "Payment stopper started");
+                                ((AppCompatActivity) context).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (loading != null) {
+                                            loading.setCancelable(true);
+                                            loading.hide();
+                                            Log.d(LOGMESSAGE, "Payment setCancelable true");
+                                        }
+                                    }
+                                });
+
+                                Log.d(LOGMESSAGE, "Payment stopper ended");
+                            }
+                        };
+                        final Handler handler = new Handler();
+                        handler.postDelayed(runnable,15000);
                         TimerTask task = new TimerTask() {
                             @Override
                             public void run() {
+
+                                if(loading != null){
+
+                                    h.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            loading.setMessage("Payment Processing started");
+                                        }
+                                    });
+                                }
+
                                 Log.d(LOGMESSAGE, "result index2 TransactionId run: " + transactionId);
                                 HashMap<String, String> contentValue = new HashMap<>();
                                 contentValue.put("TransactionId", transactionId);
@@ -398,7 +438,11 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                                 if (loading != null) {
                                                     loading.hide();
                                                 }
+                                                if(t != null){
+                                                   t.cancel();
+                                                   t.purge();
 
+                                                }
                                                if (object.getString("StatusCode").contentEquals("0000")){
                                                    Log.d(LOGMESSAGE, "Result 2: transaction is successful ");
                                                    List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
@@ -410,16 +454,12 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                                    Log.d(LOGMESSAGE, "Result 2: transaction is failed -- Reason ::  "+object.getString("Description"));
                                                    Toast.makeText(ReserveSeatFragment.this.context,""+object.getString("Description"),Toast.LENGTH_LONG).show();
                                                }
-
-                                               t.purge();t.cancel();
-
-
                                             }
 
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                             Log.d(LOGMESSAGE, "Result 2:Error:  " + e);
-                                            t.purge();t.cancel();
+                                            t.cancel(); t.purge();
                                             loading.hide();
                                         }
 
@@ -428,8 +468,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                             }
                         };
                         if (t != null){
-                            t.scheduleAtFixedRate(task,1000,2000);
-
+                            t.schedule(task,1000,2000);
                         }
 
 
