@@ -343,7 +343,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
         if(networkPossibleName[0].contains("MTN")){
             contentValue.put("Channel", "mtn-gh");
-            contentValue.put("CustomerMsisdn", "233541243508");
+            contentValue.put("CustomerMsisdn", "233241994733"); //541243508
         }
         else
         if(networkPossibleName[0].contains("TIGO")){
@@ -353,10 +353,12 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         else
         if(networkPossibleName[0].contains("AIRTEL")){
             contentValue.put("Channel", "airtel-gh");
+            contentValue.put("CustomerMsisdn", "233572636005");
         }
         else
         if(networkPossibleName[0].contains("VODAFONE")){
             contentValue.put("Channel", "vodafone-gh");
+
         }
 
         contentValue.put("Amount","1");
