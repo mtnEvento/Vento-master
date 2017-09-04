@@ -40,8 +40,11 @@ import com.github.clans.fab.FloatingActionButton;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mtn.evento.Evento;
 import com.mtn.evento.Payment;
@@ -444,16 +447,24 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                                    t.purge();
 
                                                 }
-                                               if (object.getString("StatusCode").contentEquals("0000")){
+                                               if (!object.getString("StatusCode").contentEquals("0000")){
                                                    Log.d(LOGMESSAGE, "Result 2: transaction is successful ");
-                                                   List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
+                                                   final List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
                                                    ((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
                                                    Toast.makeText(ReserveSeatFragment.this.context,""+object.getString("Description"),Toast.LENGTH_LONG).show();
+
+//                                                   todo swap not back
+
+
                                                }
                                                else
-                                               if (!object.getString("StatusCode").contentEquals("0000")){
+                                               if (object.getString("StatusCode").contentEquals("0000")){
                                                    Log.d(LOGMESSAGE, "Result 2: transaction is failed -- Reason ::  "+object.getString("Description"));
-                                                   Toast.makeText(ReserveSeatFragment.this.context,""+object.getString("Description"),Toast.LENGTH_LONG).show();
+                                                   //Toast.makeText(ReserveSeatFragment.this.context,""+object.getString("Description"),Toast.LENGTH_LONG).show();
+// todo                                             to be removed
+
+
+
                                                }
                                             }
 
@@ -468,9 +479,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                 }).connectToServer();;
                             }
                         };
-                        if (t != null){
-                            t.schedule(task,1000,2000);
-                        }
+                        t.schedule(task,1000,2000);
 
 
                     }
@@ -507,7 +516,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         EncodeData.getInstance();
         List<DisplayTicket> displayTickets = new ArrayList<>();
         String transId = System.currentTimeMillis()+""+ (new Random().nextInt()) * 100000 ;
-        for (SinglePurchaseData purchaseData: singlePurchaseData ) {
+        for (final SinglePurchaseData purchaseData: singlePurchaseData ) {
 
             int qty = Integer.parseInt(purchaseData.getQuantity());
 
@@ -530,6 +539,31 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 Log.d(LOGMESSAGE," path:  "+mEvent.getEvent_id()+ "  "+FirebaseAuth.getInstance().getCurrentUser().getUid() +  "  "+secret);
                 //TODO : update available seat
                 // mDatabase.child(mEvent.getEvent_id())
+
+                mDatabase.child(mEvent.getEvent_id()).child("ticket_type").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(LOGMESSAGE, "onDataChange: called ");
+                        for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                            Ticket ticket = snapshot.getValue(Ticket.class);
+                            Log.d(LOGMESSAGE, "onDataChange: ticket is " + ticket);
+                            if(ticket != null) {
+                                if(purchaseData.getType().equals(ticket.getName())){
+                                    int result = Integer.parseInt(ticket.getAvailable_seats()) - 1;
+                                    Log.d(LOGMESSAGE, "onDataChange: result after subtraction : " + result);
+//                                    todo subtract from total seat
+                                    mDatabase.child(mEvent.getEvent_id()).child("ticket_type").child(snapshot.getKey()).setValue(ticket.getName(),result);
+
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
 
 
