@@ -1,5 +1,6 @@
 package com.mtn.evento.activities;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -51,6 +52,7 @@ import com.mtn.evento.Evento;
 import com.mtn.evento.Factory;
 import com.mtn.evento.R;
 import com.mtn.evento.adapters.CMPagerAdapter;
+import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
 import com.mtn.evento.data.ResultSet;
 import com.mtn.evento.fragments.EventsFragment;
@@ -97,6 +99,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     private Factory.InternetDataListenter reservedSeatInternetDataListenter;
     private Factory.ReservedSeatsDataAvailableListener reservedSeatsDataAvailableListener;
     private Factory.InternetDataListenter  profileInternetDataListenter;
+    public static boolean isSearching = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,9 +112,19 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
         }
+
+        //handleIntent(getIntent());
+
+        Log.d(LOGMESSAGE, "onCreate: isSearching : " + isSearching);
         initTabs();
         initUI(mTabs);
         initSetting();
+
+
+
+        mFactory = new Factory(HomeScreenActivity.this);
+        Log.d(LOGMESSAGE, "onCreate: is called");
+
     }
 
     @Override
@@ -125,6 +138,27 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
         spinner.setOnItemSelectedListener(spinnerItemSelected());
+
+        // Associate searchable configuration with the SearchView
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(searchRequestListener != null){
+                    searchRequestListener.onSearch(newText.toLowerCase());
+                }
+               // Toast.makeText(HomeScreenActivity.this, newText, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -137,6 +171,21 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         return super.onOptionsItemSelected(item);
     }
+
+    //    handle search intent
+    private void handleIntent(Intent intent) {
+
+        Log.d(LOGMESSAGE, "handleIntent: is called");
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            isSearching = true;
+            Log.d(LOGMESSAGE, "handleIntent: issearching : " + isSearching);
+
+
+            //use the query to search your data somehow
+        }
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -196,8 +245,10 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(regionRequestListener != null){
+                    regionRequestListener.onRegionSearch(regions[position].toLowerCase(), viewPager);
+                }
 
-                regionRequestListener.onRegionSearch(regions[position].toLowerCase(), viewPager);
 
             }
 
@@ -212,7 +263,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
     protected void onStart() {
         super.onStart();
         Log.d(LOGMESSAGE, "HomeScreenActivity onStart called ");
-        mFactory = new Factory(HomeScreenActivity.this);
+
     }
 
     @Override
@@ -220,12 +271,12 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         Log.d(LOGMESSAGE, "HomeScreenActivity onResume called");
         super.onResume();
         if (mFactory != null) {
-            Log.d(LOGMESSAGE, "HomeScreenActivity onResume called mFactory != null");
+         //   Log.d(LOGMESSAGE, "HomeScreenActivity onResume called mFactory != null");
             mFactory.runReservedSeatsTasksOnInternetAvailable();
             mFactory.runNetworkTask();
             mFactory.runLoginLogoutTask();
         } else {
-            Log.d(LOGMESSAGE, "HomeScreenActivity onResume called mFactory == null");
+          //  Log.d(LOGMESSAGE, "HomeScreenActivity onResume called mFactory == null");
             mFactory = new Factory(HomeScreenActivity.this);
             if (mFactory != null) {
                 mFactory.runReservedSeatsTasksOnInternetAvailable();
@@ -233,6 +284,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                 mFactory.runLoginLogoutTask();
             }
         }
+
     }
 
     @Override
@@ -341,7 +393,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
     @Override
     public void onInternetConnected() {
-        Log.d(LOGMESSAGE, "HomeScreenActivity onInternetConnected called");
+      //  Log.d(LOGMESSAGE, "HomeScreenActivity onInternetConnected called");
 
         if (mFactory != null) {
             if (HomeScreenActivity.this.eventInternetDataListenter != null) {
@@ -358,7 +410,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
     @Override
     public void onInternetDisconnected() {
-        Log.d(LOGMESSAGE, "HomeScreenActivity onInternetDisconnected called");
+      //  Log.d(LOGMESSAGE, "HomeScreenActivity onInternetDisconnected called");
         if (mFactory != null) {
             if (HomeScreenActivity.this.eventInternetDataListenter != null) {
                 HomeScreenActivity.this.eventInternetDataListenter.onInternetDisconnected();
@@ -457,6 +509,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         tabLayout.addTab(tabLayout.newTab().setText("Events"));
         tabLayout.addTab(tabLayout.newTab().setText("Reserved"));
         tabLayout.addTab(tabLayout.newTab().setText("Profile"));
+
 
         viewPager = (ViewPager) findViewById(R.id.pager);
 

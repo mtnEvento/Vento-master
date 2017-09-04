@@ -25,7 +25,11 @@ android {
         }
         debug
                 {
+<<<<<<< HEAD
                   //  minifyEnabled true
+=======
+                   // minifyEnabled true
+>>>>>>> 430656608ffb350c3fc6f2e8a5fd5f19fde07e57
                     proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 }
     }
