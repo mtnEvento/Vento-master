@@ -186,7 +186,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                  LinearLayout layout = (LinearLayout) crd.getChildAt(0);
 
                                  MaterialSpinner spiner = (MaterialSpinner) layout.getChildAt(0);
-                               String typeName = holder.ticketCategories[spiner.getSelectedIndex()].toUpperCase();
+                                 String typeName = holder.ticketCategories[spiner.getSelectedIndex()].toUpperCase();
                                  ArrayList<Ticket>   tickets  =  mEvent.getTicket_type();
                                  ArrayList<String>   strTickets  = new ArrayList<>();
                                  for (Ticket  ticket : tickets  )
@@ -245,7 +245,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
         builder.create().show();
     }
-
     private DialogInterface.OnClickListener confirmListener(final ArrayList<SinglePurchaseData> singlePurchaseDataArrayList) {
         return new DialogInterface.OnClickListener() {
             @Override
@@ -587,7 +586,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
     }
-
     public  void alertPaymentMethod(final AppCompatActivity app,final ArrayList<SinglePurchaseData>singlePurchaseDataArrayList ){
 
         android.app.AlertDialog.Builder builder = null;
@@ -645,11 +643,9 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 })
                 .show();
     }
-
     public interface PaymentListener {
         void payed(String transactionId, boolean status, List<DisplayTicket> displayTickets);
     }
-
     private static class ReservationHolder {
         String[] ticketCategories;
         private FloatingActionButton menu_add, menu_remove;
@@ -685,6 +681,4 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         }
 
     }
-
-
 }
