@@ -13,4 +13,10 @@
         <item>Upper West</item>
         <item>Upper East</item>
     </string-array>
+    <string-array name="choices" >
+        <item>MTN MOBILE MONEY</item>
+        <item>TIGO CASH</item>
+        <item>AIRTEL MONEY</item>
+        <item>VODAFONE CASH</item>
+    </string-array>
 </resources>

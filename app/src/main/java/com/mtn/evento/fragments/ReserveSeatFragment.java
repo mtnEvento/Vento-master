@@ -2,12 +2,14 @@ package com.mtn.evento.fragments;
 
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -15,6 +17,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
@@ -42,6 +45,7 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mtn.evento.Evento;
 import com.mtn.evento.Payment;
 import com.mtn.evento.R;
+import com.mtn.evento.TelephonyInfo;
 import com.mtn.evento.activities.BarcodeActivity;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.DisplayTicket;
@@ -60,6 +64,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
@@ -76,11 +82,13 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private de.hdodenhof.circleimageview.CircleImageView event_image;
+    static String transactionId ;
 
 
     public ReserveSeatFragment() {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
     }
 
 
@@ -155,6 +163,8 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 break;
 
             case R.id.makePayment:
+
+
                 childs = holder.seats_group.getChildCount();
                 int errrorCount = 0  ;
                 String amount = "";
@@ -243,7 +253,9 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                         if(isNetworkAndInternetAvailable()){
                             if(mAuth != null && mAuth.getCurrentUser() != null)
                             {
-                                makePayment(singlePurchaseDataArrayList);
+
+                                alertPaymentMethod((AppCompatActivity) context,singlePurchaseDataArrayList );
+
                             }
                             else
                             {
@@ -285,51 +297,126 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     }
 
 
-    private void makePayment( final List<SinglePurchaseData> singlePurchaseData) {
+    private void makePayment( final List<SinglePurchaseData> singlePurchaseData, String[] networkPossibleName) {
 
+       final ProgressDialog loading = ProgressDialog.show(context, "", "Processing payment ...", false, false, new DialogInterface.OnCancelListener() {
+           @Override
+           public void onCancel(DialogInterface dialog) {
+
+               dialog.dismiss();
+           }
+       });
         HashMap<String,String> contentValue = new HashMap<>();
         contentValue.put("CustomerName","Daniel");
-        contentValue.put("CustomerMsisdn", "0274320517");//233541243508//233541243508
         contentValue.put("CustomerEmail", "prncfoli@gmail.com");
-        contentValue.put("Channel", "tigo-gh");
+
+
+        if(networkPossibleName[0].contains("MTN")){
+            contentValue.put("Channel", "mtn-gh");
+            contentValue.put("CustomerMsisdn", "233541243508");
+        }
+        else
+        if(networkPossibleName[0].contains("TIGO")){
+            contentValue.put("Channel", "tigo-gh");
+            contentValue.put("CustomerMsisdn", "0274320517");
+        }
+        else
+        if(networkPossibleName[0].contains("AIRTEL")){
+            contentValue.put("Channel", "airtel-gh");
+        }
+        else
+        if(networkPossibleName[0].contains("VODAFONE")){
+            contentValue.put("Channel", "vodafone-gh");
+        }
+
         contentValue.put("Amount","1");
         contentValue.put("Description", "Ticket");
         contentValue.put("PrimaryCallbackUrl", "https://www.crust-media.com/callback/index.php");
 
-        String url = "https://www.crust-media.com/callback/index2.php";
+        final String url = "https://www.crust-media.com/callback/index2.php";
         ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
             @Override
             public void getResult(String result) {
-                Log.d(LOGMESSAGE, "result: " + result);
+                Log.d(LOGMESSAGE, "result index2 : " + result);
                 if (result == null || result.isEmpty()) {
                     return;
                 }
-                Log.d(LOGMESSAGE, "getResult: " + result);
+                Log.d(LOGMESSAGE, "result index2 : " + result);
                 try {
                     JSONObject object = new JSONObject(result);
+
                     JSONObject data = object.getJSONObject("data");
-                    String transactionId = data.getString("TransactionId");
+                    transactionId = data.getString("TransactionId");
+                    Log.d(LOGMESSAGE, "result index2 TransactionId : " + transactionId);
 
                     if (transactionId != null && !transactionId.isEmpty()) { //cvbfcvbv
 
-                        HashMap<String, String> contentValue = new HashMap<>();
-                        contentValue.put("TransactionId", transactionId);
-                        String url = "https://www.crust-media.com/callback/index.php";
-                        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
+                        final Timer  t = new Timer();
+                        TimerTask task = new TimerTask() {
                             @Override
-                            public void getResult(String result) {
-                                Log.d(LOGMESSAGE, "Result 2: " + result);
+                            public void run() {
+                                Log.d(LOGMESSAGE, "result index2 TransactionId run: " + transactionId);
+                                HashMap<String, String> contentValue = new HashMap<>();
+                                contentValue.put("TransactionId", transactionId);
+                                final String url = "https://www.crust-media.com/callback/feedback.php";
+                                ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
+                                    @Override
+                                    public void getResult(String mResult) {
+                                        Log.d(LOGMESSAGE, "Result 2 feedback: " + mResult);
+                                        if (mResult == null || mResult.isEmpty()) {
+                                            return;
+                                        }
+                                        try
+                                        {
+                                            JSONObject object = new JSONObject(mResult);
+                                            boolean isReady = object.getBoolean("ready");
+
+                                            if (isReady)
+                                            {
+                                                loading.dismiss();
+                                               if (object.getString("StatusCode").contentEquals("0000")){
+                                                   Log.d(LOGMESSAGE, "Result 2: transaction is successful ");
+                                                   List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
+                                                   ((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
+                                                   Toast.makeText(ReserveSeatFragment.this.context,""+object.getString("Description"),Toast.LENGTH_LONG).show();
+                                               }
+                                               else
+                                               if (!object.getString("StatusCode").contentEquals("0000")){
+                                                   Log.d(LOGMESSAGE, "Result 2: transaction is failed -- Reason ::  "+object.getString("Description"));
+                                                   Toast.makeText(ReserveSeatFragment.this.context,""+object.getString("Description"),Toast.LENGTH_LONG).show();
+                                               }
+
+                                               t.purge();t.cancel();
+
+
+                                            }
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                            Log.d(LOGMESSAGE, "Result 2:Error:  " + e);
+                                            t.purge();t.cancel();
+                                            loading.dismiss();
+                                        }
+
+                                    }
+                                }).connectToServer();;
                             }
-                        });
+                        };
+                        if (t != null){
+                            t.scheduleAtFixedRate(task,1000,2000);
+
+                        }
+
+
                     }
     //
-                    // List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
-                    //((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
+
 
                     Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.d(LOGMESSAGE, "TransactionError : " + e);
+                    loading.dismiss();
                 }
             }
         }).connectToServer();
@@ -350,7 +437,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
 
     }
-
     private List<DisplayTicket> processPayment(final List<SinglePurchaseData> singlePurchaseData){
         //TODO  add all purchased tickets to list of DisplayTicket object
         EncodeData.getInstance();
@@ -393,7 +479,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         super.onAttach(context);
         this.context = context ;
     }
-
     public void setCallback(PaymentListener paymentListener) {
         mPaymentListener = paymentListener;
     }
@@ -473,6 +558,63 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
             });
         }
 
+    }
+    public  void alertPaymentMethod(final AppCompatActivity app,final ArrayList<SinglePurchaseData>singlePurchaseDataArrayList ){
+
+        android.app.AlertDialog.Builder builder = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            builder = new android.app.AlertDialog.Builder(app, R.style.AppTheme_Alert);
+        }
+        else
+        {
+            builder = new android.app.AlertDialog.Builder(app);
+        }
+
+        // Set the dialog title
+        builder.setTitle("Select Payment Method")
+
+                // specify the list array, the items to be selected by default (null for none),
+                // and the listener through which to receive call backs when items are selected
+                // again, R.array.choices were set in the resources res/values/strings.xml
+                .setSingleChoiceItems(R.array.choices, -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int selectedPosition) {
+
+                        switch (selectedPosition){
+                            case 0 :
+
+                                makePayment(singlePurchaseDataArrayList,new String[]{"MTN","MTN GH","MTN-GH","MTN GHANA"});
+                                break;
+                            case 1:
+                                makePayment(singlePurchaseDataArrayList,new String[]{"TIGO","TIGO GH","TIGO-GH","TIGO GHANA"});
+                                break;
+                            case 2:
+                                makePayment(singlePurchaseDataArrayList,new String[]{"AIRTEL","AIRTEL GH","AIRTEL-GH","AIRTEL GHANA"});
+                                break;
+                            case 3:
+                                makePayment(singlePurchaseDataArrayList,new String[]{"VODAFONE","VODAFONE GH","VODAFONE-GH","VODAFONE GHANA"});
+                                break;
+                            case 4:
+                                // alertScrollView(app,"This services not available for Glo " +
+                                //       "network","SERVICE NOT AVAILABLE");
+
+                                break;
+                            default:
+                                Toast.makeText( app.getApplicationContext(), "No Selected " +
+                                        "Network", Toast.LENGTH_SHORT ).show();
+                                break;
+                        }
+                        arg0.cancel();
+                    }
+                })
+
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // removes the dialog from the screen
+                    }
+                })
+                .show();
     }
 
 
