@@ -128,24 +128,14 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                 case APP_LOGIN:
 
                     if(reservedEventsAdapter != null && reservedRecycler != null){
-
-                        reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
                         if(reservedEvents != null){
-                           // reservedRecycler.removeAllViews();
-                            reservedEventsAdapter.setReservedEvents(reservedEvents);
-                            reservedRecycler.setAdapter(reservedEventsAdapter);
-                            //reservedRecycler.invalidate();
                             reservedRecycler.setVisibility(View.VISIBLE);
                             errorHandler.setVisibility(View.GONE);
                         }
-
                     }
-
                     return true;
                 case APP_LOGOUT :
                     if(reservedEventsAdapter != null && reservedRecycler != null){
-                        //reservedRecycler.removeAllViews();
-                       // reservedRecycler.invalidate();
                         reservedRecycler.setVisibility(View.GONE);
                         errorHandler.setText(R.string.not_logged_in);
                         errorHandler.setVisibility(View.VISIBLE);
@@ -176,41 +166,27 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
     }
     @Override
     public void onReservedSeatsDataAvailable(int count, ArrayList<ResultSet> reservedResultSets) {
-       if(innerCount <= count) {
-           if(innerCount == count)
-           {
-               //do nothing
-           }
-           else  if(innerCount < count)
-           {
-               if(isFragmentAttached)
-               {
-                   errorHandler.setVisibility(View.GONE);
-                   reservedEventsAdapter.setReservedEvents(reservedResultSets);
-                   reservedRecycler.setAdapter(reservedEventsAdapter);
-                   reservedRecycler.invalidate();
-                   reservedRecycler.setVisibility(View.VISIBLE);
-                   innerCount = count ;
-               }
-           }
-       }
+
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         isFragmentAttached = true ;
+        reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         isFragmentAttached = true ;
+        reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         isFragmentAttached  = false ;
+
     }
 }
