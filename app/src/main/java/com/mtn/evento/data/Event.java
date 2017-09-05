@@ -16,14 +16,22 @@ public class Event implements Serializable {
     private String event_type;
     private String description;
     private String region;
-    private String date_published;
+    private  long date_published;
     private String event_date;
+    private String event_time;
     private String venue;
     private String banner;
     private String total_seats;
     private ArrayList<Ticket> ticket_type;
     private Location location;
 
+    public String getEvent_time() {
+        return event_time;
+    }
+
+    public void setEvent_time(String event_time) {
+        this.event_time = event_time;
+    }
 
     public String getEvent_publisher() {
         return event_publisher;
@@ -73,11 +81,11 @@ public class Event implements Serializable {
         this.region = region;
     }
 
-    public String getDate_published() {
+    public long getDate_published() {
         return date_published;
     }
 
-    public void setDate_published(String date_published) {
+    public void setDate_published(long date_published) {
         this.date_published = date_published;
     }
 

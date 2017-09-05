@@ -143,7 +143,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     event.setBanner(object.getString("banner"));
                     event.setTotal_seats(object.getString("total_seats"));
                     event.setDescription(object.getString("description"));
-                    event.setDate_published(object.getString("date_published"));
+                    event.setDate_published(object.getLong("date_published"));
                     event.setVenue(object.getString("venue"));
                     event.setEvent_publisher(object.getString("event_publisher"));
                     event.setTitle(object.getString("title"));
