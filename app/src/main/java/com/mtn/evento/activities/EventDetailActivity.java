@@ -40,7 +40,6 @@ public class EventDetailActivity extends AppCompatActivity {
     MenuItem item;
     private FirebaseAuth mAuth;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,23 +51,23 @@ public class EventDetailActivity extends AppCompatActivity {
         Serializable serz =   ser.getSerializable(Constants.EVENT);
         event = (Event) serz;
 
-        //TODO: change the current url to the event banner url
          Glide.with(this)
                 .load(event.getBanner())
                 .asBitmap()
                 .into(( (ImageView)findViewById(R.id.event_banner))) ;
 
-        ( (TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
+        //TODO: change the current url to the event banner url
+        ((TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
          String date = new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date (Long.parseLong(event.getEvent_date())*1000));
-        ( (TextView)findViewById(R.id.evt_date)).setText(date);
+        ((TextView)findViewById(R.id.evt_date)).setText(date);
         // TODO: 8/10/2017  set available seats
         LinearLayout seatLinearLayout = (LinearLayout) findViewById(R.id.layout_seat_available);
         LinearLayout pricesLinearLayout = (LinearLayout) findViewById(R.id.layout_seat_prices);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, 10, 0, 10);
 
-
-        for(Ticket ticket : event.getTicket_type()){
+        for(Ticket ticket : event.getTicket_type())
+        {
             TextView view = (TextView) getLayoutInflater().inflate(R.layout.seats_available,null);
             TextView view2 = (TextView) getLayoutInflater().inflate(R.layout.seats_available, null);
             view.setText(ticket.getName().toUpperCase() + " :  " + ticket.getAvailable_seats());
@@ -84,8 +83,6 @@ public class EventDetailActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-
-
     }
 
     private void init() {
@@ -95,7 +92,6 @@ public class EventDetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -111,7 +107,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 if(isNetworkAndInternetAvailable()){
                     if(mAuth != null && mAuth.getCurrentUser() !=null){
                         //TODO: check if user is logged and open either login or reservation activity
-                        Toast.makeText(this, "Reserve Seats", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(this, "Reserve Seats", Toast.LENGTH_SHORT).show();
                         Intent mIntent = new Intent(this,ReservationActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putSerializable(Constants.EVENT,event);
@@ -131,11 +127,9 @@ public class EventDetailActivity extends AppCompatActivity {
                         });
                         builder.show();
                     }
-
                 }
                 else
                 {
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(EventDetailActivity.this);
                     builder.setTitle("NO NETWORK AVAILABLE");
                     builder.setMessage("Sorry, no internet connection available. Please check your network connection and try again!");
@@ -147,9 +141,6 @@ public class EventDetailActivity extends AppCompatActivity {
                     });
                     builder.show();
                 }
-
-
-
                 break;
             case R.id.share:
                 if(isNetworkAndInternetAvailable()){
@@ -161,7 +152,6 @@ public class EventDetailActivity extends AppCompatActivity {
                 }
                 else
                 {
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(EventDetailActivity.this);
                     builder.setTitle("NO NETWORK AVAILABLE");
                     builder.setMessage("Sorry, no internet connection available. Please check your network connection and try again!");
@@ -173,7 +163,6 @@ public class EventDetailActivity extends AppCompatActivity {
                     });
                     builder.show();
                 }
-
                 break;
             case R.id.directMe:
 
@@ -198,8 +187,6 @@ public class EventDetailActivity extends AppCompatActivity {
                     });
                     builder.show();
                 }
-
-
                 break;
             case android.R.id.home:
                 super.onBackPressed();
@@ -209,25 +196,20 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     public boolean isInternetOn() {
-
         // get Connectivity Manager object to check connection
         ConnectivityManager connec =
                 (ConnectivityManager)  getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
-
         // Check for network connections
         if (connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
                 connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
                 connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
                 connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
-
-
             return true;
 
         } else if (
                 connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
                         connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED)
         {
-
             return false;
         }
         return false;
@@ -237,15 +219,20 @@ public class EventDetailActivity extends AppCompatActivity {
         NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
         if(networkInfo != null && networkInfo.isConnected()==true )
         {
-            return true;
+           return true;
         }
         else
         {
-            return  false;
+          return  false;
         }
     }
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+    }
 }

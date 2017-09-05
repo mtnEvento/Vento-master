@@ -25,8 +25,9 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
     private String web_url;
     private String data = "";
     private Callback listener;
+     private ErrorCallback errorCallback;
 
-    private ServerConnector(String web_url){
+     private ServerConnector(String web_url){
         this.web_url = web_url;
     }
 
@@ -57,6 +58,11 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
         this.listener = listener;
         return this;
     }
+
+     public ServerConnector attachServerErrorListener(ErrorCallback errorCallback){
+         this.errorCallback = errorCallback;
+         return this;
+     }
 
     public void connectToServer(){
         if(web_url != null){
@@ -117,6 +123,7 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
         } catch (IOException e) {
             e.printStackTrace();
+            errorCallback.getError(e.getLocalizedMessage(),e);
         }
 
         return result;
@@ -126,5 +133,9 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
         void getResult(String result);
     }
 
+     public interface ErrorCallback{
+         void getError(String error, IOException e);
+     }
 
-}
+
+ }

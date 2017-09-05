@@ -28,17 +28,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
 
     private ArrayList<Event> events,filteredEvent;
     private Context context;
-    private   boolean filter = false;
+    private boolean filter = false;
 
     public EventAdapter() {
-        Log.d(LOGMESSAGE,"EventAdapter called") ;
+        //Log.d(LOGMESSAGE,"EventAdapter called") ;
     }
     public void setEvents(ArrayList<Event> events, boolean shouldFilter) {
 
         if(shouldFilter){
             filter = true ;
             this.filteredEvent = events;
-
         }
         else
         {
@@ -76,7 +75,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
             holder.venue.setText(events.get(position).getVenue());
             holder.layout.setTag(events.get(position));
         }
-
     }
 
     @Override
@@ -84,13 +82,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
         if(filter){
             return filteredEvent.size();
         }
-        else{
+        else
+        {
             return events.size();
         }
-
     }
-
-
 
     static class EventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -113,9 +109,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
         public   EventHolder  setEvents(ArrayList<Event> events, boolean shouldFilter) {
 
             if(shouldFilter){
-
                 this.filteredEvent = events;
-
             }
             else
             {
@@ -136,6 +130,4 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
             context.startActivity(intent);
         }
     }
-
-
 }

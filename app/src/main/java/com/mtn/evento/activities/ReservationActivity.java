@@ -1,6 +1,7 @@
 package com.mtn.evento.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -47,7 +48,8 @@ public class ReservationActivity extends AppCompatActivity implements ReserveSea
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                super.onBackPressed();
+                Intent i = new Intent(this,HomeScreenActivity.class);
+                startActivity(i);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -62,5 +64,12 @@ public class ReservationActivity extends AppCompatActivity implements ReserveSea
             getSupportFragmentManager().beginTransaction().replace(R.id.container,finishFragment).commit();
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(this,HomeScreenActivity.class);
+        startActivity(i);
     }
 }

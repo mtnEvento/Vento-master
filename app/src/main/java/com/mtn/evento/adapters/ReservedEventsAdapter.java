@@ -24,19 +24,18 @@ import java.util.ArrayList;
 
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
-
 public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAdapter.ReservedEventHolder> {
 
     ArrayList<ResultSet> reservedEvents;
     Context context;
 
     public ReservedEventsAdapter() {
-        Log.d(LOGMESSAGE, "adapter init ");
+        //Log.d(LOGMESSAGE, "adapter init ");
     }
 
     public void setReservedEvents(ArrayList<ResultSet> reservedEvents) {
         this.reservedEvents = reservedEvents;
-        Log.d(LOGMESSAGE, "adapter set: ");
+       // Log.d(LOGMESSAGE, "adapter set: ");
     }
     @Override
     public ReservedEventHolder onCreateViewHolder(ViewGroup parent, int i) {
@@ -60,7 +59,7 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
 
     @Override
     public int getItemCount() {
-        Log.d(LOGMESSAGE, "adapter size " + reservedEvents.size());
+       // Log.d(LOGMESSAGE, "adapter size " + reservedEvents.size());
         return reservedEvents.size();
     }
 
@@ -98,6 +97,4 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
             context.startActivity(intent);
         }
     }
-
-
 }
