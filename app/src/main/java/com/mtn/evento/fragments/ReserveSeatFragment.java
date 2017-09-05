@@ -140,6 +140,8 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         int result =  0 ;
                         for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+
+
                             Ticket ticket = snapshot.getValue(Ticket.class);
                             Log.d(LOGMESSAGE, "selected :" + ((String)item).toUpperCase() +"  from ticket : "+ticket.getName().toUpperCase());
                             Log.d(LOGMESSAGE, "onDataChange in Spinner : ticket is " + ticket);
@@ -743,32 +745,32 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 Log.d(LOGMESSAGE," path:  "+mEvent.getEvent_id()+ "  "+FirebaseAuth.getInstance().getCurrentUser().getUid() +  "  "+secret);
                 //TODO : update available seat
                 // mDatabase.child(mEvent.getEvent_id())
+            }
 
-                mDatabase.child("events").child(mEvent.getEvent_id()).child("ticket_type").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d(LOGMESSAGE, "onDataChange: called ");
-                        for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                            Ticket ticket = snapshot.getValue(Ticket.class);
-                            Log.d(LOGMESSAGE, "onDataChange: ticket is " + ticket);
-                            if(ticket != null) {
-                                if(purchaseData.getType().toUpperCase().equals(ticket.getName().toUpperCase())){
-                                    int result = Integer.parseInt(ticket.getAvailable_seats()) - 1;
-                                    Log.d(LOGMESSAGE, "onDataChange: result after subtraction : " + result);
-                                    //TODO: subtract from total seat
-                                    mDatabase.child("events").child(mEvent.getEvent_id()).child("ticket_type").child(snapshot.getKey()).setValue(ticket.getName(),result);
+            mDatabase.child("events").child(mEvent.getEvent_id()).child("ticket_type").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d(LOGMESSAGE, "onDataChange: called ");
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        Ticket ticket = snapshot.getValue(Ticket.class);
+                        Log.d(LOGMESSAGE, "onDataChange: ticket is " + ticket);
+                        if(ticket != null) {
+                            if(purchaseData.getType().toUpperCase().equals(ticket.getName().toUpperCase())){
+                                int result = Integer.parseInt(ticket.getAvailable_seats()) - Integer.parseInt(purchaseData.getQuantity());
+                                Log.d(LOGMESSAGE, "onDataChange: result after subtraction : " + result);
+                                //TODO: subtract from total seat
+                                mDatabase.child("events").child(mEvent.getEvent_id()).child("ticket_type").child(snapshot.getKey()).child("available_seats").setValue(""+result);
 
-                                }
                             }
                         }
                     }
+                }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
-            }
+                }
+            });
 
 
         }

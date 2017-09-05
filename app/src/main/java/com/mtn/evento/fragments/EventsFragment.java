@@ -50,6 +50,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     private String mQuery;
     ArrayList<Event> regionFiltered;
     private static  boolean isFragmentAttached = false ;
+    IAttach iAttach;
 
     public EventsFragment() {
         Log.d(LOGMESSAGE,"EventsFragment called") ;
@@ -76,27 +77,10 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     public void onInternetDisconnected() {
 
         if(isFragmentAttached){
-            //Do any thing you want here.
-            this.appContext.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
 
-                 if (eventAdapter != null && eventRecycler != null) {
-                      appContext.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(isFragmentAttached){
-                                    eventRecycler.setVisibility(View.GONE);
-                                    no_networkView.setText(getString(R.string.no_connection));
-                                    no_networkView.setVisibility(View.VISIBLE);
-                                }
-
-                       }
-                        });
-
-                 }
-                }
-            });
+            if(iAttach != null){
+                iAttach.onAttachedcheck();
+            }
         }
 
 
@@ -366,6 +350,28 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     public void onAttach(Context context) {
         super.onAttach(context);
         isFragmentAttached = true ;
+         iAttach = new IAttach() {
+            @Override
+            public void onAttachedcheck() {
+                //Do any thing you want here.
+                EventsFragment.this.appContext.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (eventAdapter != null && eventRecycler != null) {
+
+                           if(isFragmentAttached){
+                                eventRecycler.setVisibility(View.GONE);
+                                no_networkView.setText(getString(R.string.no_connection));
+                                no_networkView.setVisibility(View.VISIBLE);
+                           }
+                        }
+                    }
+                });
+            }
+
+
+        };
 
     }
 
@@ -373,6 +379,29 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         isFragmentAttached = true ;
+        iAttach = new IAttach() {
+            @Override
+            public void onAttachedcheck() {
+                //Do any thing you want here.
+                EventsFragment.this.appContext.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (eventAdapter != null && eventRecycler != null) {
+
+                            if(isFragmentAttached){
+                                eventRecycler.setVisibility(View.GONE);
+                                no_networkView.setText(getString(R.string.no_connection));
+                                no_networkView.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                });
+            }
+
+
+        };
+
     }
 
     @Override
@@ -381,5 +410,8 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         isFragmentAttached = false ;
     }
 
+    public interface IAttach{
+        void onAttachedcheck();
+    }
 
 }
