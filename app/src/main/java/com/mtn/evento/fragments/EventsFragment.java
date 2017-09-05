@@ -48,9 +48,11 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     private FirebaseDatabase firebaseDatabase;
     private EventValueListener eventValueListener;
     private String mQuery;
+    ArrayList<Event> regionFiltered;
 
     public EventsFragment() {
         Log.d(LOGMESSAGE,"EventsFragment called") ;
+        regionFiltered = new ArrayList<>();
     }
     public void setAppContext(HomeScreenActivity appContext){
         if( this.appContext == null){
@@ -185,12 +187,23 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         mQuery = query;
         Log.d(LOGMESSAGE, "onSearch: is called " + query);
         ArrayList<Event> filteredEvents = new ArrayList<>();
-        for (Event e : cacheEvent) {
-            if( e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
-                filteredEvents.add(e);
-                Log.d(LOGMESSAGE, "filtered event added");
+
+        if(regionFiltered != null && regionFiltered.size() > 0){
+            for (Event e : regionFiltered) {
+                if( e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
+                    filteredEvents.add(e);
+                    Log.d(LOGMESSAGE, "filtered event added");
+                }
+            }
+        }else{
+            for (Event e : cacheEvent) {
+                if( e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
+                    filteredEvents.add(e);
+                    Log.d(LOGMESSAGE, "filtered event added");
+                }
             }
         }
+
 
         if (eventAdapter != null) {
 
@@ -234,8 +247,9 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                         filteredEvents.add(e);
                     }
                 }
+                regionFiltered = filteredEvents;
                 if (eventAdapter != null) {
-                    if (filteredEvents != null && filteredEvents.size() > 0) {
+                    if (filteredEvents.size() > 0) {
 
                         if (eventRecycler != null) {
                             eventAdapter.setEvents(filteredEvents, true);
