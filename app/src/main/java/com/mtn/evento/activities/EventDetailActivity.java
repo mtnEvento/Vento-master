@@ -58,7 +58,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
         //TODO: change the current url to the event banner url
         ((TextView)findViewById(R.id.evt_name)).setText(event.getTitle());
-         String date = new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date (Long.parseLong(event.getEvent_date())*1000));
+         String date = new java.text.SimpleDateFormat("dd-MMM-yyyy  hh:mm:ss a").format(new java.util.Date (Long.parseLong(event.getEvent_date())));
         ((TextView)findViewById(R.id.evt_date)).setText(date);
         // TODO: 8/10/2017  set available seats
         LinearLayout seatLinearLayout = (LinearLayout) findViewById(R.id.layout_seat_available);

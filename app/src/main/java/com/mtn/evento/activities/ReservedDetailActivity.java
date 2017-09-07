@@ -44,7 +44,7 @@ public class ReservedDetailActivity extends AppCompatActivity {
                     .load(reservedSeatData.getEvent().getBanner())
                     .asBitmap()
                     .into(( (ImageView)findViewById(R.id.event_banner))) ;
-            String date = new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date (Long.parseLong(reservedSeatData.getEvent().getEvent_date())*1000));
+            String date = new java.text.SimpleDateFormat("dd-MMM-yyyy  hh:mm:ss a").format(new java.util.Date (Long.parseLong(reservedSeatData.getEvent().getEvent_date())));
             ( (TextView)findViewById(R.id.reserved_evt_name)).setText((reservedSeatData.getEvent().getTitle() == null || reservedSeatData.getEvent().getTitle().isEmpty()) ? "N/A": reservedSeatData.getEvent().getTitle());
             ( (TextView)findViewById(R.id.reserved_evt_date)).setText((reservedSeatData.getEvent().getEvent_date() == null || reservedSeatData.getEvent().getEvent_date().isEmpty()) ? "N/A": date);
             ( (TextView)findViewById(R.id.reserved_evt_venue)).setText((reservedSeatData.getEvent().getVenue()== null || reservedSeatData.getEvent().getVenue().isEmpty()) ? "N/A" : reservedSeatData.getEvent().getVenue());
