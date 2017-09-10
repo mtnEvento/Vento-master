@@ -1,7 +1,6 @@
 package com.mtn.evento.activities;
 
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,23 +9,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
-import com.mtn.evento.data.DisplayTicket;
-import com.mtn.evento.data.Event;
 import com.mtn.evento.data.ReservedSeatData;
-import com.mtn.evento.data.ResultSet;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class ReservedDetailActivity extends AppCompatActivity {
     Intent mIntent;
     private ReservedSeatData reservedSeatData;
     private Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +33,8 @@ public class ReservedDetailActivity extends AppCompatActivity {
         Serializable serz =   ser.getSerializable(Constants.RESERVED_SEAT);
 
         reservedSeatData  = ( ReservedSeatData )  serz;
+        Serializable bannerSer =   ser.getSerializable(Constants.BANNER);
+
         if( reservedSeatData != null){
             //TODO: change the current url to the event banner url
             Glide.with(this)
@@ -83,7 +80,9 @@ public class ReservedDetailActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND);
                 intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT,"Did you know "+reservedSeatData.getEvent().getTitle() +" is happening on "+reservedSeatData.getEvent().getEvent_date() +" ? To get the ticket, just download the Evento Android App from the Google Play Store and reserve a seat because i just did. please don't miss this event.");
+                String date = new java.text.SimpleDateFormat("dd-MMM-yyyy  hh:mm a").format(new java.util.Date (Long.parseLong(reservedSeatData.getEvent().getEvent_date())));
+
+                intent.putExtra(Intent.EXTRA_TEXT,"Did you know "+reservedSeatData.getEvent().getTitle() +" is happening on "+date +" ? To get the ticket, just download the Evento Android App from the Google Play Store and reserve a seat because i just did. please don't miss this event.");
                 startActivity(intent);
                 break;
             case R.id.directMe:

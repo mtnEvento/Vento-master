@@ -50,6 +50,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,6 @@ import java.util.TimerTask;
 
 import static com.mtn.evento.data.Constants.APP_USERNAME;
 import static com.mtn.evento.data.Constants.APP_USER_EMAIL;
-import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 /**
@@ -82,7 +82,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     IPay iPay ;
     Timer  t;
     private MaterialSpinner spinner;
-
 
     public ReserveSeatFragment() {
         mAuth = FirebaseAuth.getInstance();
@@ -109,6 +108,8 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         makePayment.setOnClickListener(this);
         Bundle bag = getArguments();
         mEvent = (Event) bag.getSerializable(Constants.EVENT);
+        Serializable bannerSer =   bag.getSerializable(Constants.BANNER);
+
         makePayment.setTag(mEvent);
         ArrayList<Ticket> tickets = mEvent.getTicket_type();
         ArrayList<String> strTickets = new ArrayList<>();

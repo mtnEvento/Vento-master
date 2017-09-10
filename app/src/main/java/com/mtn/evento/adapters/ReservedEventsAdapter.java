@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,16 +15,15 @@ import com.bumptech.glide.Glide;
 import com.mtn.evento.R;
 import com.mtn.evento.activities.ReservedDetailActivity;
 import com.mtn.evento.data.Constants;
-import com.mtn.evento.data.Event;
 import com.mtn.evento.data.ReservedSeatData;
 import com.mtn.evento.data.ResultSet;
+import com.mtn.evento.utils.Saver;
 
 import java.util.ArrayList;
 
-import static com.mtn.evento.data.Constants.LOGMESSAGE;
-
 public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAdapter.ReservedEventHolder> {
 
+    private static View view;
     ArrayList<ResultSet> reservedEvents;
     Context context;
 
@@ -39,7 +37,7 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
     }
     @Override
     public ReservedEventHolder onCreateViewHolder(ViewGroup parent, int i) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_event,parent,false);
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_event,parent,false);
         context = parent.getContext();
         return new ReservedEventHolder(view).setReservedEvents(this.reservedEvents);
     }
@@ -93,6 +91,7 @@ public class ReservedEventsAdapter extends RecyclerView.Adapter<ReservedEventsAd
             Intent intent = new Intent(context, ReservedDetailActivity.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable(Constants.RESERVED_SEAT,reservedSeatData);
+
             intent.putExtra(Constants.BUNDLE,bundle);
             context.startActivity(intent);
         }

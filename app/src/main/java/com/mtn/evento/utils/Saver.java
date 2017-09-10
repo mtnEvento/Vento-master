@@ -51,7 +51,7 @@ public class Saver {
         intent.setDataAndType(uri, "image/*");
         a.startActivity(intent);
     }
-    public static Bitmap takeScreenShot(View v){
+    public static Bitmap takeScreenShotOnly(View v){
         Bitmap screenShot = null;
         try
         {
@@ -60,6 +60,22 @@ public class Saver {
            screenShot = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
            Canvas c = new Canvas(screenShot);
            v.draw(c);
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return screenShot;
+    }
+    public static Bitmap takeScreenShot(View v){
+        Bitmap screenShot = null;
+        try
+        {
+            int width  = v.getMeasuredWidth();
+            int height  = v.getMeasuredHeight();
+            screenShot = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(screenShot);
+            v.draw(c);
 
         }catch (Exception e)
         {
@@ -84,7 +100,7 @@ public class Saver {
 //
                 bao = new ByteArrayOutputStream();
                 fos = new FileOutputStream(imagePath);
-                int quality = 80;
+                int quality = 90;
 
                 bitmap.compress(Bitmap.CompressFormat.PNG, quality, bao);
                 fos.write(bao.toByteArray());
@@ -106,7 +122,6 @@ public class Saver {
     }
     public static String shareTicket(Activity activity,String path){
 
-
         if(path != null) {
             try {
                 File file = new File(path);
@@ -119,11 +134,8 @@ public class Saver {
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-
             }
-
         }
-
         return  null;
     }
 }

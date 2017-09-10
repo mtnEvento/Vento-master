@@ -10,16 +10,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,10 +23,9 @@ import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
 import com.mtn.evento.data.Ticket;
+import com.mtn.evento.utils.Saver;
 
 import java.io.Serializable;
-
-import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 public class EventDetailActivity extends AppCompatActivity {
 
@@ -50,7 +45,6 @@ public class EventDetailActivity extends AppCompatActivity {
         Bundle ser =  this.mIntent.getBundleExtra(Constants.BUNDLE);
         Serializable serz =   ser.getSerializable(Constants.EVENT);
         event = (Event) serz;
-
          Glide.with(this)
                 .load(event.getBanner())
                 .asBitmap()
@@ -111,6 +105,7 @@ public class EventDetailActivity extends AppCompatActivity {
                         Intent mIntent = new Intent(this,ReservationActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putSerializable(Constants.EVENT,event);
+
                         mIntent.putExtra(Constants.BUNDLE,bundle);
                         startActivity(mIntent);
                     }

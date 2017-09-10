@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +16,9 @@ import com.mtn.evento.R;
 import com.mtn.evento.activities.EventDetailActivity;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.Event;
-import com.mtn.evento.fragments.EventsFragment;
+import com.mtn.evento.utils.Saver;
 
 import java.util.ArrayList;
-
-import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>  {
@@ -29,6 +26,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
     private ArrayList<Event> events,filteredEvent;
     private Context context;
     private boolean filter = false;
+    static  View view ;
 
     public EventAdapter() {
         //Log.d(LOGMESSAGE,"EventAdapter called") ;
@@ -48,7 +46,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
 
     @Override
     public EventHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_event,parent,false);
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_event,parent,false);
         context = parent.getContext();
         return new EventHolder(view).setEvents(this.events,filter);
     }
@@ -124,6 +122,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
             Event event = (Event) v.getTag();
             Intent intent = new Intent(context, EventDetailActivity.class);
             Bundle bundle = new Bundle();
+
             bundle.putSerializable(Constants.EVENT,event);
             intent.putExtra(Constants.BUNDLE,bundle);
             //TODO: get Bundle At event detail page and set it's values events.get(getAdapterPosition())

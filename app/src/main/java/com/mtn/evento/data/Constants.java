@@ -19,5 +19,6 @@ public class Constants {
     public static final String APP_LOGIN ="com.mtn.evento.data.APP_LOGIN" ;
     public static final String APP_LOGOUT ="com.mtn.evento.data.APP_LOGOUT" ;
     public static final String LOGINED_IN = "LOGINED_IN";
+    public static final String BANNER = "com.mtn.evento.data.BANNER";
     public static java.lang.String searchState = "searchState";
 }

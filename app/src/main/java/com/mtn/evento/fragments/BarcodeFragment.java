@@ -87,13 +87,13 @@ public class BarcodeFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void run() {
                         myBitmap =   Saver.takeScreenShot(printable_surface);
-                        Toast.makeText(getActivity(),"myBitmap : "+myBitmap,Toast.LENGTH_LONG).show();
+                      //  Toast.makeText(getActivity(),"myBitmap : "+myBitmap,Toast.LENGTH_LONG).show();
 
                         String path = Saver.saveBitmap(myBitmap,getActivity());
 
                         if(path != null){
                             Saver.openScreenshot(path,getActivity());
-                            Toast.makeText(getActivity(), "Ticket Shared", Toast.LENGTH_SHORT).show();
+                           // Toast.makeText(getActivity(), "Ticket Shared", Toast.LENGTH_SHORT).show();
                             Log.d(LOGMESSAGE, "Ticket Shared");
                         }
                         else
@@ -110,11 +110,11 @@ public class BarcodeFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void run() {
                         myBitmap =   Saver.takeScreenShot(printable_surface);
-                        Toast.makeText(getActivity(),"myBitmap : "+myBitmap,Toast.LENGTH_LONG).show();
+                       // Toast.makeText(getActivity(),"myBitmap : "+myBitmap,Toast.LENGTH_LONG).show();
                         String path = Saver.saveBitmap(myBitmap,getActivity());
                         String result = Saver.shareTicket(getActivity(),path);
                         if(result != null){
-                            Toast.makeText(getActivity(), "Ticket Shared", Toast.LENGTH_SHORT).show();
+                           // Toast.makeText(getActivity(), "Ticket Shared", Toast.LENGTH_SHORT).show();
                             Log.d(LOGMESSAGE, "Ticket Shared");
 //                            File file = new File(result);
 //                            if(file.exists()){
