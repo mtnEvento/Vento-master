@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -59,6 +58,10 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     public void setAppContext(HomeScreenActivity appContext){
         if( this.appContext == null){
             this.appContext = appContext ;
+            if(this.appContext == null)
+            {
+                this.setAppContext((HomeScreenActivity) getContext());
+            }
 
             if(eventAdapter == null){
                 eventAdapter = new EventAdapter();
@@ -67,23 +70,15 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     }
 
     @Override
-    public void onInternetConnected() {
-
-        if(isFragmentAttached){
-           //Do any thing you want here.
-        }
-    }
+    public void onInternetConnected() {}
     @Override
     public void onInternetDisconnected() {
-
-        if(isFragmentAttached){
-
+        if(isFragmentAttached)
+        {
             if(iAttach != null){
                 iAttach.onAttachedcheck();
             }
         }
-
-
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -101,41 +96,44 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(LOGMESSAGE, "onStart: isSearching is " + HomeScreenActivity.isSearching);
-
-            initFirebase();
-            if (Factory.isNetworkAndInternetAvailableNow()) {
-                if (eventRecycler != null && no_networkView != null) {
-                    if (cacheEvent != null && cacheEvent.size() > 0) {
+        initFirebase();
+        if (Factory.isNetworkAndInternetAvailableNow())
+        {
+             if (eventRecycler != null && no_networkView != null)
+             {
+                  if (cacheEvent != null && cacheEvent.size() > 0) {
                         eventAdapter.setEvents(cacheEvent, false);
                         eventRecycler.setAdapter(eventAdapter);
                         no_networkView.setVisibility(View.GONE);
                         eventRecycler.setVisibility(View.VISIBLE);
-                    } else {
+                  }
+                  else
+                  {
                         eventRecycler.setVisibility(View.GONE);
                         no_networkView.setText("Loading Events...");
                         no_networkView.setVisibility(View.VISIBLE);
-                    }
-                }
-            } else {
-                if (eventRecycler != null && no_networkView != null && cacheEvent != null && cacheEvent.size() > 0) {
-                    eventAdapter.setEvents(cacheEvent, false);
-                    eventRecycler.setAdapter(eventAdapter);
-                    no_networkView.setVisibility(View.GONE);
-                    eventRecycler.setVisibility(View.VISIBLE);
-                } else {
-                    eventRecycler.setVisibility(View.GONE);
-                    no_networkView.setText(getString(R.string.no_connection));
-                    no_networkView.setVisibility(View.VISIBLE);
-                }
+                  }
+             }
+        }
+        else
+        {
+            if (eventRecycler != null && no_networkView != null && cacheEvent != null && cacheEvent.size() > 0) {
+                eventAdapter.setEvents(cacheEvent, false);
+                eventRecycler.setAdapter(eventAdapter);
+                no_networkView.setVisibility(View.GONE);
+                eventRecycler.setVisibility(View.VISIBLE);
             }
-
-
+            else
+            {
+                eventRecycler.setVisibility(View.GONE);
+                no_networkView.setText(getString(R.string.no_connection));
+                no_networkView.setVisibility(View.VISIBLE);
+            }
+        }
     }
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("TAG", "" + cacheEvent);
         if(Factory.isNetworkAndInternetAvailableNow()){
             if (eventRecycler != null && no_networkView != null){
                 if (cacheEvent != null && cacheEvent.size() > 0) {
@@ -164,58 +162,70 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                 no_networkView.setVisibility(View.VISIBLE);
             }
         }
-        if (isNotFirstResume) {
+        if (isNotFirstResume)
+        {
             restoreSpinnerState();
         }
+    }
+
+    @Override
+    public void onSearch(String query,int adapterPosition) {
+        if( adapterPosition == 0)
+        {
+            mQuery = query;
+            Log.d(LOGMESSAGE, "onSearch: is called " + query);
+            ArrayList<Event> filteredEvents = new ArrayList<>();
+
+            if(regionFiltered != null && regionFiltered.size() > 0){
+                for (Event e : regionFiltered) {
+                    if( e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
+                        filteredEvents.add(e);
+                        Log.d(LOGMESSAGE, "filtered event added");
+                    }
+                }
+            }
+            else
+            {
+                for (Event e : cacheEvent) {
+                    if( e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
+                        filteredEvents.add(e);
+                        Log.d(LOGMESSAGE, "filtered event added");
+                    }
+                }
+            }
+
+            if (eventAdapter != null) {
+
+                Log.d(LOGMESSAGE, "filteredEvents.size() : " + filteredEvents.size());
+
+                if (filteredEvents.size() > 0)
+                {
+                    if (eventRecycler != null)
+                    {
+                        eventAdapter.setEvents(filteredEvents, true);
+                        eventRecycler.setAdapter(eventAdapter);
+                        eventRecycler.setVisibility(View.VISIBLE);
+                        no_networkView.setVisibility(View.GONE);
+                    }
+                }
+                else
+                {
+                    eventRecycler.setVisibility(View.GONE);
+                    no_networkView.setText("NO MATCH FOUND");
+                    no_networkView.setTextSize(3,12);
+                    no_networkView.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onSearchQueryEmpty(int adapterPosition) {
 
     }
 
     @Override
-    public ArrayList<Event> onSearch(String query) {
-        mQuery = query;
-        Log.d(LOGMESSAGE, "onSearch: is called " + query);
-        ArrayList<Event> filteredEvents = new ArrayList<>();
-
-        if(regionFiltered != null && regionFiltered.size() > 0){
-            for (Event e : regionFiltered) {
-                if( e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
-                    filteredEvents.add(e);
-                    Log.d(LOGMESSAGE, "filtered event added");
-                }
-            }
-        }else{
-            for (Event e : cacheEvent) {
-                if( e != null  && e.getTitle() != null && e.getTitle().toLowerCase().contains(query)){
-                    filteredEvents.add(e);
-                    Log.d(LOGMESSAGE, "filtered event added");
-                }
-            }
-        }
-
-
-        if (eventAdapter != null) {
-
-            Log.d(LOGMESSAGE, "filteredEvents.size() : " + filteredEvents.size());
-
-            if (filteredEvents.size() > 0) {
-                if (eventRecycler != null) {
-                    eventAdapter.setEvents(filteredEvents, true);
-                    eventRecycler.setAdapter(eventAdapter);
-                    eventRecycler.setVisibility(View.VISIBLE);
-                    no_networkView.setVisibility(View.GONE);
-                }
-            } else {
-                eventRecycler.setVisibility(View.GONE);
-                no_networkView.setText("NO EVENTS MATCH THE SEARCH");
-                no_networkView.setVisibility(View.VISIBLE);
-            }
-
-        }
-
-        return null;
-    }
-    @Override
-    public ArrayList<Event> onRegionSearch(String query, ViewPager vp) {
+    public void onRegionSearch(String query) {
         if(!query.isEmpty()){
             currentSpinnerSelection = query;
             isNotFirstResume = true;
@@ -248,12 +258,12 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                     } else {
                         eventRecycler.setVisibility(View.GONE);
                         no_networkView.setText("NO EVENTS AVAILABLE");
+                        no_networkView.setTextSize(3,12);
                         no_networkView.setVisibility(View.VISIBLE);
                     }
                 }
             }
         }
-        return null;
     }
     public void initFirebase() {
         if (firebaseDatabase == null) {
@@ -300,45 +310,67 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                 } else {
                     eventRecycler.setVisibility(View.GONE);
                     no_networkView.setText("NO EVENTS AVAILABLE");
+                    no_networkView.setTextSize(3,12);
                     no_networkView.setVisibility(View.VISIBLE);
                 }
             }
         }
     }
+
+
+
     public interface EventFilter {
         public void onFilterEvent(String filterTerm, ArrayList<Event> events);
     }
 
     class EventValueListener implements ValueEventListener {
-        volatile int preDataCount;
-
-        public EventValueListener() {
-
-        }
-
+        public EventValueListener() {}
         @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            events.clear();
-            for (DataSnapshot aDataSnapshot : dataSnapshot.getChildren()) {
-                Event evt = aDataSnapshot.getValue(Event.class);
-                events.add(evt);
-            }
-            cacheEvent = events;
+        public void onDataChange(DataSnapshot dataSnapshot)
+        {
+            Log.d(LOGMESSAGE, "onDataChange: dataSnapshot " + dataSnapshot);
+            if(dataSnapshot != null && dataSnapshot.getValue() != null)
+            {
+                events.clear();
+                for (DataSnapshot aDataSnapshot : dataSnapshot.getChildren()) {
 
-            Log.d(LOGMESSAGE, "onDataChange: Events " + cacheEvent);
+                    Object o = aDataSnapshot.getValue();
+                    if( o instanceof  Event){
+                        Event evt = aDataSnapshot.getValue(Event.class);
+                        events.add(evt);
+                    }
+                    else
+                    {
+                        Log.d(LOGMESSAGE, "Object not an instanceof");
+                        Event evt = aDataSnapshot.getValue(Event.class);
+                        events.add(evt);
+                    }
 
-
-            EventsFragment.this.appContext.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    Log.d(LOGMESSAGE, "onEventsDataAvailable called ");
-                    eventAdapter.setEvents(cacheEvent, false);
-                    eventRecycler.setAdapter(eventAdapter);
-                    no_networkView.setVisibility(View.GONE);
-                    eventRecycler.setVisibility(View.VISIBLE);
                 }
-            });
+                if(dataSnapshot.getChildrenCount()> 0){
+                    cacheEvent = events;
+                    Log.d(LOGMESSAGE, "onDataChange: cacheEvent " + cacheEvent);
+                    EventsFragment.this.appContext.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            eventAdapter.setEvents(cacheEvent, false);
+                            eventRecycler.setAdapter(eventAdapter);
+                            no_networkView.setVisibility(View.GONE);
+                            eventRecycler.setVisibility(View.VISIBLE);
+                            Log.d(LOGMESSAGE, "onEventsDataAvailable called ");
+                        }
+                    });
+                }
+                else
+                {
+                    Log.d(LOGMESSAGE, "dataSnapshot has no children");
+                }
+
+            }
+            else
+            {
+                Log.d(LOGMESSAGE, "dataSnapshot value is null ");
+            }
         }
 
         @Override
@@ -357,15 +389,15 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                 EventsFragment.this.appContext.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
-                        if (eventAdapter != null && eventRecycler != null) {
-
-                           if(isFragmentAttached){
-                                eventRecycler.setVisibility(View.GONE);
-                                no_networkView.setText(getString(R.string.no_connection));
-                                no_networkView.setVisibility(View.VISIBLE);
-                           }
+                    if (eventAdapter != null && eventRecycler != null)
+                    {
+                        if(isFragmentAttached)
+                        {
+                            eventRecycler.setVisibility(View.GONE);
+                            no_networkView.setText(getString(R.string.no_connection));
+                            no_networkView.setVisibility(View.VISIBLE);
                         }
+                    }
                     }
                 });
             }

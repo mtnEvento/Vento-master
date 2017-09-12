@@ -23,16 +23,14 @@ import java.util.ArrayList;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>  {
 
-    private ArrayList<Event> events,filteredEvent;
+    private ArrayList<Event> collected, events,filteredEvent;
     private Context context;
     private boolean filter = false;
     static  View view ;
 
-    public EventAdapter() {
-        //Log.d(LOGMESSAGE,"EventAdapter called") ;
-    }
+    public EventAdapter() {}
     public void setEvents(ArrayList<Event> events, boolean shouldFilter) {
-
+        this.collected  = events;
         if(shouldFilter){
             filter = true ;
             this.filteredEvent = events;
@@ -48,7 +46,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
     public EventHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_event,parent,false);
         context = parent.getContext();
-        return new EventHolder(view).setEvents(this.events,filter);
+        return new EventHolder(view).setEvents( this.collected ,filter);
     }
 
     @Override
@@ -56,34 +54,35 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventHolder>
 
         if(filter){
             Glide.with(context)
-                    .load(filteredEvent.get(position).getBanner())
+                    .load(holder.filteredEvent.get(position).getBanner())
                     .asBitmap()
                     .into(holder.imageView) ;
-            holder.title.setText(filteredEvent.get(position).getTitle());
-            holder.venue.setText(filteredEvent.get(position).getVenue());
-            holder.layout.setTag(filteredEvent.get(position));
+            holder.title.setText(holder.filteredEvent.get(position).getTitle());
+            holder.venue.setText(holder.filteredEvent.get(position).getVenue());
+            holder.layout.setTag(holder.filteredEvent.get(position));
         }
         else
         {
             Glide.with(context)
-                    .load(events.get(position).getBanner())
+                    .load(holder.events.get(position).getBanner())
                     .asBitmap()
                     .into(holder.imageView) ;
-            holder.title.setText(events.get(position).getTitle());
-            holder.venue.setText(events.get(position).getVenue());
-            holder.layout.setTag(events.get(position));
+            holder.title.setText(holder.events.get(position).getTitle());
+            holder.venue.setText(holder.events.get(position).getVenue());
+            holder.layout.setTag(holder.events.get(position));
         }
     }
 
     @Override
     public int getItemCount() {
-        if(filter){
-            return filteredEvent.size();
-        }
-        else
-        {
-            return events.size();
-        }
+//        if(filter){
+//            return filteredEvent.size();
+//        }
+//        else
+//        {
+//            return events.size();
+//        }
+        return  collected.size();
     }
 
     static class EventHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

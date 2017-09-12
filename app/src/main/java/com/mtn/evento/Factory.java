@@ -40,7 +40,6 @@ public class Factory {
         if(this.manager == null){
             this.manager = homeScreenActivity ;
             this.internetDataListenter = (InternetDataListenter) this.manager ;
-            this.reservedSeatsDataAvailableListener = (ReservedSeatsDataAvailableListener )this.manager;
             this.userLogInOrOutListenter = (UserLogInOrOutListenter) this.manager ;
         }
 

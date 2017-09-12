@@ -108,7 +108,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = null ;
         try
         {
-            ArrayList<Event> eventList = new ArrayList<Event>();
+
             ArrayList<ResultSet> resultSets = new ArrayList<>();
             String selectQuery = "SELECT  * FROM " + TABLE_RESERVED_EVENT;
             db = getReadableDatabase();
@@ -166,8 +166,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
                     event.setTicket_type(tickets);
                     // Adding event to list
-                    eventList.add(event);
-                    resultSets.add(new ResultSet(eventList,displayTickets));
+                    //eventList.add(event);
+                    resultSets.add(new ResultSet(event,displayTickets));
                 } while (cursor.moveToNext());
 
                 db.close();

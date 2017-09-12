@@ -38,7 +38,7 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ReservedFragment extends Fragment implements HomeScreenActivity.LoginLogoutListener ,Factory.InternetDataListenter, Factory.ReservedSeatsDataAvailableListener {
+public class ReservedFragment extends Fragment implements HomeScreenActivity.LoginLogoutListener, HomeScreenActivity.SearchRequestListener {
     static RecyclerView reservedRecycler;
     static RecyclerView.LayoutManager layoutManager;
     static ReservedEventsAdapter reservedEventsAdapter;
@@ -46,16 +46,26 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
     static private FirebaseAuth mAuth;
     static private TextView errorHandler;
     static private int innerCount;
-    static private boolean isFragmentAttached = false;
-     ArrayList<ResultSet> reservedEvents;
+    static ArrayList<ResultSet> reservedEvents,cachedReservedEvents;
+    private volatile boolean isFragmentAttached, resumed; ;
+
 
     public ReservedFragment() {
         Log.d(LOGMESSAGE, "ReservedFragment: instantiated ");
-        reservedEventsAdapter = new ReservedEventsAdapter();
+
     }
     public void setAppContext(HomeScreenActivity appContext){
         if(this.appContext == null ){
             this.appContext = appContext ;
+
+            reservedEvents = new ArrayList<>();
+            cachedReservedEvents = new ArrayList<>();
+            Log.d(LOGMESSAGE, "ReservedFragment appContext: instantiated ");
+            reservedEvents = ((Evento) (appContext).getApplication()).getDatabaseHandler().getAllreservedEvents();
+            cachedReservedEvents =  ((Evento) (appContext).getApplication()).getDatabaseHandler().getAllreservedEvents();
+            Log.d(LOGMESSAGE, "ReservedFragment reservedEvents : instantiated " +reservedEvents);
+            Log.d(LOGMESSAGE, "ReservedFragment cachedReservedEvents : instantiated " +cachedReservedEvents);
+            reservedEventsAdapter = new ReservedEventsAdapter();
         }
     }
     @Override
@@ -68,125 +78,196 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
         reservedRecycler.setHasFixedSize(true);
         return v;
     }
-    @Override
-    public void onStart() {
-        super.onStart();
-        checkReservedSeats();
-    }
+
     @Override
     public void onResume() {
-        super.onResume();
         checkReservedSeats();
+        super.onResume();
+        Log.d(LOGMESSAGE, "ReservedFragment: onResume called ");
+
+        resumed = true ;
     }
     private void checkReservedSeats(){
-        if(mAuth == null){
-            mAuth = FirebaseAuth.getInstance();
-        }
-        if(mAuth != null && mAuth.getCurrentUser() != null){
-            if(reservedEventsAdapter != null && reservedRecycler != null && appContext != null && appContext.getApplication() != null  && ((Evento) appContext.getApplication()).getDatabaseHandler() !=null )
-            {
-                reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
-                if(reservedEvents != null && reservedEvents.size() > 0 )
+
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+
+                if(cachedReservedEvents != null && cachedReservedEvents.size() > 0 )
                 {
-                    errorHandler.setVisibility(View.GONE);
-                    reservedEventsAdapter.setReservedEvents(reservedEvents);
+                    Log.d(LOGMESSAGE, "ReservedFragment:2 cachedReservedEvents "+ cachedReservedEvents);
+                    reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
                     reservedRecycler.setAdapter(reservedEventsAdapter);
                     reservedRecycler.invalidate();
+                    errorHandler.setVisibility(View.GONE);
                     reservedRecycler.setVisibility(View.VISIBLE);
                 }
-                else  if(reservedEvents != null && reservedEvents.size() == 0 )
-                {
-                    reservedRecycler.setVisibility(View.GONE);
-                    reservedRecycler.invalidate();
-                    errorHandler.setText(R.string.no_seats_reservred);
-                    errorHandler.setVisibility(View.VISIBLE);
-                }
+
                 else
                 {
-                    reservedRecycler.setVisibility(View.GONE);
+
                     reservedRecycler.invalidate();
                     errorHandler.setText(R.string.no_seats_reservred);
+                    errorHandler.setTextSize(3,12);
+                    reservedRecycler.setVisibility(View.GONE);
                     errorHandler.setVisibility(View.VISIBLE);
+                    Log.d(LOGMESSAGE, "ReservedFragment:2 no reserved seats :  "+ cachedReservedEvents);
                 }
-            }
+
+            Log.d(LOGMESSAGE, "ReservedFragment:2 signin "+ cachedReservedEvents);
         }
         else
         {
-            if( reservedRecycler != null ) {
-                reservedRecycler.removeAllViews();
+            Log.d(LOGMESSAGE, "ReservedFragment:2 signout "+ cachedReservedEvents);
                 reservedRecycler.invalidate();
-                reservedRecycler.setVisibility(View.GONE);
                 errorHandler.setText(R.string.not_logged_in);
+                errorHandler.setTextSize(3,12);
+                reservedRecycler.setVisibility(View.GONE);
                 errorHandler.setVisibility(View.VISIBLE);
-            }
         }
     }
     @Override
     public boolean onLoginLogout(String which) {
-        if(isFragmentAttached){
+
             switch (which){
                 case APP_LOGIN:
 
-                    if(reservedEventsAdapter != null && reservedRecycler != null){
-                        if(reservedEvents != null){
-                            reservedRecycler.setVisibility(View.VISIBLE);
-                            errorHandler.setVisibility(View.GONE);
-                        }
-                    }
+//                    if(reservedEventsAdapter != null && reservedRecycler != null){
+//                        if(cachedReservedEvents != null){
+//                            reservedRecycler.setVisibility(View.VISIBLE);
+//                            errorHandler.setVisibility(View.GONE);
+//                        }
+//                    }
+                    //if()
                     return true;
                 case APP_LOGOUT :
                     if(reservedEventsAdapter != null && reservedRecycler != null){
                         reservedRecycler.setVisibility(View.GONE);
                         errorHandler.setText(R.string.not_logged_in);
+                        errorHandler.setTextSize(3,12);
                         errorHandler.setVisibility(View.VISIBLE);
                     }
 
                     return true;
             }
-        }
-
         return false;
     }
-    @Override
-    public void onInternetConnected() {
 
-      /*/
-      reservedRecycler.setVisibility(View.GONE);
-      errorHandler.setText(R.string.no_connection);
-      errorHandler.setVisibility(View.VISIBLE);
-     /*/
-    }
-    @Override
-    public void onInternetDisconnected() {
-        /*/
-        reservedRecycler.setVisibility(View.GONE);
-        errorHandler.setText(R.string.no_connection);
-        errorHandler.setVisibility(View.VISIBLE);
-       /*/
-    }
-    @Override
-    public void onReservedSeatsDataAvailable(int count, ArrayList<ResultSet> reservedResultSets) {
-
-    }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        isFragmentAttached = true ;
-        reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
+    public void onSearch(String query, int adapterPosition) {
+        Log.d(LOGMESSAGE, "ReservedFragment: query: " + query);
+       if( !query.isEmpty() ) {
+           if (adapterPosition == 1) {
+
+               Log.d(LOGMESSAGE, "ReservedFragment: query: " + query);
+
+               if (reservedEvents != null) {
+                   if ( reservedEvents.size() > 0 && !query.isEmpty()) {
+                       Log.d(LOGMESSAGE, "ReservedFragment: query 2: " + query);
+                       ArrayList<ResultSet> filteredResultSet = new ArrayList<>();
+                       filteredResultSet.clear();
+                       for (int i = 0; i < reservedEvents.size(); i++) {
+
+                           if (reservedEvents.get(i) != null)
+                           {
+
+                               ResultSet resultSet = reservedEvents.get(i);
+                               if (resultSet != null)
+                               {
+                                   if (resultSet.getmEvent() != null) {
+                                       Event events = resultSet.getmEvent();
+                                       if (events != null) {
+                                           if (events != null && events.getTitle() != null && events.getTitle().toLowerCase().contains(query.toLowerCase())) {
+
+                                               Log.d(LOGMESSAGE, "ReservedFragment: resultSet: " + resultSet);
+                                               Log.d(LOGMESSAGE, "filtered event added");
+                                               filteredResultSet.add(resultSet);
+                                           }
+                                       }
+                                   }
+
+                               }
+                           }
+                       }
+
+                       if ( filteredResultSet.size() > 0 && !query.isEmpty()) {
+                           errorHandler.setVisibility(View.GONE);
+                           reservedEventsAdapter.setReservedEvents(filteredResultSet,true);
+                           reservedRecycler.setAdapter(reservedEventsAdapter);
+                          // reservedRecycler.invalidate();
+                           reservedRecycler.setVisibility(View.VISIBLE);
+                       }
+                       else if( filteredResultSet.size() <= 0 && !query.isEmpty()){
+                           reservedRecycler.setVisibility(View.GONE);
+                           errorHandler.setText("No match found");
+                           errorHandler.setTextSize(3, 12);
+                           errorHandler.setVisibility(View.VISIBLE);
+                       }
+                       else if(query.isEmpty()){
+                           if( cachedReservedEvents != null ){
+                               errorHandler.setVisibility(View.GONE);
+                               reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
+                               reservedRecycler.setAdapter(reservedEventsAdapter);
+                               reservedRecycler.invalidate();
+                               reservedRecycler.setVisibility(View.VISIBLE);
+                           }
+                       }
+
+                   }
+                   else
+                   {
+                          //TODO: no match found
+                       if(query.isEmpty()){
+                           if( cachedReservedEvents != null ){
+                               errorHandler.setVisibility(View.GONE);
+                               reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
+                               reservedRecycler.setAdapter(reservedEventsAdapter);
+                               reservedRecycler.invalidate();
+                               reservedRecycler.setVisibility(View.VISIBLE);
+                           }
+                       }
+
+                   }
+
+               }
+               else
+               {
+                   //TODO: no match found
+
+               }
+           }
+       }
+       else{
+           if( cachedReservedEvents != null ){
+               errorHandler.setVisibility(View.GONE);
+               reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
+               reservedRecycler.setAdapter(reservedEventsAdapter);
+               reservedRecycler.invalidate();
+               reservedRecycler.setVisibility(View.VISIBLE);
+           }
+       }
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        isFragmentAttached = true ;
-        reservedEvents = ((Evento) appContext.getApplication()).getDatabaseHandler().getAllreservedEvents();
+    public void onSearchQueryEmpty(int adapterPosition) {
+        if (adapterPosition == 1) {
+            if( cachedReservedEvents != null ){
+                errorHandler.setVisibility(View.GONE);
+                reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
+                reservedRecycler.setAdapter(reservedEventsAdapter);
+                reservedRecycler.invalidate();
+                reservedRecycler.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        isFragmentAttached  = false ;
+    public void onPause() {
+        Log.d(LOGMESSAGE, "ReservedFragment: onPause called ");
+        resumed = false;
+        if(appContext != null &&  appContext.getSearchView() != null){
+            appContext.getSearchView().clearFocus();
+        }
+        super.onPause();
 
     }
 }

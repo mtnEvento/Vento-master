@@ -9,19 +9,19 @@ import java.util.List;
  */
 
 public class ResultSet implements Serializable {
-    private ArrayList<Event> mEvent;
+    private Event mEvent;
     private List<DisplayTicket> mDisplayTickets;
 
-    public ResultSet(ArrayList<Event> mEvent, List<DisplayTicket> mDisplayTickets) {
+    public ResultSet(Event mEvent, List<DisplayTicket> mDisplayTickets) {
         this.mEvent = mEvent;
         this.mDisplayTickets = mDisplayTickets;
     }
 
-    public ArrayList<Event> getmEvent() {
+    public Event getmEvent() {
         return mEvent;
     }
 
-    public void setmEvent(ArrayList<Event> mEvent) {
+    public void setmEvent(Event mEvent) {
         this.mEvent = mEvent;
     }
 

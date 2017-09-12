@@ -71,79 +71,118 @@ import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 import static com.mtn.evento.data.Constants.LOGINED_IN;
 import static com.mtn.evento.data.Constants.LOGMESSAGE;
 
-public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Factory.UserLogInOrOutListenter, ProfileFragment.UserProfile, Factory.InternetDataListenter, Factory.ReservedSeatsDataAvailableListener {
+public class HomeScreenActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Factory.UserLogInOrOutListenter, ProfileFragment.UserProfile, Factory.InternetDataListenter {
     private static final int LOGIN_REQUEST = 47;
     private static final int SIGNUP_REQUEST = 49;
     public static ArrayList<Event> events, cacheEvent;
     private Factory mFactory;
-    private SearchRequestListener searchRequestListener;
-    private SearchRegionRequestListener regionRequestListener;
+    private ArrayList<SearchRequestListener> searchRequestListeners;
+    private ArrayList<SearchRegionRequestListener> regionRequestListeners;
     private MenuItem Login, logout;
     private TextView nav_username, nav_email;
     private DrawerLayout mDrawerLayout;
     private de.hdodenhof.circleimageview.CircleImageView  imageView;
     private ActionBarDrawerToggle mDrawerToggle;
-    private ImageView customSearchIcon;
-    private EditText searchEditText;
     private SearchView searchView;
     private ViewPager viewPager;
     private CMPagerAdapter tabAdapter;
     private Spinner spinner;
     private TabLayout tabLayout;
-    private ArrayList<Fragment> mTabs ;
+    private  ArrayList<Fragment> mTabs ;
     private EventsFragment tab1;
     private ReservedFragment tab2;
     private ProfileFragment tab3 ;
     private LoginLogoutListener reservedLoginLogoutListener;
     private Factory.InternetDataListenter eventInternetDataListenter;
-    private Factory.InternetDataListenter reservedSeatInternetDataListenter;
-    private Factory.ReservedSeatsDataAvailableListener reservedSeatsDataAvailableListener;
     private Factory.InternetDataListenter  profileInternetDataListenter;
+    private  MenuItem itemSpinner;
+
     public static boolean isSearching = false;
+    private int selectedPage= 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if(getSupportActionBar() != null){
-            // getSupportActionBar().setIcon(R.mipmap.ic_launcher_round);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-        }
-
-        //handleIntent(getIntent());
-
-        Log.d(LOGMESSAGE, "onCreate: isSearching : " + isSearching);
+        initToolbar();
         initTabs();
         initUI(mTabs);
         initSetting();
-
-
-
-        mFactory = new Factory(HomeScreenActivity.this);
-        Log.d(LOGMESSAGE, "onCreate: is called");
+        initFactory();
 
     }
+    private void initFactory(){
+        mFactory = new Factory(HomeScreenActivity.this);
+    }
 
+    public ViewPager getViewPager() {
+        return viewPager;
+    }
+
+    public Spinner getSpinner() {
+        return spinner;
+    }
+
+    public SearchView getSearchView() {
+        return searchView;
+    }
+
+    private void initToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem item = menu.findItem(R.id.action_spinner);
-        spinner = (Spinner) MenuItemCompat.getActionView(item);
+        itemSpinner = menu.findItem(R.id.action_spinner);
+        itemSpinner.setVisible(false);
+        spinner = (Spinner) MenuItemCompat.getActionView(itemSpinner);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            spinner.setPopupBackgroundResource(R.color.colorAccent);
+        }
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.regions, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
         spinner.setOnItemSelectedListener(spinnerItemSelected());
 
-        // Associate searchable configuration with the SearchView
-//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        if(viewPager.getCurrentItem() == 0){
+            Fragment fragment = mTabs.get(viewPager.getCurrentItem());
+            if(fragment instanceof  EventsFragment){
+                if(itemSpinner != null ){
+                    itemSpinner.setVisible(true);
+                }
+            }
+            else
+            {
+                if(itemSpinner != null ){
+                    itemSpinner.setVisible(false);
+                }
+            }
+        }
+        ImageView mCloseButton = (ImageView) getSearchView().findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        SearchView.SearchAutoComplete mSearchSrcTextView = (SearchView.SearchAutoComplete) getSearchView().findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        mSearchSrcTextView.setText("");
+
+        mCloseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.clearFocus();
+                v.setSelected(false);
+                searchView.setIconified(false);
+                SearchView.SearchAutoComplete mSearchSrcTextView = (SearchView.SearchAutoComplete) getSearchView().findViewById(android.support.v7.appcompat.R.id.search_src_text);
+                mSearchSrcTextView.setText("");
+                searchView.onActionViewCollapsed();
+
+            }
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -151,17 +190,29 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(searchRequestListener != null){
-                    searchRequestListener.onSearch(newText.toLowerCase());
+
+                if(searchRequestListeners!= null){
+                    if(searchRequestListeners.size() > 0 )
+                    {
+                        for ( SearchRequestListener searchRequestListener  :searchRequestListeners )
+                        {
+                            searchRequestListener.onSearch(newText.toLowerCase(),selectedPage);
+                        }
+
+                    }
+                    else
+                    {
+                        for ( SearchRequestListener searchRequestListener  :searchRequestListeners )
+                        {
+                            searchRequestListener.onSearchQueryEmpty(selectedPage);
+                        }
+                    }
                 }
-               // Toast.makeText(HomeScreenActivity.this, newText, Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
-
         return super.onCreateOptionsMenu(menu);
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -171,22 +222,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         return super.onOptionsItemSelected(item);
     }
-
-    //    handle search intent
-    private void handleIntent(Intent intent) {
-
-        Log.d(LOGMESSAGE, "handleIntent: is called");
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            isSearching = true;
-            Log.d(LOGMESSAGE, "handleIntent: issearching : " + isSearching);
-
-
-            //use the query to search your data somehow
-        }
-    }
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -239,17 +274,21 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         }
     }
-
     public AdapterView.OnItemSelectedListener spinnerItemSelected() {
         final String[] regions = getResources().getStringArray(R.array.regions);
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(regionRequestListener != null){
-                    regionRequestListener.onRegionSearch(regions[position].toLowerCase(), viewPager);
+                if(regionRequestListeners != null){
+                    if(regionRequestListeners.size() > 0 )
+                    {
+                        for ( SearchRegionRequestListener searchRegionRequestListener :regionRequestListeners )
+                        {
+                            searchRegionRequestListener.onRegionSearch(regions[position].toLowerCase());
+                        }
+
+                    }
                 }
-
-
             }
 
             @Override
@@ -258,46 +297,49 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             }
         };
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(LOGMESSAGE, "HomeScreenActivity onStart called ");
-
-    }
-
     @Override
     protected void onResume() {
-        Log.d(LOGMESSAGE, "HomeScreenActivity onResume called");
         super.onResume();
-        if (mFactory != null) {
-         //   Log.d(LOGMESSAGE, "HomeScreenActivity onResume called mFactory != null");
-            mFactory.runReservedSeatsTasksOnInternetAvailable();
+        if (mFactory != null)
+        {
             mFactory.runNetworkTask();
             mFactory.runLoginLogoutTask();
-        } else {
-          //  Log.d(LOGMESSAGE, "HomeScreenActivity onResume called mFactory == null");
+        }
+        else
+        {
             mFactory = new Factory(HomeScreenActivity.this);
-            if (mFactory != null) {
-                mFactory.runReservedSeatsTasksOnInternetAvailable();
+            if (mFactory != null)
+            {
                 mFactory.runNetworkTask();
                 mFactory.runLoginLogoutTask();
             }
         }
 
+        if(  getSearchView() != null )
+        {
+            getSearchView().clearFocus();
+        }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
         if (mFactory != null) {
-
             mFactory.stopNetworkTask();
             mFactory.stopLoginLogoutTask();
             mFactory.cancelReservedSeatsTasksOnInternetUnAvailable();
         }
-    }
+        if(  getSearchView() != null )
+        {
+            getSearchView().setIconified(false);
+            getSearchView().setSelected(false);
+            ImageView mCloseButton = (ImageView) getSearchView().findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+            SearchView.SearchAutoComplete mSearchSrcTextView = (SearchView.SearchAutoComplete) getSearchView().findViewById(android.support.v7.appcompat.R.id.search_src_text);
+            mSearchSrcTextView.setText("");
+            getSearchView().onActionViewCollapsed();
+           // mCloseButton.performClick();
+        }
 
+    }
     @Override
     protected void onStop() {
         if (mFactory != null) {
@@ -305,18 +347,8 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         super.onStop();
     }
-
-    @Override
-    protected void onDestroy() {
-        if (mFactory != null) {
-            mFactory = null;
-        }
-        super.onDestroy();
-    }
-
     @Override
     public void onBackPressed() {
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -324,7 +356,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             moveTaskToBack(true);
         }
     }
-
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -367,7 +398,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         return false;
     }
-
     @Override
     public void onUserProfileChange(final String which, final String value) {
         Log.d(LOGMESSAGE, "HomeScreenActivity onUserProfileChange called");
@@ -379,7 +409,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                 }
             }
         });
-
         nav_username.post(new Runnable() {
             @Override
             public void run() {
@@ -388,53 +417,29 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                 }
             }
         });
-
     }
-
     @Override
     public void onInternetConnected() {
-      //  Log.d(LOGMESSAGE, "HomeScreenActivity onInternetConnected called");
-
         if (mFactory != null) {
             if (HomeScreenActivity.this.eventInternetDataListenter != null) {
                 HomeScreenActivity.this.eventInternetDataListenter.onInternetConnected();
-            }
-            if (HomeScreenActivity.this.reservedSeatInternetDataListenter != null) {
-                HomeScreenActivity.this.reservedSeatInternetDataListenter.onInternetConnected();
             }
             if (HomeScreenActivity.this.profileInternetDataListenter != null) {
                 HomeScreenActivity.this.profileInternetDataListenter.onInternetConnected();
             }
         }
     }
-
     @Override
     public void onInternetDisconnected() {
-      //  Log.d(LOGMESSAGE, "HomeScreenActivity onInternetDisconnected called");
         if (mFactory != null) {
             if (HomeScreenActivity.this.eventInternetDataListenter != null) {
                 HomeScreenActivity.this.eventInternetDataListenter.onInternetDisconnected();
-            }
-            if (HomeScreenActivity.this.reservedSeatInternetDataListenter != null) {
-
-                HomeScreenActivity.this.reservedSeatInternetDataListenter.onInternetDisconnected();
-
             }
             if (HomeScreenActivity.this.profileInternetDataListenter != null) {
                 HomeScreenActivity.this.profileInternetDataListenter.onInternetDisconnected();
             }
         }
     }
-
-    @Override
-    public void onReservedSeatsDataAvailable(int count, ArrayList<ResultSet> reservedResultSets) {
-
-        Log.d(LOGMESSAGE, "HomeScreenActivity onReservedSeatsDataAvailable called");
-        if (HomeScreenActivity.this.reservedSeatsDataAvailableListener != null) {
-            HomeScreenActivity.this.reservedSeatsDataAvailableListener.onReservedSeatsDataAvailable(count, reservedResultSets);
-        }
-    }
-
     @Override
     public void onUserSignedIn() {
         Log.d(LOGMESSAGE, "HomeScreenActivity onUserSignedIn called");
@@ -461,13 +466,11 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                         Login.setVisible(false);
                         reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
                     }
-
                 }
             }
         });
 
     }
-
     @Override
     public void onUserSignedOut() {
 
@@ -489,13 +492,25 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         });
 
     }
-    public void initUI(ArrayList<Fragment> mTabs){
+    public void initUI(final ArrayList<Fragment> mTabs){
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.mNavigationView);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.mNavigationView);
         navigationView.setNavigationItemSelectedListener(this);
 
-        View headerView = navigationView.getHeaderView(0);
+        navigationView.post(new Runnable() {
+            @Override
+            public void run() {
+                navigationView.setBackgroundResource(R.color.colorBackground);
+            }
+        });
+        final View headerView = navigationView.getHeaderView(0);
+        mDrawerLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mDrawerLayout.setBackgroundResource(R.color.colorBackground);
+            }
+        });
         imageView =  (de.hdodenhof.circleimageview.CircleImageView) headerView. findViewById(R.id.nav_user);
         nav_username = (TextView) headerView. findViewById(R.id.nav_username);
         nav_email = (TextView) headerView. findViewById(R.id.nav_email);
@@ -503,7 +518,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         final Menu menu = navigationView.getMenu();
         Login = menu.findItem(R.id.action_login);
         logout = menu.findItem(R.id.action_logout);
-
 
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Events"));
@@ -513,37 +527,89 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         viewPager = (ViewPager) findViewById(R.id.pager);
 
-        tabAdapter  = new CMPagerAdapter(getSupportFragmentManager(),mTabs, mTabs.size());
+        tabAdapter  = new CMPagerAdapter(getSupportFragmentManager(),mTabs,3);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                selectedPage = position ;
+                //Toast.makeText(HomeScreenActivity.this,""+position,Toast.LENGTH_LONG).show();
+                Fragment fragment = mTabs.get(position);
+                Toast.makeText(HomeScreenActivity.this,""+position +"\n"+mTabs.get(position),Toast.LENGTH_LONG).show();
+
+                if(fragment instanceof EventsFragment){
+
+                    if(itemSpinner != null ){
+                        itemSpinner.setVisible(true);
+                    }
+                    if(spinner!= null ){ spinner.setVisibility(View.VISIBLE);}
+                    ((EventsFragment) fragment).onRegionSearch("--region--");
+
+                }
+                else{
+                    if(spinner!= null ){spinner.setVisibility(View.GONE);}
+                    if(itemSpinner != null ){
+                        itemSpinner.setVisible(false);
+                    }
+                }
+
+                if(fragment instanceof ProfileFragment)
+                {
+                    if(getSearchView()!= null ){
+                        getSearchView().setVisibility(View.GONE);
+                        SearchView.SearchAutoComplete mSearchSrcTextView = (SearchView.SearchAutoComplete) getSearchView().findViewById(android.support.v7.appcompat.R.id.search_src_text);
+                        mSearchSrcTextView.setText("");
+                        getSearchView().onActionViewCollapsed();
+
+                    }
+                }
+                else
+               {
+                   if(getSearchView()!= null ){
+                       getSearchView().setVisibility(View.VISIBLE);
+                       SearchView.SearchAutoComplete mSearchSrcTextView = (SearchView.SearchAutoComplete) getSearchView().findViewById(android.support.v7.appcompat.R.id.search_src_text);
+                       mSearchSrcTextView.setText("");
+                       getSearchView().onActionViewCollapsed();
+                   }
+               }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                if(tab.getPosition() > 0 ){
-                    if(spinner!= null ){spinner.setVisibility(View.GONE);}
-                }
-                else
-                {
-                    if(spinner!= null ){ spinner.setVisibility(View.VISIBLE);}
-                }
+                selectedPage = tab.getPosition();
             }
-
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
-        reservedLoginLogoutListener = (LoginLogoutListener) (tab2);
+        reservedLoginLogoutListener = (tab2);
         mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,android.R.string.ok,android.R.string.cancel);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         viewPager.setAdapter(tabAdapter);
-        searchRequestListener = (SearchRequestListener) ((EventsFragment) tab1);
-        regionRequestListener = (SearchRegionRequestListener) ((EventsFragment)tab1);
+        searchRequestListeners.add(tab1);
+        searchRequestListeners.add(tab2);
+
+        regionRequestListeners.add(tab1) ;
+       // regionRequestListeners.add(tab2)) ;
+
 
     }
     public void initTabs(){
-
         if (events == null) {
             events = new ArrayList<>();
         }
@@ -551,6 +617,8 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             cacheEvent = new ArrayList<>();
         }
 
+        searchRequestListeners = new ArrayList<>();
+        regionRequestListeners = new ArrayList<>();
         mTabs = new ArrayList<>();
         tab1 = new EventsFragment();
         tab1.setAppContext(HomeScreenActivity.this);
@@ -559,116 +627,12 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         tab2 = new ReservedFragment();
         tab2.setAppContext(HomeScreenActivity.this);
-        this.reservedSeatInternetDataListenter = tab2 ;
-        this.reservedSeatsDataAvailableListener = tab2;
         mTabs.add(tab2);
 
         tab3 = new ProfileFragment();
         tab3.setAppContext(HomeScreenActivity.this);
         this.profileInternetDataListenter = tab3 ;
         mTabs.add(tab3);
-
-    }
-    private void initSearch(){
-
-        searchView = (SearchView) findViewById(R.id.reserve_seat);
-        searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-        View mSearchEditFrame = searchView.findViewById(android.support.v7.appcompat.R.id.search_edit_frame);
-        ImageView mCollapsedIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_mag_icon);
-        ImageView mCloseButton = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
-        Drawable mSearchHintIcon = new Drawable() {
-            @Override
-            public void draw(Canvas canvas) {
-                canvas.setBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.ic_search_svg));
-            }
-
-            @Override
-            public void setAlpha(int alpha) {
-
-            }
-
-            @Override
-            public void setColorFilter(ColorFilter colorFilter) {
-
-            }
-
-            @Override
-            public int getOpacity() {
-                return PixelFormat.OPAQUE;
-            }
-        };
-
-        View mSearchPlate = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);;
-        final View mSubmitArea  = searchView.findViewById(android.support.v7.appcompat.R.id.submit_area);
-        ImageView mSearchButton = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_button);;
-        ImageView mGoButton =(ImageView)searchView.findViewById(android.support.v7.appcompat.R.id.search_go_btn); ;
-
-        mCloseButton.setVisibility(View.GONE);
-        mCloseButton.removeOnLayoutChangeListener(null);
-        mCloseButton.setOnFocusChangeListener(null);
-        mCollapsedIcon.setImageDrawable(mSearchHintIcon);
-
-        mCloseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(HomeScreenActivity.this,"close Btn clicked! and mSubmitArea with text : "+(searchEditText).getText().toString(),Toast.LENGTH_LONG).show();
-            }
-        });
-        mGoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(HomeScreenActivity.this,"Go Btn clicked!",Toast.LENGTH_LONG).show();
-            }
-        });
-//        mSearchButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(HomeScreenActivity.this,"Search Btn clicked! and mSubmitArea with text : "+(searchEditText).getText().toString(),Toast.LENGTH_LONG).show();
-//            }
-//        });
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            mCloseButton.setRevealOnFocusHint(false);
-        }
-        searchEditText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-        searchEditText.setHintTextColor(Color.LTGRAY);
-        searchEditText.setHint("           Search Events by Titles...");
-
-//        searchView.setOnSearchClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-//                customSearchIcon.setVisibility(View.GONE);
-//                searchEditText.setHint("       Search Events by Titles...");
-//            }
-//        });
-//
-//        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                if(hasFocus){
-//                    customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-//                    customSearchIcon.setVisibility(View.GONE);
-//                    searchEditText.setHint("       Search Events by Titles...");
-//                }
-//                else{
-//                    customSearchIcon = (ImageView) findViewById(R.id.customSearchIcon);
-//                    customSearchIcon.setVisibility(View.VISIBLE);
-//                    searchEditText.setHint("           Search Events by Titles...");
-//                }
-//            }
-//        });
-//
-//        searchView.setOnSearchClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(HomeScreenActivity.this,""+ v.getId(),Toast.LENGTH_LONG).show();
-//            }
-//        });
-
-
-        // searchView.
     }
     private void initSetting(){
 
@@ -688,14 +652,9 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
 
     }
-
     public boolean isInternetOn() {
 
-        // get Connectivity Manager object to check connection
-        ConnectivityManager connec =
-                (ConnectivityManager) getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
-
-        // Check for network connections
+        ConnectivityManager connec =(ConnectivityManager) getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
         if (connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
                 connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
                 connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
@@ -713,7 +672,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
         }
         return false;
     }
-
     private boolean isNetworkOn(){
         ConnectivityManager ConnectionManager=(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
@@ -726,19 +684,17 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             return  false;
         }
     }
-
     private boolean isNetworkAndInternetAvailable(){
         return  isNetworkOn()&& isInternetOn() ;
     }
-
     public interface SearchRequestListener {
-        public ArrayList<Event> onSearch(String query);
-    }
+        public void onSearch(String query,int adapterPosition);
+        public void onSearchQueryEmpty(int adapterPosition);
 
+    }
     public interface SearchRegionRequestListener {
-        public ArrayList<Event> onRegionSearch(String query, ViewPager vp);
+        public void onRegionSearch(String query);
     }
-
     public interface LoginLogoutListener {
         public boolean onLoginLogout(String which);
     }

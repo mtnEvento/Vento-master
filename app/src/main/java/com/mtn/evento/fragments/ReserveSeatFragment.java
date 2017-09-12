@@ -38,6 +38,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.mtn.evento.Evento;
 import com.mtn.evento.R;
+import com.mtn.evento.activities.HomeScreenActivity;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.DisplayTicket;
 import com.mtn.evento.data.EncodeData;
@@ -65,7 +66,7 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ReserveSeatFragment extends Fragment implements View.OnClickListener {
+public class ReserveSeatFragment extends Fragment implements View.OnClickListener  {
     static String transactionId;
     Context context;
     static MenuItem cartView;
@@ -88,6 +89,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
+
     public interface IPay{
         void onPaymentConfirm(String transactionId,String result, List<DisplayTicket> displayTickets);
         void onPaymentDenied(String transactionId,String result);
@@ -108,26 +110,28 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         makePayment.setOnClickListener(this);
         Bundle bag = getArguments();
         mEvent = (Event) bag.getSerializable(Constants.EVENT);
-        Serializable bannerSer =   bag.getSerializable(Constants.BANNER);
-
         makePayment.setTag(mEvent);
         ArrayList<Ticket> tickets = mEvent.getTicket_type();
         ArrayList<String> strTickets = new ArrayList<>();
-        for (Ticket ticket : tickets) {
-            strTickets.add(ticket.getName());
-        }
-        String[] types = new String[strTickets.size()];
-        for (int i = 0; i < strTickets.size(); i++) {
-            types[i] = strTickets.get(i).toUpperCase();
+        if(tickets != null && tickets.size()> 0){
+            for (Ticket ticket : tickets) {
+                strTickets.add(ticket.getName());
+            }
+            String[] types = new String[strTickets.size()];
+            for (int i = 0; i < strTickets.size(); i++) {
+                types[i] = strTickets.get(i).toUpperCase();
+            }
+
+            holder = new ReservationHolder(view,this,mEvent,mDatabase,mAuth,types );
+            spinner = (com.jaredrummler.materialspinner.MaterialSpinner) view.findViewById(R.id.spinner);
+            spinner.setOnItemSelectedListener(new SpinnerListener());
+            Glide.with(context)
+                    .load(mEvent.getBanner())
+                    .asBitmap()
+                    .into(event_image) ;
+
         }
 
-        holder = new ReservationHolder(view,this,mEvent,mDatabase,mAuth,types );
-        spinner = (com.jaredrummler.materialspinner.MaterialSpinner) view.findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(new SpinnerListener());
-        Glide.with(context)
-                .load(mEvent.getBanner())
-                .asBitmap()
-                .into(event_image) ;
 
         return view;
     }
@@ -140,55 +144,63 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         int result =  0 ;
-                        for(DataSnapshot snapshot : dataSnapshot.getChildren()){
 
-
-                            Ticket ticket = snapshot.getValue(Ticket.class);
-                            Log.d(LOGMESSAGE, "selected :" + ((String)item).toUpperCase() +"  from ticket : "+ticket.getName().toUpperCase());
-                            Log.d(LOGMESSAGE, "onDataChange in Spinner : ticket is " + ticket);
-                            if(ticket != null)
+                        if(dataSnapshot != null && dataSnapshot.getValue() != null )
+                        {
+                            for(DataSnapshot snapshot : dataSnapshot.getChildren())
                             {
 
-                                if(((String)item).toUpperCase().equals(ticket.getName().toUpperCase()))
-                                {
-                                    result = Integer.parseInt(ticket.getAvailable_seats());
-                                    if(result > 0 )
-                                    {
-                                        Snackbar.make(view, "Ticket(s) left for " + item +" category is "+result, Snackbar.LENGTH_LONG).show();
-                                        Log.d(LOGMESSAGE, "Available_seats  is "+ result);
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        int childs = seats_group.getChildCount();
-                                        Snackbar.make(view, "Sorry! no ticket left for '" + item + "' category", Snackbar.LENGTH_LONG).show();
-                                        if( childs > 0)
-                                        {
-                                            seats_group.removeViewAt(childs-1);
-                                            if( cartView != null &&  cartView.getTitle()!= null){
 
-                                                if(!cartView.getTitle().toString().isEmpty()){
-                                                    String numberOnly = cartView.getTitle().toString().replaceAll("[^0-9]", "");
-                                                    cartView.setTitle( "Cart : "+ ( (Integer.parseInt(numberOnly))- 1));
+                                Ticket ticket = snapshot.getValue(Ticket.class);
+                                Log.d(LOGMESSAGE, "selected :" + ((String)item).toUpperCase() +"  from ticket : "+ticket.getName().toUpperCase());
+                                Log.d(LOGMESSAGE, "onDataChange in Spinner : ticket is " + ticket);
+                                if(ticket != null)
+                                {
+
+                                    if(((String)item).toUpperCase().equals(ticket.getName().toUpperCase()))
+                                    {
+                                        result = Integer.parseInt(ticket.getAvailable_seats());
+                                        if(result > 0 )
+                                        {
+                                            Snackbar.make(view, "Ticket(s) left for " + item +" category is "+result, Snackbar.LENGTH_LONG).show();
+                                            Log.d(LOGMESSAGE, "Available_seats  is "+ result);
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            int childs = seats_group.getChildCount();
+                                            Snackbar.make(view, "Sorry! no ticket left for '" + item + "' category", Snackbar.LENGTH_LONG).show();
+                                            if( childs > 0)
+                                            {
+                                                seats_group.removeViewAt(childs-1);
+                                                if( cartView != null &&  cartView.getTitle()!= null){
+
+                                                    if(!cartView.getTitle().toString().isEmpty()){
+                                                        String numberOnly = cartView.getTitle().toString().replaceAll("[^0-9]", "");
+                                                        cartView.setTitle( "Cart : "+ ( (Integer.parseInt(numberOnly))- 1));
+                                                    }
                                                 }
                                             }
-                                        }
 
-                                        break;
+                                            break;
+                                        }
                                     }
                                 }
-                                // Log.d(LOGMESSAGE, "onDataChange in Spinner: result after checking : " + result);
                             }
+                        }
+                        else
+                        {
+                            Log.d(LOGMESSAGE, "No ticket types available");
                         }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        Log.d(LOGMESSAGE, "databaseError : \n"+databaseError.getMessage());
+                        Log.d(LOGMESSAGE, "databaseError : \n"+databaseError.getDetails());
+                        Log.d(LOGMESSAGE, "databaseError : \n"+databaseError.toException());
                     }
                 });
-
-                Log.d(LOGMESSAGE, "Done here");
             }
     }
     @Override
@@ -233,71 +245,90 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
             case R.id.makePayment:
 
-                childs = holder.seats_group.getChildCount();
-                int errrorCount = 0  ;
-                String amount = "";
-                String strQnt = "";
-                if(!cartView.getTitle().toString().isEmpty()){
-                       String numberOnly = cartView.getTitle().toString().replaceAll("[^0-9]", "");
+                if(holder != null  && holder.seats_group != null && holder.seats_group.getChildCount()> 0 ){
+                    childs = holder.seats_group.getChildCount();
+                    int errrorCount = 0  ;
+                    String amount = "";
+                    String strQnt = "";
+                    if(!cartView.getTitle().toString().isEmpty()){
+                        String numberOnly = cartView.getTitle().toString().replaceAll("[^0-9]", "");
 
-                       if (Integer.parseInt(numberOnly) > 0 ){
+                        if (Integer.parseInt(numberOnly) > 0 ){
 
-                           ArrayList<SinglePurchaseData> singlePurchaseDataArrayList = new ArrayList<>();
+                            ArrayList<SinglePurchaseData> singlePurchaseDataArrayList = new ArrayList<>();
 
-                           for (int i = 0; i < childs; i++) {
-                                 double dubleAmount= 0.00;
-                                 int quantity = 0 ;
-                                 SinglePurchaseData  singlePurchaseData = new SinglePurchaseData();
-                                 CardView crd = (CardView) holder.seats_group.getChildAt(i);
-                                 LinearLayout layout = (LinearLayout) crd.getChildAt(0);
+                            for (int i = 0; i < childs; i++) {
+                                double dubleAmount= 0.00;
+                                int quantity = 0 ;
+                                SinglePurchaseData  singlePurchaseData = new SinglePurchaseData();
+                                CardView crd = (CardView) holder.seats_group.getChildAt(i);
+                                LinearLayout layout = (LinearLayout) crd.getChildAt(0);
 
-                                 MaterialSpinner spiner = (MaterialSpinner) layout.getChildAt(0);
-                                 String typeName = holder.ticketCategories[spiner.getSelectedIndex()];
-                                 ArrayList<Ticket>   tickets  =  mEvent.getTicket_type();
-                                 ArrayList<String>   strTickets  = new ArrayList<>();
-                                 for (Ticket  ticket : tickets  )
-                                 {
-                                     if (typeName.toUpperCase().contentEquals(ticket.getName().toUpperCase())) {
-                                          amount =   ticket.getAmount().trim();
-                                          dubleAmount = Double.parseDouble(amount);
-                                          singlePurchaseData.setType(typeName);
-                                          break;
-                                      }
-                                 }
+                                MaterialSpinner spiner = (MaterialSpinner) layout.getChildAt(0);
+                                String typeName = holder.ticketCategories[spiner.getSelectedIndex()];
+                                ArrayList<Ticket>   tickets  =  mEvent.getTicket_type();
+                                ArrayList<String>   strTickets  = new ArrayList<>();
+                                if(tickets != null )
+                                {
+                                    for (Ticket  ticket : tickets  )
+                                    {
+                                        if (typeName.toUpperCase().contentEquals(ticket.getName().toUpperCase())) {
+                                            amount =   ticket.getAmount().trim();
+                                            dubleAmount = Double.parseDouble(amount);
+                                            singlePurchaseData.setType(typeName);
+                                            break;
+                                        }
+                                    }
+                                }
 
-                               AppCompatEditText qty = (AppCompatEditText) layout.getChildAt(1);
-                               if (TextUtils.isEmpty(qty.getText().toString().trim())) {
-                                   qty.setError("Quantity Required!");
-                                   errrorCount += 1 ;
-                                   break;
-                               } else {
-                                   qty.setError(null);
-                                   strQnt = qty.getText().toString().trim();
-                                   singlePurchaseData.setQuantity(strQnt);
-                                   singlePurchaseData.setPrice( "" + (dubleAmount * Integer.parseInt(strQnt)) );
-                                   errrorCount = 0  ;
-                               }
+                                AppCompatEditText qty = (AppCompatEditText) layout.getChildAt(1);
+                                if (TextUtils.isEmpty(qty.getText().toString().trim())) {
+                                    qty.setError("Quantity Required!");
+                                    errrorCount += 1 ;
+                                    break;
+                                } else {
+                                    qty.setError(null);
+                                    strQnt = qty.getText().toString().trim();
+                                    singlePurchaseData.setQuantity(strQnt);
+                                    singlePurchaseData.setPrice( "" + (dubleAmount * Integer.parseInt(strQnt)) );
+                                    errrorCount = 0  ;
+                                }
 
-                               singlePurchaseDataArrayList.add(singlePurchaseData);
-                           }
+                                singlePurchaseDataArrayList.add(singlePurchaseData);
+                            }
 
-                           if(errrorCount <= 0){
-                               double total_price = 0.00 ;
-                               for(SinglePurchaseData data : singlePurchaseDataArrayList){
-                                   total_price += Double.parseDouble(data.getPrice());
-                               }
-                               confirmPayment(String.format("%.2f",total_price),singlePurchaseDataArrayList);
-                           }
-                           else{
-                               Toast.makeText(getActivity(),"You may have not specified the quantity of some ticket type",Toast.LENGTH_LONG).show();
-                           }
-                       }
-                       else
-                       {
-                           //TODO: Alert nothing added to chart.
-                           Toast.makeText(getActivity(),"Sorry! you cannot make payment because anything added to the ticket cart.",Toast.LENGTH_LONG).show();
-                       }
+                            if(errrorCount <= 0){
+                                double total_price = 0.00 ;
+                                for(SinglePurchaseData data : singlePurchaseDataArrayList){
+                                    total_price += Double.parseDouble(data.getPrice());
+                                }
+
+                                if(total_price > 0 ){
+                                    confirmPayment(String.format("%.2f",total_price),singlePurchaseDataArrayList);
+                                }
+                                else
+                                {
+                                   showErrorOrWarningAlert("SORRY","You can not enter '0'  for quantity");
+                                }
+
+                            }
+                            else
+                            {
+                                Toast.makeText(getActivity(),"You may have not specified the quantity of some ticket type",Toast.LENGTH_LONG).show();
+                            }
+                        }
+                        else
+                        {
+                            //TODO: Alert nothing added to chart.
+                            Toast.makeText(getActivity(),"Sorry! you cannot make payment because anything added to the ticket cart.",Toast.LENGTH_LONG).show();
+                        }
+                    }
                 }
+                else
+                {
+                    showErrorOrWarningAlert("UNKNOWN ERROR","An error occurred while trying to access UI component content. The event published might have contain some errors that are affecting it. Please contact us to report such issues. ");
+                }
+
                 break;
         }
     }
@@ -308,7 +339,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         builder.setMessage("Total Price : "+ amount);
         builder.setNegativeButton("Cancel", confirmListener(null, amount));
         builder.setPositiveButton("Confirm", confirmListener(singlePurchaseDataArrayList,amount));
-
         builder.create().show();
     }
     private DialogInterface.OnClickListener confirmListener(final ArrayList<SinglePurchaseData> singlePurchaseDataArrayList,final String amount) {
@@ -364,25 +394,41 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     }
 
     private void makePayment(final List<SinglePurchaseData> singlePurchaseData, String[] networkPossibleName,final String amount, final String number) {
-        final Handler h2 = new Handler();
-        if(loading != null){
-            loading.setMessage(  "Please wait...\n\nTrying to Contact Network Operator. This may take about 15secs ...");
-            loading.setCancelable(false);
-            loading.setIndeterminate(false);
-        }
-        else
-        {
-            loading = new ProgressDialog(context);
-            loading.setMessage(  "Please wait...\n\nTrying to Contact Network Operator. This may take about 15secs ...");
-            loading.setCancelable(false);
-            loading.setIndeterminate(false);
-        }
 
+        runOnUI(new Runnable() {
+            @Override
+            public void run()
+            {
+                if(loading != null){
+                    loading.setMessage(  "Please wait...\n\nTrying to Contact Network Operator. This may take about 15secs ...");
+                    loading.setCancelable(false);
+                    loading.setIndeterminate(false);
+                }
+                else
+                {
+                    loading = new ProgressDialog(context);
+                    loading.setMessage(  "Please wait...\n\nTrying to Contact Network Operator. This may take about 15secs ...");
+                    loading.setCancelable(false);
+                    loading.setIndeterminate(false);
+                }
+            }
+        });
+
+        String str_username = null , str_email = null ;
+        if ( context != null &&((AppCompatActivity) context).getApplication() !=null &&((Evento)((AppCompatActivity) context).getApplication()).getSettings().contains(APP_USER_EMAIL)) {
+            str_email = ((Evento)((AppCompatActivity) context).getApplication()).getSettings().getString(APP_USER_EMAIL, "");
+
+        }
+        if ( context != null &&((AppCompatActivity) context).getApplication() !=null &&((Evento)((AppCompatActivity) context).getApplication()).getSettings().contains(APP_USERNAME)) {
+             str_username = ((Evento)((AppCompatActivity) context).getApplication()).getSettings().getString(APP_USERNAME, "");
+
+        }
+        Log.d("contentValue","number: "+ number + " amount: " + amount + " username: " +  str_username + "  email: " +  str_email);
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 Log.d(LOGMESSAGE, "Payment 1 stopper started");
-                ((AppCompatActivity) context).runOnUiThread(new Runnable() {
+                runOnUI(new Runnable() {
                     @Override
                     public void run() {
                         if (loading != null) {
@@ -398,7 +444,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                     }
                                 }
                             };
-                            h2.postDelayed(r2,60000);
+                            runOnUI(r2,60000);
                         }
                     }
                 });
@@ -406,21 +452,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 Log.d(LOGMESSAGE, "Payment 1 stopper ended");
             }
         };
-        String str_username = null , str_email = null ;
-        if ( context != null &&((AppCompatActivity) context).getApplication() !=null &&((Evento)((AppCompatActivity) context).getApplication()).getSettings().contains(APP_USER_EMAIL)) {
-            str_email = ((Evento)((AppCompatActivity) context).getApplication()).getSettings().getString(APP_USER_EMAIL, "");
-
-        }
-        if ( context != null &&((AppCompatActivity) context).getApplication() !=null &&((Evento)((AppCompatActivity) context).getApplication()).getSettings().contains(APP_USERNAME)) {
-             str_username = ((Evento)((AppCompatActivity) context).getApplication()).getSettings().getString(APP_USERNAME, "");
-
-        }
-
-        Log.d("contentValue","number: "+ number + " amount: " + amount + " username: " +  str_username + "  email: " +  str_email);
-        final Handler handler = new Handler();
-        handler.postDelayed(runnable,30000);
-
-        final Handler h = new Handler();
+        runOnUI(runnable,30000);
 
         HashMap<String,String> contentValue = new HashMap<>();
         contentValue.put("CustomerName",""+str_username);
@@ -481,36 +513,33 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                 Runnable runnable = new Runnable() {
                                     @Override
                                     public void run() {
-                                        Log.d(LOGMESSAGE, "Payment stopper started");
-                                        ((AppCompatActivity) context).runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (loading != null) {
-                                                    loading.setCancelable(true);
-                                                    loading.hide();
-                                                    Log.d(LOGMESSAGE, "Payment setCancelable true");
-                                                }
-                                            }
-                                        });
-
-                                        Log.d(LOGMESSAGE, "Payment stopper ended");
+                                    Log.d(LOGMESSAGE, "Payment stopper started");
+                                    if (loading != null) {
+                                        loading.setCancelable(true);
+                                        loading.hide();
+                                        Log.d(LOGMESSAGE, "Payment setCancelable true");
+                                    }
+                                    Log.d(LOGMESSAGE, "Payment stopper ended");
                                     }
                                 };
-                                final Handler handler = new Handler();
-                                handler.postDelayed(runnable,15000);
+                                runOnUI(runnable,15000);
                                 TimerTask task = new TimerTask() {
                                     @Override
                                     public void run() {
-
-                                        if(loading != null){
-
-                                            h.post(new Runnable() {
+                                        runOnUI(
+                                            new Runnable()
+                                            {
                                                 @Override
-                                                public void run() {
-                                                    loading.setMessage("Payment Processing started");
+                                                public void run()
+                                                {
+                                                    if(loading != null)
+                                                    {
+                                                      loading.setMessage("Payment Processing started");
+                                                    }
                                                 }
-                                            });
-                                        }
+                                            }
+                                        );
+
 
                                         Log.d(LOGMESSAGE, "result index2 TransactionId run: " + transactionId);
                                         HashMap<String, String> contentValue = new HashMap<>();
@@ -530,10 +559,8 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
                                                     if (isReady)
                                                     {
-                                                        if (loading != null) {
-                                                            loading.hide();
-                                                        }
-                                                        if(t != null){
+                                                        hideLoading();
+                                                        if( t != null){
                                                             t.cancel();
                                                             t.purge();
                                                             t = null ;
@@ -541,7 +568,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                                         if (!object.getString("StatusCode").contentEquals("0000")){
                                                             Log.d(LOGMESSAGE, "Result 2: transaction is successful ");
                                                             final List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
-                                                            ((Evento) getActivity().getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
+                                                            ((Evento)( (AppCompatActivity)getContext()).getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
                                                             iPay.onPaymentConfirm(transactionId,""+object.getString("Description"),displayTickets);
                                                         }
                                                         else
@@ -561,10 +588,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                                         t.purge();
                                                         t = null ;
                                                     }
-                                                    if (loading != null){
-                                                        loading.hide();
-                                                    }
-
+                                                    hideLoading();
                                                 }
 
                                             }
@@ -577,34 +601,15 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                                     t.purge();
                                                     t = null ;
                                                 }
-
-
-                                                if (loading != null){
-                                                    loading.hide();
-                                                }
-
-
-                                                ((AppCompatActivity)context).runOnUiThread(new Runnable() {
+                                                runOnUI(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        Handler mHandler= new Handler();
-                                                        mHandler.post(new Runnable() {
-                                                            @Override
-                                                            public void run() {
+                                                        if (loading != null)
+                                                        {
+                                                            loading.hide();
+                                                        }
 
-                                                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                                                builder.setTitle("SERVER CONNECT ERROR");
-                                                                builder.setMessage(error);
-                                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                                    @Override
-                                                                    public void onClick(DialogInterface dialog, int which) {
-                                                                        dialog.dismiss();
-                                                                    }
-                                                                });
-                                                                builder.show();
-                                                            }
-                                                        });
-
+                                                        showErrorOrWarningAlert("SERVER CONNECT ERROR",error);
                                                     }
                                                 });
                                             }
@@ -616,105 +621,76 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                 }
                                 else
                                 {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                    builder.setTitle("TRANSACTION PROCESSING FAILURE");
-                                    builder.setMessage("Could not process the transaction! please try again");
-                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                   runOnUI(new Runnable() {
                                         @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
+                                        public void run() {
+                                            showErrorOrWarningAlert("TRANSACTION PROCESSING FAILURE","Could not process the transaction! please try again");
                                         }
                                     });
-                                    builder.show();
                                 }
-
                             }
                             Log.d(LOGMESSAGE, "TransactionId : " + transactionId);
                         }
                         else
                         {
                             Log.d(LOGMESSAGE, "TransactionError : Could not process the transaction because of the incorrect information provided. Please the correct information and try again");
-                            // Toast.makeText(ReserveSeatFragment.this.context,"",Toast.LENGTH_LONG).show();
-                            if (loading != null){
-                                loading.hide();
-                            }
-                            ((AppCompatActivity)context).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Handler mHandler= new Handler();
-                                    mHandler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                            builder.setTitle("TRANSACTION FAILED");
-                                            builder.setMessage("Could not process the transaction because of the incorrect information provided. Please the correct information and try again!");
-                                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                }
-                                            });
-                                            builder.show();
-                                        }
-                                    });
-                                }
+                            hideLoading();
+                            runOnUI(new Runnable() {
+                                 @Override
+                                  public void run() {
+                                     showErrorOrWarningAlert("DELAY IN PROCESSING","Could not process the transaction immediately because there may be incorrect information provided. Please wait for some about 15secs and try again if there is still delay in processing.!");
+                                 }
                             });
 
-                            //TODO: could not process transaction
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                         Log.d(LOGMESSAGE, "TransactionError : " + e);
-                        loading.hide();
+                        hideLoading();
                     }
                 }
             }).attachServerErrorListener(new ServerConnector.ErrorCallback() {
                 @Override
                 public void getError(final String error, IOException e) {
-
                     if(t != null){
                         t.cancel();
                         t.purge();
                         t = null ;
                     }
-                    if (loading != null){
-                        loading.hide();
-                    }
-                    ((AppCompatActivity)context).runOnUiThread(new Runnable() {
+                    runOnUI(new Runnable() {
                         @Override
-                        public void run() {
-                            Handler mHandler= new Handler();
-                            mHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                    builder.setTitle("SERVER CONNECT ERROR");
-                                    builder.setMessage(error);
-                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                                    builder.show();
-                                }
-                            });
+                        public void run () {
+                            if (loading != null)
+                            {
+                                loading.hide();
+                            }
+                            showErrorOrWarningAlert("SERVER CONNECT ERROR",error);
                         }
                     });
                 }
             }).connectToServer();
-            if( loading != null ){
-                loading.show();
-            }
-            else
-            {
-                Toast.makeText(context,"Could not initialize progress dialog!",Toast.LENGTH_LONG).show();
-            }
+            runOnUI(new Runnable() {
+                @Override
+                public void run() {
+                    if( loading != null ){
+                        loading.show();
+                    }
+                    else
+                    {
+                        Toast.makeText(getContext(),"Could not initialize progress dialog!",Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
         }
-        catch(Exception e)
+        catch(final Exception e)
         {
-            Toast.makeText(context,"Error ::: "+e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
+         runOnUI(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context,"Error ::: "+e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
+                }
+            });
         }
         finally {}
     }
@@ -852,20 +828,13 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         {
             builder = new android.app.AlertDialog.Builder(app);
         }
-
-        // Set the dialog title
         builder.setTitle("Select Payment Method")
-
-                // specify the list array, the items to be selected by default (null for none),
-                // and the listener through which to receive call backs when items are selected
-                // again, R.array.choices were set in the resources res/values/strings.xml
-                .setSingleChoiceItems(R.array.choices, -1, new DialogInterface.OnClickListener() {
+               .setSingleChoiceItems(R.array.choices, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int selectedPosition) {
 
                         switch (selectedPosition){
                             case 0 :
-
                                 createUserInputResquest(singlePurchaseDataArrayList,new String[]{"MTN","MTN GH","MTN-GH","MTN GHANA"},amount,false);
                                 break;
                             case 1:
@@ -884,15 +853,14 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                         }
                         arg0.cancel();
                     }
-                })
-
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+               })
+               .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        // removes the dialog from the screen
-                    }
-                })
-                .show();
+                        dialog.cancel();
+                   }
+               })
+               .show();
     }
 
     private void createUserInputResquest(final ArrayList<SinglePurchaseData> singlePurchaseDataArrayList, final String[] networkNames, final String amount,boolean recreate){
@@ -973,64 +941,112 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             int result =  0 ;
-                            for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                                Ticket ticket = snapshot.getValue(Ticket.class);
-                                Log.d(LOGMESSAGE, "selected :" + ((String)item).toUpperCase() +"  from ticket : "+ticket.getName().toUpperCase());
-                                Log.d(LOGMESSAGE, "onDataChange in Spinner : ticket is " + ticket);
-                                if(ticket != null)
+                            if(dataSnapshot != null && dataSnapshot.getValue() != null )
+                            {
+                                for(DataSnapshot snapshot : dataSnapshot.getChildren())
                                 {
-
-                                    if(((String)item).toUpperCase().equals(ticket.getName().toUpperCase()))
+                                    Ticket ticket = snapshot.getValue(Ticket.class);
+                                    Log.d(LOGMESSAGE, "selected :" + ((String)item).toUpperCase() +"  from ticket : "+ticket.getName().toUpperCase());
+                                    Log.d(LOGMESSAGE, "onDataChange in Spinner : ticket is " + ticket);
+                                    if(ticket != null)
                                     {
-                                        result = Integer.parseInt(ticket.getAvailable_seats());
-                                        if(result > 0 )
+                                        if(((String)item).toUpperCase().equals(ticket.getName().toUpperCase()))
                                         {
-                                            Snackbar.make(view, "Ticket(s) left for " + item +" category is "+result, Snackbar.LENGTH_LONG).show();
-                                            Log.d(LOGMESSAGE, "Available_seats  is "+ result);
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            int childs = seats_group.getChildCount();
-                                            Snackbar.make(view, "Sorry! no ticket left for '" + item + "' category", Snackbar.LENGTH_LONG).show();
-                                            if( childs > 0)
+                                            result = Integer.parseInt(ticket.getAvailable_seats());
+                                            if(result > 0 )
                                             {
-                                                seats_group.removeViewAt(childs-1);
-                                                if( cartView != null &&  cartView.getTitle()!= null){
+                                                Snackbar.make(view, "Ticket(s) left for " + item +" category is "+result, Snackbar.LENGTH_LONG).show();
+                                                Log.d(LOGMESSAGE, "Available_seats  is "+ result);
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                int childs = seats_group.getChildCount();
+                                                Snackbar.make(view, "Sorry! no ticket left for '" + item + "' category", Snackbar.LENGTH_LONG).show();
+                                                if( childs > 0)
+                                                {
+                                                    seats_group.removeViewAt(childs-1);
+                                                    if( cartView != null &&  cartView.getTitle()!= null){
 
-                                                    if(!cartView.getTitle().toString().isEmpty()){
-                                                        String numberOnly = cartView.getTitle().toString().replaceAll("[^0-9]", "");
-                                                        cartView.setTitle( "Cart : "+ ( (Integer.parseInt(numberOnly))- 1));
+                                                        if(!cartView.getTitle().toString().isEmpty()){
+                                                            String numberOnly = cartView.getTitle().toString().replaceAll("[^0-9]", "");
+                                                            cartView.setTitle( "Cart : "+ ( (Integer.parseInt(numberOnly))- 1));
+                                                        }
                                                     }
                                                 }
-                                            }
 
-                                            break;
+                                                break;
+                                            }
                                         }
                                     }
-                                    // Log.d(LOGMESSAGE, "onDataChange in Spinner: result after checking : " + result);
                                 }
+                            }
+                            else
+                            {
+                                Log.d(LOGMESSAGE, "No ticket types available");
                             }
                         }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
+                            Log.d(LOGMESSAGE, "databaseError : \n"+databaseError.getMessage());
+                            Log.d(LOGMESSAGE, "databaseError : \n"+databaseError.getDetails());
+                            Log.d(LOGMESSAGE, "databaseError : \n"+databaseError.toException());
                         }
                     });
-
-                    Log.d(LOGMESSAGE, "Done here");
                 }
             });
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        if (loading != null){
-            loading.dismiss();
-            loading = null ;
+    public void runOnUI( final Runnable run){
+        if(getContext() != null && ((AppCompatActivity)getContext()) != null ) {
+            ((AppCompatActivity) getContext()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Handler handler = new Handler();
+                    handler.post(run);
+                }
+            });
+
         }
+    }
+
+    public void runOnUI(final Runnable run, final int timeDelay){
+        if(getContext() != null && ((AppCompatActivity)getContext()) != null ){
+            ((AppCompatActivity)getContext()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Handler handler = new Handler() ;
+                    handler.postDelayed(run,timeDelay) ;
+                }
+            });
+        }
+
+    }
+
+    public void showErrorOrWarningAlert(String title, String msg){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(title);
+        builder.setMessage(msg);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    public void hideLoading(){
+        runOnUI(new Runnable() {
+            @Override
+            public void run() {
+                if(loading != null)
+                {
+                    loading.hide();
+                }
+            }
+        });
     }
 }

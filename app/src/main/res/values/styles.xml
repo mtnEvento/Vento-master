@@ -6,7 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:actionMenuTextColor">@color/white</item>
+        <item name="android:actionMenuTextColor">#000000</item>
+
         <item name="android:typeface">monospace</item>
     </style>
 
@@ -25,7 +26,6 @@
         <item name="android:maxLines">2</item>
         <item name="android:ellipsize">end</item>
     </style>
-
 
     <style name="MenuButtonsStyle">
         <item name="fab_size">mini</item>

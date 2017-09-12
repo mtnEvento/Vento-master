@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:padding="20dp"
     android:layout_height="match_parent"
     android:id="@+id/layout">
 
@@ -10,9 +11,13 @@
         android:id="@+id/avatar"
         android:layout_width="150sp"
         android:layout_height="150sp"
-        android:src="@drawable/user"
+        android:src="@drawable/user_5"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#fafafa"
+        app:civ_border_overlay="true"
         android:layout_below="@+id/toolbar" />
 
     <android.support.v7.widget.CardView
@@ -21,12 +26,13 @@
         android:layout_height="wrap_content"
         android:minHeight="@dimen/card_size"
         android:padding="20dp"
+        android:layout_marginBottom="10dp"
         android:layout_below="@+id/avatar"
-        android:layout_marginTop="@dimen/margin_standard"
-        >
+        android:layout_marginTop="@dimen/margin_standard">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:orientation="horizontal">
             <ImageView
                 android:id="@+id/editUsernameLeft"
@@ -34,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginLeft="@dimen/margin_standard"
-                android:tint="@color/lightBlue"
+
                 app:srcCompat="@drawable/ic_person_24dp" />
             <TextView
                 android:id="@+id/username"
@@ -45,6 +51,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_weight="0.7"
                 android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginRight="@dimen/margin_standard"
                 />
             <ImageView
                 android:id="@+id/editUsername"
@@ -53,7 +60,9 @@
                 android:layout_gravity="center_vertical|end"
                 app:srcCompat="@drawable/ic_edit_black_24dp"
                 android:layout_marginRight="@dimen/margin_standard"
-                android:tint="@color/lightBlue"
+
+                android:visibility="gone"
+                android:tint="@color/colorAccent"
                 />
         </LinearLayout>
     </android.support.v7.widget.CardView>
@@ -63,10 +72,12 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/card_size"
         android:padding="20dp"
+        android:layout_marginBottom="10dp"
         android:layout_below="@+id/usernameCardView">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:orientation="horizontal">
             <ImageView
                 android:id="@+id/phoneLeft"
@@ -74,7 +85,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginLeft="@dimen/margin_standard"
-                android:tint="@color/lightBlue"
                 app:srcCompat="@drawable/ic_phone" />
             <TextView
                 android:id="@+id/phone"
@@ -94,7 +104,7 @@
                 app:srcCompat="@drawable/ic_edit_black_24dp"
                 android:layout_marginRight="@dimen/margin_standard"
                 android:clickable="true"
-                android:tint="@color/lightBlue"
+                android:tint="@color/colorAccent"
                 />
         </LinearLayout>
     </android.support.v7.widget.CardView>
@@ -106,6 +116,7 @@
         android:layout_below="@+id/phoneCardView"
         android:padding="20dp">
         <LinearLayout
+            android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -115,7 +126,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginLeft="@dimen/margin_standard"
-                android:tint="@color/lightBlue"
                 app:srcCompat="@drawable/ic_local_email" />
             <TextView
                 android:id="@+id/email"
@@ -124,6 +134,7 @@
                 android:text="@string/email"
                 android:gravity="center_vertical"
                 android:layout_marginLeft="@dimen/margin_standard"
+                android:layout_marginRight="@dimen/margin_standard"
                 />
         </LinearLayout>
     </android.support.v7.widget.CardView>

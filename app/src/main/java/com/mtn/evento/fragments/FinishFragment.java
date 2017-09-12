@@ -45,9 +45,8 @@ public class FinishFragment extends Fragment implements View.OnClickListener {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_finish, container, false);
         TextView username = (TextView) view.findViewById(R.id.name);
         TextView number = (TextView) view.findViewById(R.id.phone);
@@ -63,6 +62,7 @@ public class FinishFragment extends Fragment implements View.OnClickListener {
         }
 
         Button finish = (Button) view.findViewById(R.id.next);
+        finish.setText("View Ticket(s)");
         Button transactionId = (Button) view.findViewById(R.id.transactionId);
 
         transactionId.setText(( mTransactionId != null  && mTransactionId.length() > 10)? mTransactionId.substring(0,7) + "..." : mTransactionId);
