@@ -46,7 +46,7 @@ import static com.mtn.evento.data.Constants.APP_USER_PHONE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProfileFragment extends Fragment implements View.OnClickListener,Factory.InternetDataListenter {
+public class ProfileFragment extends Fragment implements View.OnClickListener,Factory.InternetDataListenter,  SwipeRefreshLayout.OnRefreshListener  {
     private final int EMAIL_EDIT_REQUEST = 120;
     private final int PHONE_EDIT_REQUEST = 121;
     private final int USERNAME_EDIT_REQUEST = 122;
@@ -90,6 +90,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,Fa
                              Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_profile, container, false);
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresher);
+        refreshLayout.setOnRefreshListener(this);
         CardView phoneCardView = (CardView) v.findViewById(R.id.phoneCardView);
         email = (TextView) v.findViewById(R.id.email);
         phone = (TextView) v.findViewById(R.id.phone);
@@ -216,6 +217,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,Fa
     @Override
     public void onInternetDisconnected() {
         hasInternet = false ;
+    }
+
+    @Override
+    public void onRefresh() {
+        if(appContext != null ){
+            appContext.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    displayUserdetails();
+                    refreshLayout.setRefreshing(false);
+                }
+            });
+        }
+        else
+        {
+            //TODO:
+            Toast.makeText(getContext(),"Could not refresh profile.",Toast.LENGTH_LONG).show();
+        }
     }
 
     public interface UserProfile{

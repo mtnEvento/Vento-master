@@ -578,6 +578,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                 Fragment fragment = mTabs.get(position);
 
                 if(fragment instanceof EventsFragment){
+                    ((EventsFragment) fragment).onRefresh();
 
                     if(itemSpinner != null ){
                         itemSpinner.setVisible(true);
@@ -604,6 +605,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
                 if(fragment instanceof ProfileFragment)
                 {
+                    ((ProfileFragment) fragment).onRefresh();
                     if(getSearchView()!= null ){
                         getSearchView().setVisibility(View.GONE);
                         SearchView.SearchAutoComplete mSearchSrcTextView = (SearchView.SearchAutoComplete) getSearchView().findViewById(android.support.v7.appcompat.R.id.search_src_text);
@@ -621,8 +623,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                        getSearchView().onActionViewCollapsed();
                    }
                }
-
-
             }
 
             @Override
@@ -651,8 +651,6 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
 
         regionRequestListeners.add(tab1) ;
        // regionRequestListeners.add(tab2)) ;
-
-
     }
     public void initTabs(){
         if (events == null) {
