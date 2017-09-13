@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -83,16 +85,29 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     IPay iPay ;
     Timer  t;
     private MaterialSpinner spinner;
+    AlertDialog.Builder builder;
+    boolean isAlertVisible;
+    int count=0 ;
+    ArrayList<String> transacIds = new ArrayList<>();
+    static CountDownTimer countDownTimer;
+
 
     public ReserveSeatFragment() {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
     }
 
 
     public interface IPay{
         void onPaymentConfirm(String transactionId,String result, List<DisplayTicket> displayTickets);
         void onPaymentDenied(String transactionId,String result);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+         builder = new AlertDialog.Builder(getContext());
     }
 
     public void setCartView(MenuItem cartView ){
@@ -334,7 +349,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     }
 
     private void confirmPayment(String amount, ArrayList<SinglePurchaseData> singlePurchaseDataArrayList) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Confirm Reservation");
         builder.setMessage("Total Price : "+ amount);
         builder.setNegativeButton("Cancel", confirmListener(null, amount));
@@ -496,7 +510,7 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                     Log.d(LOGMESSAGE, "result index2 : " + result);
                     try
                     {
-                        if(!result.contains("\"data\":null") )
+                        if( result.contains("\"data\":") && !result.contains("\"data\":null") )
                         {
                             JSONObject object = new JSONObject(result);
                             JSONObject object2 = object.getJSONObject("data");
@@ -506,10 +520,6 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
 
                             if (transactionId != null && !transactionId.isEmpty())
                             {
-                                if(t == null){
-                                    t = new Timer();
-                                }
-
                                 Runnable runnable = new Runnable() {
                                     @Override
                                     public void run() {
@@ -522,102 +532,10 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                                     Log.d(LOGMESSAGE, "Payment stopper ended");
                                     }
                                 };
-                                runOnUI(runnable,15000);
-                                TimerTask task = new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        runOnUI(
-                                            new Runnable()
-                                            {
-                                                @Override
-                                                public void run()
-                                                {
-                                                    if(loading != null)
-                                                    {
-                                                      loading.setMessage("Payment Processing started");
-                                                    }
-                                                }
-                                            }
-                                        );
+                                runOnUI(runnable,20000);
 
-
-                                        Log.d(LOGMESSAGE, "result index2 TransactionId run: " + transactionId);
-                                        HashMap<String, String> contentValue = new HashMap<>();
-                                        contentValue.put("TransactionId", transactionId);
-                                        final String url = "https://www.crust-media.com/callback/feedback.php";
-                                        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
-                                            @Override
-                                            public void getResult(String mResult) {
-                                                Log.d(LOGMESSAGE, "Result 2 feedback: " + mResult);
-                                                if (mResult == null || mResult.isEmpty()) {
-                                                    return;
-                                                }
-                                                try
-                                                {
-                                                    JSONObject object = new JSONObject(mResult);
-                                                    boolean isReady = object.getBoolean("ready");
-
-                                                    if (isReady)
-                                                    {
-                                                        hideLoading();
-                                                        if( t != null){
-                                                            t.cancel();
-                                                            t.purge();
-                                                            t = null ;
-                                                        }
-                                                        if (!object.getString("StatusCode").contentEquals("0000")){
-                                                            Log.d(LOGMESSAGE, "Result 2: transaction is successful ");
-                                                            final List<DisplayTicket> displayTickets = processPayment(singlePurchaseData);
-                                                            ((Evento)( (AppCompatActivity)getContext()).getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
-                                                            iPay.onPaymentConfirm(transactionId,""+object.getString("Description"),displayTickets);
-                                                        }
-                                                        else
-                                                        if (object.getString("StatusCode").contentEquals("0000")){
-                                                            Log.d(LOGMESSAGE, "Result 2: transaction failed -- Reason ::  "+object.getString("Description"));
-                                                            iPay.onPaymentDenied(transactionId,object.getString("Description"));
-                                                        }
-
-                                                        transactionId = "";
-                                                    }
-
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                    Log.d(LOGMESSAGE, "Result 2:Error:  " + e);
-                                                    if(t != null){
-                                                        t.cancel();
-                                                        t.purge();
-                                                        t = null ;
-                                                    }
-                                                    hideLoading();
-                                                }
-
-                                            }
-                                        }).attachServerErrorListener(new ServerConnector.ErrorCallback() {
-                                            @Override
-                                            public void getError(final String error, IOException e) {
-
-                                                if(t != null){
-                                                    t.cancel();
-                                                    t.purge();
-                                                    t = null ;
-                                                }
-                                                runOnUI(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        if (loading != null)
-                                                        {
-                                                            loading.hide();
-                                                        }
-
-                                                        showErrorOrWarningAlert("SERVER CONNECT ERROR",error);
-                                                    }
-                                                });
-                                            }
-                                        }).connectToServer();;
-                                    }
-                                };
-                                if (t != null && task != null){
-                                    t.schedule(task,1000,2000);
+                                if (countDownTimer == null ){
+                                    usingCountDownTimer(singlePurchaseData);
                                 }
                                 else
                                 {
@@ -638,7 +556,8 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                             runOnUI(new Runnable() {
                                  @Override
                                   public void run() {
-                                     showErrorOrWarningAlert("DELAY IN PROCESSING","Could not process the transaction immediately because there may be incorrect information provided. Please wait for some about 15secs and try again if there is still delay in processing.!");
+                                     showErrorOrWarningAlert("TRANSACTION PROCESSING FAILED","Server could not process this transaction. Please try again later.\n");
+                                     //DELAY IN PROCESSING","Could not process the transaction immediately because there may be incorrect information provided. Please wait for some about 15secs and try again if there is still delay in processing.!
                                  }
                             });
 
@@ -652,10 +571,8 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
             }).attachServerErrorListener(new ServerConnector.ErrorCallback() {
                 @Override
                 public void getError(final String error, IOException e) {
-                    if(t != null){
-                        t.cancel();
-                        t.purge();
-                        t = null ;
+                    if(countDownTimer != null){
+                        countDownTimer.cancel();
                     }
                     runOnUI(new Runnable() {
                         @Override
@@ -694,11 +611,11 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
         }
         finally {}
     }
-    private List<DisplayTicket> processPayment(final List<SinglePurchaseData> singlePurchaseData){
+    private List<DisplayTicket> processPayment(final List<SinglePurchaseData> singlePurchaseData, final String transId){
         //TODO  add all purchased tickets to list of DisplayTicket object
         EncodeData.getInstance();
         List<DisplayTicket> displayTickets = new ArrayList<>();
-        String transId = System.currentTimeMillis()+""+ (new Random().nextInt()) * 100000 ;
+       // String transId = System.currentTimeMillis()+""+ (new Random().nextInt()) * 100000 ;
         for (final SinglePurchaseData purchaseData: singlePurchaseData ) {
 
             int qty = Integer.parseInt(purchaseData.getQuantity());
@@ -709,8 +626,10 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 displayTicket.setTransactionId(transId);
 
                 String timestamp = "" +System.currentTimeMillis() ;
-                String secret = ( FirebaseAuth.getInstance().getCurrentUser().getUid() +timestamp ).trim();
-                String encoded =  EncodeData.encode( (FirebaseAuth.getInstance().getCurrentUser()+" "+displayTicket.getTransactionId()+ " " +secret ).trim());
+                String secret = ( ""+ FirebaseAuth.getInstance().getCurrentUser().getUid() + timestamp ).trim();
+                // Firebase UserId space transactionId space secret(FirebaseUserId + Timestamp)
+                String encoded = ( EncodeData.encode( (""+FirebaseAuth.getInstance().getCurrentUser().getUid()+" "+displayTicket.getTransactionId()+ " " +secret ).trim())).trim();
+                Log.d(LOGMESSAGE," Result Data Encoded:  "+FirebaseAuth.getInstance().getCurrentUser().getUid());
                 displayTicket.setQrCode(encoded);
                 displayTickets.add(displayTicket);
 
@@ -733,11 +652,22 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                         Log.d(LOGMESSAGE, "onDataChange: ticket is " + ticket);
                         if(ticket != null) {
                             if(purchaseData.getType().toUpperCase().equals(ticket.getName().toUpperCase())){
-                                int result = Integer.parseInt(ticket.getAvailable_seats()) - Integer.parseInt(purchaseData.getQuantity());
-                                Log.d(LOGMESSAGE, "onDataChange: result after subtraction : " + result);
-                                //TODO: subtract from total seat
-                                mDatabase.child("events").child(mEvent.getEvent_id()).child("ticket_type").child(snapshot.getKey()).child("available_seats").setValue(""+result);
 
+                                int avail_seat = Integer.parseInt(ticket.getAvailable_seats());
+                                int purchaseQty = Integer.parseInt(purchaseData.getQuantity());
+                                if(avail_seat > 0 &&  purchaseQty <= avail_seat)
+                                {
+                                    int result = Integer.parseInt(ticket.getAvailable_seats()) - Integer.parseInt(purchaseData.getQuantity());
+                                    Log.d(LOGMESSAGE, "onDataChange: result after subtraction : " + result);
+                                    //TODO: subtract from total seat
+                                    mDatabase.child("events").child(mEvent.getEvent_id()).child("ticket_type").child(snapshot.getKey()).child("available_seats").setValue(""+result);
+
+                                }
+                                else
+                                {
+                                   //TODO: No tickets for reservation.
+                                    Log.d(LOGMESSAGE, "onDataChange: No seats availble");
+                                }
                             }
                         }
                     }
@@ -759,14 +689,15 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        ;
         this.context = context ;
         loading = new ProgressDialog((AppCompatActivity)context);
                 iPay = new IPay() {
             @Override
             public void onPaymentConfirm(String transactionId,String resultMSG, final List<DisplayTicket> displayTickets) {
+                 Toast.makeText(ReserveSeatFragment.this.context,""+resultMSG,Toast.LENGTH_LONG).show();
+                 mPaymentListener.payed(transactionId,true,displayTickets);
 
-                Toast.makeText(ReserveSeatFragment.this.context,""+resultMSG,Toast.LENGTH_LONG).show();
-                mPaymentListener.payed(transactionId,true,displayTickets);
             }
 
             @Override
@@ -1026,16 +957,29 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
     }
 
     public void showErrorOrWarningAlert(String title, String msg){
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(title);
-        builder.setMessage(msg);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.show();
+
+        if(isAlertVisible){
+
+            builder.setTitle(title);
+            builder.setMessage(msg);
+            isAlertVisible = true ;
+        }
+        else
+        {
+            builder.setTitle(title);
+            builder.setMessage(msg);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                    isAlertVisible = false ;
+                }
+            });
+            builder.show();
+            isAlertVisible = true ;
+        }
+
+
     }
 
     public void hideLoading(){
@@ -1048,5 +992,101 @@ public class ReserveSeatFragment extends Fragment implements View.OnClickListene
                 }
             }
         });
+    }
+
+
+
+    public void usingCountDownTimer(final  List<SinglePurchaseData> singlePurchaseData) {
+        countDownTimer = new CountDownTimer(Long.MAX_VALUE, 5000) {
+
+            // This is called after every  sec interval.
+            public void onTick(long millisUntilFinished) {
+                jobTask(singlePurchaseData);
+            }
+
+            public void onFinish() {
+                start();
+            }
+        }.start();
+    }
+
+    public void jobTask(final  List<SinglePurchaseData> singlePurchaseData){
+
+
+        Log.d(LOGMESSAGE, "result index2 TransactionId run: " + transactionId);
+        HashMap<String, String> contentValue = new HashMap<>();
+        contentValue.put("TransactionId", transactionId);
+        final String url = "https://www.crust-media.com/callback/feedback.php";
+        ServerConnector.newInstance(url).setParameters(contentValue).attachListener(new ServerConnector.Callback() {
+            @Override
+            public void getResult(String mResult) {
+                Log.d(LOGMESSAGE, "Result 2 feedback: " + mResult);
+                if (mResult == null || mResult.isEmpty()) {
+                    return;
+                }
+                try
+                {
+                    JSONObject object = new JSONObject(mResult);
+                    boolean isReady = object.getBoolean("ready");
+
+                    if (isReady)
+                    {
+                        hideLoading();
+                        if(countDownTimer != null)
+                        {
+                            countDownTimer.cancel();
+                        }
+                        if (!object.getString("StatusCode").contentEquals("0000"))
+                        {
+                            Log.d(LOGMESSAGE, "Result 2: transaction is successful ");
+
+                            if(!transacIds.contains(transactionId)){
+                                transacIds.add(transactionId);
+                                final List<DisplayTicket> displayTickets = processPayment(singlePurchaseData,transactionId);
+                                ((Evento)( (AppCompatActivity) context).getApplication()).getDatabaseHandler().addEvent(mEvent, displayTickets);
+                                iPay.onPaymentConfirm(transactionId,""+object.getString("Description"),displayTickets);
+                            }
+                            else
+                            {
+                                Log.d(LOGMESSAGE, "Result 2: transaction already processed.\n -- Reason ::  "+object.getString("Description"));
+                            }
+                        }
+                        else
+                        if (object.getString("StatusCode").contentEquals("0000")){
+                            Log.d(LOGMESSAGE, "Result 2: transaction failed -- Reason ::  "+object.getString("Description"));
+                            iPay.onPaymentDenied(transactionId,object.getString("Description"));
+                        }
+                        transactionId = "";
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.d(LOGMESSAGE, "Result 2:Error:  " + e);
+                    if(countDownTimer != null){
+                        countDownTimer.cancel();
+                    }
+                    hideLoading();
+                }
+
+            }
+        }).attachServerErrorListener(new ServerConnector.ErrorCallback() {
+            @Override
+            public void getError(final String error, IOException e) {
+
+                if(countDownTimer != null){
+                    countDownTimer.cancel();
+                }
+                runOnUI(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (loading != null)
+                        {
+                            loading.hide();
+                        }
+
+                        showErrorOrWarningAlert("SERVER CONNECT ERROR",error);
+                    }
+                });
+            }
+        }).connectToServer();;
     }
 }

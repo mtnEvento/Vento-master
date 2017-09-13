@@ -48,8 +48,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.mtn.evento.AboutUsActivity;
 import com.mtn.evento.Evento;
 import com.mtn.evento.Factory;
+import com.mtn.evento.MobileMoneyActivity;
 import com.mtn.evento.R;
 import com.mtn.evento.adapters.CMPagerAdapter;
 import com.mtn.evento.data.Constants;
@@ -389,15 +391,49 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                 if (FirebaseAuth.getInstance().getCurrentUser() == null) {
 
                     if (isNetworkAndInternetAvailable()) {
-                        HomeScreenActivity.this.startActivityForResult(new Intent(HomeScreenActivity.this, LoginActivity.class), LOGIN_REQUEST);
+
                     } else {
                         Toast.makeText(HomeScreenActivity.this, "No internet available to perform this task", Toast.LENGTH_LONG).show();
                     }
                 }
                 return true;
+            case R.id.action_account_settings:
+                handleAccountSettings();
+                return true;
+            case R.id.nav_about_us:
+                handleAboutUs();
+                return true;
+            case R.id.nav_share_app_link:
+                handleShareAppLink();
+                return true;
+
+
         }
         return false;
     }
+
+    private void handleShareAppLink() {
+
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT,"Hello friends, check out 'MTN Evento' which happens to be an Events App that allows you to purchase/reserve tickets of your favorite events, with just some few click from anywhere and at anytime of your convenience.  MTN Event coming soon on MTN Apps store.");
+            startActivity(intent);
+    }
+
+    private void handleAboutUs() {
+        Intent aboutUsIntent = new Intent(this, AboutUsActivity.class);
+        startActivity(aboutUsIntent);
+
+    }
+
+    private void handleAccountSettings() {
+
+        Intent mobileMoneyIntent = new Intent(this, MobileMoneyActivity.class);
+        startActivity(mobileMoneyIntent);
+
+    }
+
     @Override
     public void onUserProfileChange(final String which, final String value) {
         Log.d(LOGMESSAGE, "HomeScreenActivity onUserProfileChange called");
@@ -539,9 +575,7 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
             public void onPageSelected(int position) {
 
                 selectedPage = position ;
-                //Toast.makeText(HomeScreenActivity.this,""+position,Toast.LENGTH_LONG).show();
                 Fragment fragment = mTabs.get(position);
-                Toast.makeText(HomeScreenActivity.this,""+position +"\n"+mTabs.get(position),Toast.LENGTH_LONG).show();
 
                 if(fragment instanceof EventsFragment){
 
@@ -550,13 +584,22 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                     }
                     if(spinner!= null ){ spinner.setVisibility(View.VISIBLE);}
                     ((EventsFragment) fragment).onRegionSearch("--region--");
-
                 }
-                else{
+                else
+                {
                     if(spinner!= null ){spinner.setVisibility(View.GONE);}
                     if(itemSpinner != null ){
                         itemSpinner.setVisible(false);
                     }
+                }
+
+                if(fragment instanceof ReservedFragment)
+                {
+                    ((ReservedFragment) fragment).onRefresh();
+                }
+                else
+                {
+                    //TODO: nothing here
                 }
 
                 if(fragment instanceof ProfileFragment)
@@ -578,6 +621,8 @@ public class HomeScreenActivity extends AppCompatActivity implements NavigationV
                        getSearchView().onActionViewCollapsed();
                    }
                }
+
+
             }
 
             @Override

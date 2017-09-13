@@ -1,19 +1,17 @@
 package com.mtn.evento.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 
 import com.mtn.evento.R;
 import com.mtn.evento.data.Constants;
 import com.mtn.evento.data.DisplayTicket;
-import com.mtn.evento.fragments.FinishFragment;
 import com.mtn.evento.fragments.ReserveSeatFragment;
+import com.mtn.evento.ticket_view.ViewableTicket;
 
 import java.util.List;
 
@@ -56,14 +54,20 @@ public class ReservationActivity extends AppCompatActivity implements ReserveSea
     }
 
     @Override
-    public void payed(String transactionId, boolean status, List<DisplayTicket> displayTickets) {
+    public void payed(final String transactionId, final boolean status,final List<DisplayTicket> displayTickets) {
 
-        if(status){
-            FinishFragment finishFragment = new FinishFragment();
-            finishFragment.setValues(transactionId, displayTickets);
-            getSupportFragmentManager().beginTransaction().replace(R.id.container,finishFragment).commit();
-        }
-
+       runOnUiThread(new Runnable() {
+           @Override
+           public void run() {
+               if(status){
+                   Intent i = new Intent(ReservationActivity.this,ViewReservationActivity.class);
+                   Bundle bag = new Bundle();
+                   bag.putSerializable(Constants.VIEWABLE_TICKET,new ViewableTicket(transactionId,status,displayTickets));
+                   i.putExtra(Constants.VIEW_TICKET_BUNBLE,bag);
+                   startActivity(i);
+               }
+           }
+       });
     }
 
     @Override

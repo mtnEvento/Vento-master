@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,7 +34,7 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EventsFragment extends Fragment implements HomeScreenActivity.SearchRequestListener, HomeScreenActivity.SearchRegionRequestListener, Factory.InternetDataListenter {
+public class EventsFragment extends Fragment implements HomeScreenActivity.SearchRequestListener, HomeScreenActivity.SearchRegionRequestListener, Factory.InternetDataListenter, SwipeRefreshLayout.OnRefreshListener {
 
     static EventAdapter eventAdapter;
     private static RecyclerView eventRecycler;
@@ -50,6 +51,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     ArrayList<Event> regionFiltered;
     private static  boolean isFragmentAttached = false ;
     IAttach iAttach;
+    private static SwipeRefreshLayout refreshLayout;
 
     public EventsFragment() {
         Log.d(LOGMESSAGE,"EventsFragment called") ;
@@ -84,6 +86,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_events, container, false);
+        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresher);
         eventRecycler = (RecyclerView) view.findViewById(R.id.eventRecycler);
         no_networkView = (TextView) view.findViewById(R.id.no_network);
         layoutManager = new LinearLayoutManager(appContext);
@@ -99,33 +102,33 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         initFirebase();
         if (Factory.isNetworkAndInternetAvailableNow())
         {
-             if (eventRecycler != null && no_networkView != null)
+             if (refreshLayout != null && no_networkView != null)
              {
                   if (cacheEvent != null && cacheEvent.size() > 0) {
-                        eventAdapter.setEvents(cacheEvent, false);
-                        eventRecycler.setAdapter(eventAdapter);
-                        no_networkView.setVisibility(View.GONE);
-                        eventRecycler.setVisibility(View.VISIBLE);
+                      eventAdapter.setEvents(cacheEvent, false);
+                      eventRecycler.setAdapter(eventAdapter);
+                      no_networkView.setVisibility(View.GONE);
+                      refreshLayout.setVisibility(View.VISIBLE);
                   }
                   else
                   {
-                        eventRecycler.setVisibility(View.GONE);
-                        no_networkView.setText("Loading Events...");
-                        no_networkView.setVisibility(View.VISIBLE);
+                      refreshLayout.setVisibility(View.GONE);
+                      no_networkView.setText("Loading Events...");
+                      no_networkView.setVisibility(View.VISIBLE);
                   }
              }
         }
         else
         {
-            if (eventRecycler != null && no_networkView != null && cacheEvent != null && cacheEvent.size() > 0) {
+            if ( refreshLayout!= null &&  eventRecycler != null && no_networkView != null && cacheEvent != null && cacheEvent.size() > 0) {
                 eventAdapter.setEvents(cacheEvent, false);
                 eventRecycler.setAdapter(eventAdapter);
                 no_networkView.setVisibility(View.GONE);
-                eventRecycler.setVisibility(View.VISIBLE);
+                refreshLayout.setVisibility(View.VISIBLE);
             }
             else
             {
-                eventRecycler.setVisibility(View.GONE);
+                refreshLayout.setVisibility(View.GONE);
                 no_networkView.setText(getString(R.string.no_connection));
                 no_networkView.setVisibility(View.VISIBLE);
             }
@@ -140,9 +143,9 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                     eventAdapter.setEvents(cacheEvent, false);
                     eventRecycler.setAdapter(eventAdapter);
                     no_networkView.setVisibility(View.GONE);
-                    eventRecycler.setVisibility(View.VISIBLE);
+                    refreshLayout.setVisibility(View.VISIBLE);
                 } else {
-                    eventRecycler.setVisibility(View.GONE);
+                    refreshLayout.setVisibility(View.GONE);
                     no_networkView.setText("Loading Events...");
                     no_networkView.setVisibility(View.VISIBLE);
                 }
@@ -154,10 +157,10 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                 eventAdapter.setEvents(cacheEvent, false);
                 eventRecycler.setAdapter(eventAdapter);
                 no_networkView.setVisibility(View.GONE);
-                eventRecycler.setVisibility(View.VISIBLE);
+                refreshLayout.setVisibility(View.VISIBLE);
             } else {
 
-                eventRecycler.setVisibility(View.GONE);
+                refreshLayout.setVisibility(View.GONE);
                 no_networkView.setText( getString(R.string.no_connection));
                 no_networkView.setVisibility(View.VISIBLE);
             }
@@ -204,13 +207,13 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                     {
                         eventAdapter.setEvents(filteredEvents, true);
                         eventRecycler.setAdapter(eventAdapter);
-                        eventRecycler.setVisibility(View.VISIBLE);
+                        refreshLayout.setVisibility(View.VISIBLE);
                         no_networkView.setVisibility(View.GONE);
                     }
                 }
                 else
                 {
-                    eventRecycler.setVisibility(View.GONE);
+                    refreshLayout.setVisibility(View.GONE);
                     no_networkView.setText("NO MATCH FOUND");
                     no_networkView.setTextSize(3,12);
                     no_networkView.setVisibility(View.VISIBLE);
@@ -233,7 +236,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                 if (cacheEvent != null && !cacheEvent.isEmpty() && eventAdapter != null && eventRecycler != null) {
                     eventAdapter.setEvents(cacheEvent, false);
                     eventRecycler.setAdapter(eventAdapter);
-                    eventRecycler.setVisibility(View.VISIBLE);
+                    refreshLayout.setVisibility(View.VISIBLE);
                     no_networkView.setVisibility(View.GONE);
                 }
             }
@@ -252,11 +255,11 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                         if (eventRecycler != null) {
                             eventAdapter.setEvents(filteredEvents, true);
                             eventRecycler.setAdapter(eventAdapter);
-                            eventRecycler.setVisibility(View.VISIBLE);
+                            refreshLayout.setVisibility(View.VISIBLE);
                             no_networkView.setVisibility(View.GONE);
                         }
                     } else {
-                        eventRecycler.setVisibility(View.GONE);
+                        refreshLayout.setVisibility(View.GONE);
                         no_networkView.setText("NO EVENTS AVAILABLE");
                         no_networkView.setTextSize(3,12);
                         no_networkView.setVisibility(View.VISIBLE);
@@ -287,7 +290,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
             if (cacheEvent != null && !cacheEvent.isEmpty() && eventAdapter != null && eventRecycler != null) {
                 eventAdapter.setEvents(cacheEvent, false);
                 eventRecycler.setAdapter(eventAdapter);
-                eventRecycler.setVisibility(View.VISIBLE);
+                refreshLayout.setVisibility(View.VISIBLE);
                 no_networkView.setVisibility(View.GONE);
 
             }
@@ -304,11 +307,11 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                     if (eventRecycler != null) {
                         eventAdapter.setEvents(filteredEvents, true);
                         eventRecycler.setAdapter(eventAdapter);
-                        eventRecycler.setVisibility(View.VISIBLE);
+                        refreshLayout.setVisibility(View.VISIBLE);
                         no_networkView.setVisibility(View.GONE);
                     }
                 } else {
-                    eventRecycler.setVisibility(View.GONE);
+                    refreshLayout.setVisibility(View.GONE);
                     no_networkView.setText("NO EVENTS AVAILABLE");
                     no_networkView.setTextSize(3,12);
                     no_networkView.setVisibility(View.VISIBLE);
@@ -317,6 +320,80 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
         }
     }
 
+    @Override
+    public void onRefresh() {
+        if(appContext != null ){
+            appContext.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(refreshLayout != null)
+                    {
+                        refreshLayout.post(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                eventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        Log.d(LOGMESSAGE, "onDataChange: dataSnapshot " + dataSnapshot);
+                                        if(dataSnapshot != null && dataSnapshot.getValue() != null)
+                                        {
+                                            events.clear();
+                                            for (DataSnapshot aDataSnapshot : dataSnapshot.getChildren()) {
+
+                                                Object o = aDataSnapshot.getValue();
+                                                if( o instanceof  Event){
+                                                    Event evt = aDataSnapshot.getValue(Event.class);
+                                                    events.add(evt);
+                                                }
+                                                else
+                                                {
+                                                    Log.d(LOGMESSAGE, "Object not an instanceof");
+                                                    Event evt = aDataSnapshot.getValue(Event.class);
+                                                    events.add(evt);
+                                                }
+
+                                            }
+                                            if(dataSnapshot.getChildrenCount()> 0){
+                                                cacheEvent = events;
+                                                Log.d(LOGMESSAGE, "onDataChange: cacheEvent " + cacheEvent);
+                                                EventsFragment.this.appContext.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        eventAdapter.setEvents(cacheEvent, false);
+                                                        eventRecycler.setAdapter(eventAdapter);
+                                                        no_networkView.setVisibility(View.GONE);
+                                                        refreshLayout.setVisibility(View.VISIBLE);
+                                                        Log.d(LOGMESSAGE, "onEventsDataAvailable called ");
+                                                    }
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Log.d(LOGMESSAGE, "dataSnapshot has no children");
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            Log.d(LOGMESSAGE, "dataSnapshot value is null ");
+                                        }
+
+                                        refreshLayout.setRefreshing(false);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        refreshLayout.setRefreshing(false);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
 
 
     public interface EventFilter {
@@ -356,7 +433,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                             eventAdapter.setEvents(cacheEvent, false);
                             eventRecycler.setAdapter(eventAdapter);
                             no_networkView.setVisibility(View.GONE);
-                            eventRecycler.setVisibility(View.VISIBLE);
+                            refreshLayout.setVisibility(View.VISIBLE);
                             Log.d(LOGMESSAGE, "onEventsDataAvailable called ");
                         }
                     });
@@ -393,7 +470,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                     {
                         if(isFragmentAttached)
                         {
-                            eventRecycler.setVisibility(View.GONE);
+                            refreshLayout.setVisibility(View.GONE);
                             no_networkView.setText(getString(R.string.no_connection));
                             no_networkView.setVisibility(View.VISIBLE);
                         }

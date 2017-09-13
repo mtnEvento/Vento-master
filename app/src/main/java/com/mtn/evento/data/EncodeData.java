@@ -61,7 +61,7 @@ public class EncodeData {
            }
            else
            {
-               encodingData +=  c;
+               encodingData +=  ""+c;
            }
 
         }

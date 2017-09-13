@@ -3,18 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.mtn.evento.fragments.EventsFragment">
-
-    <ScrollView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refresher"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/eventRecycler"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
-    </ScrollView>
+            android:layout_height="match_parent">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/eventRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+               />
+        </android.support.v4.widget.NestedScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
     <TextView
         android:id="@+id/no_network"
         android:layout_width="match_parent"
@@ -24,5 +27,4 @@
         android:textColor="@color/darkBlue"
         android:textSize="@dimen/standard_height"
         />
-
 </FrameLayout>

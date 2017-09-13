@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
@@ -55,6 +56,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,Fa
     private HomeScreenActivity appContext;
     private DatabaseReference mDatabase;
     private volatile boolean hasInternet= false;
+    private static SwipeRefreshLayout refreshLayout;
 
     public ProfileFragment() {   mDatabase = FirebaseDatabase.getInstance().getReference();}
 
@@ -87,6 +89,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,Fa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_profile, container, false);
+        refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresher);
         CardView phoneCardView = (CardView) v.findViewById(R.id.phoneCardView);
         email = (TextView) v.findViewById(R.id.email);
         phone = (TextView) v.findViewById(R.id.phone);

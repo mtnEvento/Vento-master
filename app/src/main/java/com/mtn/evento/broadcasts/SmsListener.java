@@ -12,17 +12,16 @@ import android.provider.Telephony;
 import android.support.v4.app.ActivityCompat;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
-import android.telephony.SmsManager;
 import android.telephony.gsm.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.mtn.evento.TelephonyInfo;
+import com.mtn.evento.utils.TelephonyInfo;
 
 import java.util.List;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.mtn.evento.TelephonyInfo.getOutput;
+import static com.mtn.evento.utils.TelephonyInfo.getOutput;
 
 
 /**

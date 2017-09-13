@@ -27,8 +27,13 @@ import com.mtn.evento.utils.Saver;
 
 import java.io.Serializable;
 
+import static com.mtn.evento.data.Constants.APP_LOGIN;
+import static com.mtn.evento.data.Constants.APP_LOGOUT;
+import static com.mtn.evento.data.Constants.LOGINED_IN;
+
 public class EventDetailActivity extends AppCompatActivity {
 
+    private static final int LOGIN_REQUEST = 83 ;
     Toolbar toolbar;
     Intent mIntent;
     Event event;
@@ -123,6 +128,8 @@ public class EventDetailActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
+                                Intent mIntent = new Intent(EventDetailActivity.this,LoginActivity.class);
+                                EventDetailActivity.this.startActivityForResult(mIntent, LOGIN_REQUEST);
                             }
                         });
                         builder.show();
@@ -234,5 +241,61 @@ public class EventDetailActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LOGIN_REQUEST && resultCode == RESULT_OK) {
+            boolean loginedIn = data.getBooleanExtra(LOGINED_IN, false);
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+//                if (Login != null && logout != null && loginedIn) {
+//                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
+//                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
+//                    Login.setVisible(false);
+//                    logout.setVisible(true);
+//                    reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
+//                }
+              //  reservedLoginLogoutListener.onLoginLogout(APP_LOGIN);
+                //TODO: check if user is logged and open either login or reservation activity
+                //Toast.makeText(this, "Reserve Seats", Toast.LENGTH_SHORT).show();
+                Intent mIntent = new Intent(this,ReservationActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(Constants.EVENT,event);
+
+                mIntent.putExtra(Constants.BUNDLE,bundle);
+                startActivity(mIntent);
+            }
+            else if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+
+//                if (Login != null && logout != null) {
+//                    nav_username.setText(data.getStringExtra(LoginActivity.USERNAME));
+//                    nav_email.setText(data.getStringExtra(LoginActivity.EMAIL));
+//                    Login.setVisible(true);
+//                    logout.setVisible(false);
+//                    reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
+//                }
+//                reservedLoginLogoutListener.onLoginLogout(APP_LOGOUT);
+                AlertDialog.Builder builder = new AlertDialog.Builder(EventDetailActivity.this);
+                builder.setTitle("STILL NOT LOGGED IN");
+                builder.setMessage("Sorry, You need to login first in order to reserve a seat! Goto the Side-Navigation and login if you are already registered.");
+                builder.setPositiveButton("SIGN-IN", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        Intent mIntent = new Intent(EventDetailActivity.this,LoginActivity.class);
+                        EventDetailActivity.this.startActivityForResult(mIntent, LOGIN_REQUEST);
+                    }
+                });
+                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
+            }
+
+        }
     }
 }

@@ -1,18 +1,13 @@
-package com.mtn.evento;
+package com.mtn.evento.utils;
 
 /**
  * Created by TheCodeLegend on 4/29/2017.
  */
 
 import android.content.Context;
-import android.telephony.SubscriptionInfo;
-import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 public final class TelephonyInfo {
 

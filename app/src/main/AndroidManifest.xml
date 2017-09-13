@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.mtn.evento">
+
+    <uses-sdk tools:overrideLibrary="com.mancj.materialsearchbar" />
+
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -9,7 +12,6 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-sdk tools:overrideLibrary="com.mancj.materialsearchbar"/>
 
     <application
         android:name=".Evento"
@@ -20,21 +22,20 @@
         android:roundIcon="@drawable/time_event"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.mtn.evento.utils.GlideConfiguration"
+            android:value="GlideModule" />
 
-        <meta-data android:name="com.mtn.evento.utils.GlideConfiguration"
-            android:value="GlideModule"/>
-
-        <activity android:name=".activities.HomeScreenActivity"
-            android:windowSoftInputMode="stateHidden"
-            >
-
-            <meta-data android:name="android.app.searchable"
+        <activity
+            android:name=".activities.HomeScreenActivity"
+            android:windowSoftInputMode="stateHidden">
+            <meta-data
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".activities.EventDetailActivity"
@@ -62,16 +63,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Payment"
-            android:theme="@style/AppTheme" />
-        <activity
             android:name=".activities.SignUpActivity"
             android:theme="@style/AppTheme" />
+
         <receiver android:name=".broadcasts.SmsListener">
             <intent-filter android:priority="1000">
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".activities.ViewReservationActivity" />
+        <activity android:name=".AboutUsActivity" />
+        <activity android:name=".MobileMoneyActivity"></activity>
     </application>
 
 </manifest>

@@ -4,17 +4,22 @@
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
     tools:context="com.mtn.evento.fragments.ReservedFragment">
-    <ScrollView
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refresher"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/reservedRecycler"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
-
-    </ScrollView>
+            android:layout_height="match_parent">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/reservedRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+        </android.support.v4.widget.NestedScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
     <TextView
         android:id="@+id/no_seats"
         android:layout_width="match_parent"

@@ -7,7 +7,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,7 +40,7 @@ import static com.mtn.evento.data.Constants.LOGMESSAGE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ReservedFragment extends Fragment implements HomeScreenActivity.LoginLogoutListener, HomeScreenActivity.SearchRequestListener {
+public class ReservedFragment extends Fragment implements HomeScreenActivity.LoginLogoutListener, HomeScreenActivity.SearchRequestListener, SwipeRefreshLayout.OnRefreshListener {
     static RecyclerView reservedRecycler;
     static RecyclerView.LayoutManager layoutManager;
     static ReservedEventsAdapter reservedEventsAdapter;
@@ -47,6 +49,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
     static private TextView errorHandler;
     static private int innerCount;
     static ArrayList<ResultSet> reservedEvents,cachedReservedEvents;
+    static SwipeRefreshLayout refreshLayout ;
     private volatile boolean isFragmentAttached, resumed; ;
 
 
@@ -71,6 +74,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_reserved, container, false);
+        refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresher);
         reservedRecycler = (RecyclerView) v.findViewById(R.id.reservedRecycler);
         errorHandler = (TextView) v.findViewById(R.id.no_seats);
         layoutManager = new LinearLayoutManager(appContext);
@@ -98,16 +102,15 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                     reservedRecycler.setAdapter(reservedEventsAdapter);
                     reservedRecycler.invalidate();
                     errorHandler.setVisibility(View.GONE);
-                    reservedRecycler.setVisibility(View.VISIBLE);
+                    refreshLayout.setVisibility(View.VISIBLE);
                 }
-
                 else
                 {
 
                     reservedRecycler.invalidate();
                     errorHandler.setText(R.string.no_seats_reservred);
                     errorHandler.setTextSize(3,12);
-                    reservedRecycler.setVisibility(View.GONE);
+                    refreshLayout.setVisibility(View.GONE);
                     errorHandler.setVisibility(View.VISIBLE);
                     Log.d(LOGMESSAGE, "ReservedFragment:2 no reserved seats :  "+ cachedReservedEvents);
                 }
@@ -120,7 +123,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                 reservedRecycler.invalidate();
                 errorHandler.setText(R.string.not_logged_in);
                 errorHandler.setTextSize(3,12);
-                reservedRecycler.setVisibility(View.GONE);
+                refreshLayout.setVisibility(View.GONE);
                 errorHandler.setVisibility(View.VISIBLE);
         }
     }
@@ -140,7 +143,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                     return true;
                 case APP_LOGOUT :
                     if(reservedEventsAdapter != null && reservedRecycler != null){
-                        reservedRecycler.setVisibility(View.GONE);
+                        refreshLayout.setVisibility(View.GONE);
                         errorHandler.setText(R.string.not_logged_in);
                         errorHandler.setTextSize(3,12);
                         errorHandler.setVisibility(View.VISIBLE);
@@ -194,10 +197,10 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                            reservedEventsAdapter.setReservedEvents(filteredResultSet,true);
                            reservedRecycler.setAdapter(reservedEventsAdapter);
                           // reservedRecycler.invalidate();
-                           reservedRecycler.setVisibility(View.VISIBLE);
+                           refreshLayout.setVisibility(View.VISIBLE);
                        }
                        else if( filteredResultSet.size() <= 0 && !query.isEmpty()){
-                           reservedRecycler.setVisibility(View.GONE);
+                           refreshLayout.setVisibility(View.GONE);
                            errorHandler.setText("No match found");
                            errorHandler.setTextSize(3, 12);
                            errorHandler.setVisibility(View.VISIBLE);
@@ -208,7 +211,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                                reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
                                reservedRecycler.setAdapter(reservedEventsAdapter);
                                reservedRecycler.invalidate();
-                               reservedRecycler.setVisibility(View.VISIBLE);
+                               refreshLayout.setVisibility(View.VISIBLE);
                            }
                        }
 
@@ -222,7 +225,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                                reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
                                reservedRecycler.setAdapter(reservedEventsAdapter);
                                reservedRecycler.invalidate();
-                               reservedRecycler.setVisibility(View.VISIBLE);
+                               refreshLayout.setVisibility(View.VISIBLE);
                            }
                        }
 
@@ -242,7 +245,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
                reservedRecycler.setAdapter(reservedEventsAdapter);
                reservedRecycler.invalidate();
-               reservedRecycler.setVisibility(View.VISIBLE);
+               refreshLayout.setVisibility(View.VISIBLE);
            }
        }
     }
@@ -255,7 +258,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                 reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
                 reservedRecycler.setAdapter(reservedEventsAdapter);
                 reservedRecycler.invalidate();
-                reservedRecycler.setVisibility(View.VISIBLE);
+                refreshLayout.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -269,5 +272,35 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
         }
         super.onPause();
 
+    }
+
+    @Override
+    public void onRefresh() {
+        if(appContext != null ){
+            appContext.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                   if(refreshLayout != null)
+                   {
+                       refreshLayout.post(new Runnable() {
+                           @Override
+                           public void run() {
+
+                               cachedReservedEvents =  ((Evento) (appContext).getApplication()).getDatabaseHandler().getAllreservedEvents();
+                               if( cachedReservedEvents != null ){
+                                   errorHandler.setVisibility(View.GONE);
+                                   reservedEventsAdapter.setReservedEvents(cachedReservedEvents,false);
+                                   reservedRecycler.setAdapter(reservedEventsAdapter);
+                                   reservedRecycler.invalidate();
+                                   refreshLayout.setVisibility(View.VISIBLE);
+                               }
+
+                               refreshLayout.setRefreshing(false);
+                           }
+                       });
+                   }
+                }
+            });
+        }
     }
 }
