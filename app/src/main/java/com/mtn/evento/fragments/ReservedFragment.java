@@ -293,6 +293,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
                                    reservedRecycler.setAdapter(reservedEventsAdapter);
                                    reservedRecycler.invalidate();
                                    refreshLayout.setVisibility(View.VISIBLE);
+                                   refreshLayout.setRefreshing(false);
                                }
 
                                refreshLayout.setRefreshing(false);

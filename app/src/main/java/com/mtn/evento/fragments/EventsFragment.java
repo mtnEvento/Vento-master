@@ -3,9 +3,13 @@ package com.mtn.evento.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mtn.evento.Factory;
 import com.mtn.evento.R;
+import com.mtn.evento.activities.EventDetailActivity;
 import com.mtn.evento.activities.HomeScreenActivity;
 import com.mtn.evento.adapters.EventAdapter;
 import com.mtn.evento.data.Database;
@@ -322,73 +327,92 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
 
     @Override
     public void onRefresh() {
-        if(appContext != null ){
+        if(appContext != null )
+        {
             appContext.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if(refreshLayout != null)
                     {
-                        refreshLayout.post(new Runnable() {
-                            @Override
-                            public void run() {
+                        if(isNetworkAndInternetAvailable())
+                        {
+                            refreshLayout.post(new Runnable() {
+                                @Override
+                                public void run() {
 
-                                eventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        Log.d(LOGMESSAGE, "onDataChange: dataSnapshot " + dataSnapshot);
-                                        if(dataSnapshot != null && dataSnapshot.getValue() != null)
-                                        {
-                                            events.clear();
-                                            for (DataSnapshot aDataSnapshot : dataSnapshot.getChildren()) {
+                                    eventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            Log.d(LOGMESSAGE, "addListenerForSingleValueEvent onDataChange: dataSnapshot " + dataSnapshot);
+                                            if(dataSnapshot != null && dataSnapshot.getValue() != null)
+                                            {
+                                                events.clear();
+                                                for (DataSnapshot aDataSnapshot : dataSnapshot.getChildren()) {
 
-                                                Object o = aDataSnapshot.getValue();
-                                                if( o instanceof  Event){
-                                                    Event evt = aDataSnapshot.getValue(Event.class);
-                                                    events.add(evt);
+                                                    Object o = aDataSnapshot.getValue();
+                                                    if( o instanceof  Event){
+                                                        Event evt = aDataSnapshot.getValue(Event.class);
+                                                        events.add(evt);
+                                                    }
+                                                    else
+                                                    {
+                                                        Log.d(LOGMESSAGE, "Object not an instanceof");
+                                                        Event evt = aDataSnapshot.getValue(Event.class);
+                                                        events.add(evt);
+                                                    }
+
+                                                }
+                                                if(dataSnapshot.getChildrenCount()> 0){
+                                                    cacheEvent = events;
+                                                    Log.d(LOGMESSAGE, "addListenerForSingleValueEvent onDataChange: cacheEvent " + cacheEvent);
+                                                    EventsFragment.this.appContext.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            eventAdapter.setEvents(cacheEvent, false);
+                                                            eventRecycler.setAdapter(eventAdapter);
+                                                            no_networkView.setVisibility(View.GONE);
+                                                            refreshLayout.setVisibility(View.VISIBLE);
+                                                            Log.d(LOGMESSAGE, "addListenerForSingleValueEvent onEventsDataAvailable called ");
+                                                        }
+                                                    });
                                                 }
                                                 else
                                                 {
-                                                    Log.d(LOGMESSAGE, "Object not an instanceof");
-                                                    Event evt = aDataSnapshot.getValue(Event.class);
-                                                    events.add(evt);
+                                                    Log.d(LOGMESSAGE, "addListenerForSingleValueEvent dataSnapshot has no children");
                                                 }
 
                                             }
-                                            if(dataSnapshot.getChildrenCount()> 0){
-                                                cacheEvent = events;
-                                                Log.d(LOGMESSAGE, "onDataChange: cacheEvent " + cacheEvent);
-                                                EventsFragment.this.appContext.runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        eventAdapter.setEvents(cacheEvent, false);
-                                                        eventRecycler.setAdapter(eventAdapter);
-                                                        no_networkView.setVisibility(View.GONE);
-                                                        refreshLayout.setVisibility(View.VISIBLE);
-                                                        Log.d(LOGMESSAGE, "onEventsDataAvailable called ");
-                                                    }
-                                                });
-                                            }
                                             else
                                             {
-                                                Log.d(LOGMESSAGE, "dataSnapshot has no children");
+                                                Log.d(LOGMESSAGE, "addListenerForSingleValueEvent dataSnapshot value is null ");
                                             }
 
-                                        }
-                                        else
-                                        {
-                                            Log.d(LOGMESSAGE, "dataSnapshot value is null ");
+                                            refreshLayout.setRefreshing(false);
                                         }
 
-                                        refreshLayout.setRefreshing(false);
-                                    }
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            refreshLayout.setRefreshing(false);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else
+                        {
+                            refreshLayout.setRefreshing(false);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(appContext);
+                            builder.setTitle("NO NETWORK AVAILABLE");
+                            builder.setMessage("Sorry, no internet connection available. Please check your network connection and try again!");
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            builder.show();
+                        }
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                        refreshLayout.setRefreshing(false);
-                                    }
-                                });
-                            }
-                        });
                     }
                 }
             });
@@ -521,6 +545,43 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
 
     public interface IAttach{
         void onAttachedcheck();
+    }
+
+    public boolean isInternetOn() {
+
+        ConnectivityManager connec =(ConnectivityManager) appContext .getSystemService(appContext.getBaseContext().CONNECTIVITY_SERVICE);
+        if (connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED) {
+
+
+            return true;
+
+        } else if (
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
+                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED)
+        {
+
+            return false;
+        }
+        return false;
+    }
+    private boolean isNetworkOn(){
+        ConnectivityManager ConnectionManager=(ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo=ConnectionManager.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected()==true )
+        {
+            return true;
+        }
+        else
+        {
+            return  false;
+        }
+    }
+    private boolean isNetworkAndInternetAvailable(){
+        return  isNetworkOn()&& isInternetOn() ;
     }
 
 }
