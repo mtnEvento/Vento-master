@@ -75,6 +75,7 @@ public class ReservedFragment extends Fragment implements HomeScreenActivity.Log
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_reserved, container, false);
         refreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.refresher);
+        refreshLayout.setOnRefreshListener(this);
         reservedRecycler = (RecyclerView) v.findViewById(R.id.reservedRecycler);
         errorHandler = (TextView) v.findViewById(R.id.no_seats);
         layoutManager = new LinearLayoutManager(appContext);

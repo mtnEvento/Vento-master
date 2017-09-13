@@ -92,6 +92,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_events, container, false);
         refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresher);
+        refreshLayout.setOnRefreshListener(this);
         eventRecycler = (RecyclerView) view.findViewById(R.id.eventRecycler);
         no_networkView = (TextView) view.findViewById(R.id.no_network);
         layoutManager = new LinearLayoutManager(appContext);
@@ -329,6 +330,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
     public void onRefresh() {
         if(appContext != null )
         {
+            Log.d(LOGMESSAGE, "appContext is not null onRefresh");
             appContext.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -336,6 +338,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                     {
                         if(isNetworkAndInternetAvailable())
                         {
+
                             refreshLayout.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -363,6 +366,7 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
 
                                                 }
                                                 if(dataSnapshot.getChildrenCount()> 0){
+                                                    refreshLayout.setRefreshing(false);
                                                     cacheEvent = events;
                                                     Log.d(LOGMESSAGE, "addListenerForSingleValueEvent onDataChange: cacheEvent " + cacheEvent);
                                                     EventsFragment.this.appContext.runOnUiThread(new Runnable() {
@@ -373,21 +377,24 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                                                             no_networkView.setVisibility(View.GONE);
                                                             refreshLayout.setVisibility(View.VISIBLE);
                                                             Log.d(LOGMESSAGE, "addListenerForSingleValueEvent onEventsDataAvailable called ");
+                                                            refreshLayout.setRefreshing(false);
                                                         }
                                                     });
                                                 }
                                                 else
                                                 {
+                                                    refreshLayout.setRefreshing(false);
                                                     Log.d(LOGMESSAGE, "addListenerForSingleValueEvent dataSnapshot has no children");
                                                 }
+
+                                                refreshLayout.setRefreshing(false);
 
                                             }
                                             else
                                             {
+                                                refreshLayout.setRefreshing(false);
                                                 Log.d(LOGMESSAGE, "addListenerForSingleValueEvent dataSnapshot value is null ");
                                             }
-
-                                            refreshLayout.setRefreshing(false);
                                         }
 
                                         @Override
@@ -416,6 +423,10 @@ public class EventsFragment extends Fragment implements HomeScreenActivity.Searc
                     }
                 }
             });
+        }
+        else
+        {
+            Log.d(LOGMESSAGE, "appContext is null onRefresh");
         }
     }
 
